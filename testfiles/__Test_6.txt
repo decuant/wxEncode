@@ -1,0 +1,361 @@
+AHU! AHU! AHU! AHU! AHU! AHU! AHU! AHU! AHU! AHU! AHU! AHU! AHU! AHU! AHU! AHU!
+    ______________________ _____           ___________ ______   ____..____
+ ===\_   .____/\_        /=\   /===========\    .____/=\ ___ \==\   ||   /=====
+ ::°:/   |  \:::/    ___/::/   \:+::::::::°/    |  \:::/  |   \:/   |:   \::°::
+ +::/    :   \:/   ___|::+/     \/\:::___:/     :   \:/   :    \    :.    \WS::
+ ::/     .    \     |°:::/      /  \°/__//      .    \     \_   \   .∙     \:+:
+ :°\_____      \_   |::°:\____ :    \::+:\_____       \____      \___      /°::
+ ========\_____/=\__|=========\_____/==========\______/====\_____/===\____/====
+                                                                   MAY 1996 
+                                                                   rel 0.96a
+
+                                 ■───────────■
+      ┌─────────────────────────══≡ TFL-TDV ≡══─────────────────────────┐
+      │                          ■───────────■                          │
+   ┌──│─────────────────────────────────────────────────────────────────│──┐
+   │  │               The FLamoots    AND    The Dark Vision            │  │
+   └──└─────────────────────────────────────────────────────────────────┘──┘
+
+                      "Rabat ta tête dans ton disque dur !"
+                          "Viande ta carte mèèèèèèère !"
+                   "Prend ta disquette à deux mains, mon gamin"
+                             "Sois Informaticien !!!"
+
+··············································································
+╒═════════════════════════════════════════════════════════════════════════════╕
+│  A) Official Members list      D) How to contact us ?         G) Greetings  │
+│  B) TFL-TDV Boards             E) Wanted                                    │
+│  C) TFL-TDV : What's that ?    F) TFL-TDV Official releases                 │ 
+╘═════════════════════════════════════════════════════════════════════════════╛
+··············································································
+
+╒═════════════════════════════════════════════════════════════════════════════╕
+│ A) Official Members list :                                                  │
+╘═════════════════════════════════════════════════════════════════════════════╛
+┌──────────┬─────────────┬─────────────────────────────┬────┬─────────────────┐
+│ Acronym  │   Function  │           Contact           │Born│    Study / Job  │
+└──────────┼─────────────┼─────────────────────────────┼────┼─────────────────┘
+Pom        │ WHQ SysOp   │roulive@student.fsa.ucl.ac.be│1975│ Computer Eng(3rd)
+Green Kawa │ SysOp/Hdware│Olivier.Gilbert@infoboard.be │1974│ Chemical Eng(3rd)
+Magic Fred │ Muzak/SndFX │llardin@ulb.ac.be(4Fred)     │1974│ Sound Engineer
+cSurfer    │ GFX/ANSI/Cod│csurfer@netropolis.be        │1975│ Mathematics (3rd)
+Zoltan     │ GFX/3DS/µzak│gdesmet@ulb.ac.be(4Zoltan)   │1971│ Works
+Morflame   │ Coder       │gdesmet@is1.ulb.ac.be        │1974│ Computer Sc (2nd)
+Karma      │ Coder       │jcardin@is1.ulb.ac.be        │1976│ Computer Sc (2nd)
+Type One   │ Coder       │llardin@is1.ulb.ac.be        │1974│ Computer Sc (4th)
+Bismarck   │ Coder       │+32-2-3746551 (ask 4 'FX')   │1975│ Computer Gr (1st)
+Fly        │ Coder       │ahuet@is1.ulb.ac.be          │1974│ Computer Sc (2nd)
+SamLePirate│ Coder       │mderie@is1.ulb.ac.be         │1973│ Computer Sc (3rd)
+───────────┴─────────────┴─────────────────────────────┴────┴──────────────────
+
+PS: Ya brenmin des gins kin'font ré dins group, séés
+    mais n'da pon d'mal à çà, tint kon peut pinter un coup !
+
+··············································································
+
+╒═════════════════════════════════════════════════════════════════════════════╕
+│B) TFL-TDV Boards :                                                          │
+╘═════════════════════════════════════════════════════════════════════════════╛
+
+ - Summary -
+
+┌───────────────────────┬────────────────────┬─────────────────┬──────────────┐
+│      Board name       │    Phone number    │      SysOp      │   Location   │
+├───────────────────────┴────────────────────┴─────────────────┴──────────────┤
+│                                 TFL-TDV HQs                                 │
+└───────────────────────┬────────────────────┬─────────────────┬──────────────┘
+TetSuo BBS              │ +32-(0)2-OFFLINE   │ Pom             │ WHQ / Belgium
+Dyspepsian Desires      │ +31-(2990)49376    │ Codex Warrior   │ Netherlands
+ACE BBS                 │ +33-1-45887548 V34 │ Gandalf         │ France
+                        │ +33-1-45888809 VIP │                 │
+                        │ +33-1-45887799 VIP │                 │
+HideOut BBS             │ +49-611-9545013    │ BaudBandit      │ Germany
+The Neutral Zone        │ +41-32-418860      │ Wave & Locutus  │ Swiss
+Reckless Life BBS       │ +351-01-7166758    │ AK              │ Portugal
+CountZero BBS           │ +47-55-122962      │ Yitzhak         │ Norway
+The Mach 5 BBS          │ +1-319-332-4822    │ Speed Racer     │ USA-Iowa
+The Programmers Archive │ +1-703-476-9015    │ Boatman Jack    │ USA-Washington
+The Vicious Circle      │ +1-503-364-5171    │ Aokey           │ USA-Oregon
+The Turrahan Relm       │ +1-604-477-0639    │ Mr Wonka        │ Canada
+Unreal BBS              │ +55-11-585-3396    │ The Avenger     │ Brazil
+Epicentre               │ +61-75-97-2218     │ Ardii/Icepick   │ Australia
+                        │ +61-75-97-????     │                 │
+The Lair                │ +27-(0)11-888-6345 │ Moof/John       │ South Africa
+┌───────────────────────┴────────────────────┴─────────────────┴──────────────┐
+│                                TFL-TDV Distros                              │
+└───────────────────────┬────────────────────┬─────────────────┬──────────────┘
+Edge of Delight         │ +32-(0)2-3755651   │ Cobra           │ Belgium
+The Velvet UnderGround  │ +32-(0)3-3851594   │ Sleeping Dog    │ Belgium
+Neo Tokyo               │ +32-50-620112      │ Tasmaniac       │ Belgium
+                        │ +32-50-625717      │                 │
+Da Bronx                │ +32-14-650001      │ Spiritual Steven│ Belgium
+Da TRiP MaCHiNE         │ +31-30-288009      │ Da XTZ          │ Netherlands
+The Underworld BBS      │ +41-22-9600621 V34 │ Synoptic        │ Swiss
+                        │ +41-22-9600622 V34+│                 │
+                        │ +41-22-9600623 ISDN│                 │
+ProtoType BBS           │ +49-6074-35292     │ BlackKnight     │ Germany
+Last Resort             │ +49-2234-801715    │ MARiO           │ Germany
+The Northern Lights BBS │ +1-(206)-259-4004  │ Odin Galgagramr │ USA-Washington
+                        │ +1-(206)-252-4164  │                 │
+Coder's Pixel           │ +1-514-624-5900    │ Cyrix           │ Canada/Quebec
+┌───────────────────────┴────────────────────┴─────────────────┴──────────────┐
+│                               InterNet FTP Sites                            │
+└────────────────────────────────────────────┬─────────────────┬──────────────┘
+hagar.arts.kuleuven.ac.be /pub/demos/tfl-tdv │ Sleeping Dog    │ Cyber-HQ 
+─────────────────────────────────────────────┴─────────────────┴──────────────-
+
+··············································································
+
+╒═════════════════════════════════════════════════════════════════════════════╕
+│ C) TFL-TDV : The FLamoots AND The Dark Vision - What's that ?               │
+╘═════════════════════════════════════════════════════════════════════════════╛
+
+           Æhu!       ///  OUR 3+1 RULES :   - Modesty  \\\      ·   ┌─┐     ·
+          Ö ┌                            - FriendShip              ┌─┘ └─┐ 
+        ┌─┼─┘                        - Derision                °   └─┐ ┌─┘
+        ┘ ∩─┐         \\\        - Dark vision          ///       ·  │ │ ·   °
+          │ └                                                     ─ R.I.P ─
+         ┌┘                                                          └─┘
+
+              There are mainly two philosophies in our crew : 
+
+First, we have The Dark Vision partisans... they are active during the night,
+and their favourite places are cemeteries...(You can recognize them by their
+black glasses and black T-shirts)
+
+Then, there are The FLamoots, partisans of self-derision... Their main rule :
+"Drink a beer as I do, and brush your teeth before going to bed :-) "
+Their favourite places are those where they can express their famous style of
+dancing.... (You can recognize them by the purple flowers on their shorts and
+their "Flamoot Inside" T-shirts, with or without cap)
+
+Fortunately, both species have common interest for coding and moving on
+
+                         ──  HardCore tekkkno !!!!! ──
+                                (except Bismarck)
+
+··············································································
+
+╒═════════════════════════════════════════════════════════════════════════════╕
+│ E) How to contact us ?                                                      │
+╘═════════════════════════════════════════════════════════════════════════════╛
+
+1) CompuServe     100346.535
+2) InterNet       llardin@is1.ulb.ac.be (until october 1996)
+                  jcardin@is1.ulb.ac.be (after october 1996)
+
+3) Snail       a) Frédéric Scalliet           b) Laurent Lardinois
+                  53 Dieweg                      271 chaussée de Saint Job 
+                  1180 Bruxelles                 1180 Bruxelles
+                  Belgium                        Belgium
+
+··············································································
+
+╒═════════════════════════════════════════════════════════════════════════════╕
+│ E) Wanted :                                                                 │
+╘═════════════════════════════════════════════════════════════════════════════╛
+
+1) We are looking for dist sites !!!!!!! contact us !!!!
+────────────────────────────────────────────────────────
+
+Specially in foreign countries or outside Brussels zone.
+
+(We accept about 3-4 boards/country - except Belgium where we still need a
+board in Wallonie)
+
+So get your chance if you have a board running 24/24 at 28800 bds, multi-nodes
+demo-scene oriented AND you have InterNet access !!! (so we can contact you via
+email to tell you when a new TFL-TDV release is out). 
+
+If you have the "ultimate privilege" to be a TFL-TDV HQ or Dist ;-), you 
+absolutely have to create a "The FLamoots AND The Dark Vision" area with all  
+our files FREE !!!!!
+
+We'll mention your board in all our next releases .....
+
+REM: - YOU have the obligation to contact us if something is wrong with your
+       board (ex. 6 months off-line, email no available.....)
+     - if you have problems to find some of our releases, we can send you some
+       disks !!!
+
+2) We are looking for more GFX men and Muzak makers !!!!!
+─────────────────────────────────────────────────────────
+
+3) We don't refuse high level coders (and nice girls, by the way :-) ) !!!!
+───────────────────────────────────────────────────────────────────────────
+
+PS: we all live in Brussels, mostly in Uccle.... so it would be better if
+    you also live there or if you're studiing at the ULB, VUB or UCL !!!!
+
+··············································································
+
+╒═════════════════════════════════════════════════════════════════════════════╕
+│ F) !!! The FLamoots AND The Dark Vision OFFICIAL releases list !!!! :       │
+╘═════════════════════════════════════════════════════════════════════════════╛
+
+PS: from 1987 to 1992, Type One was on Atari ST.... so his 68000 codes are not 
+    mentionned here ;-)
+
+··············································································
+                                     1990
+··············································································
+- glutzen.zip   52K : MOD 4 channels  BEURK !!!            / Magic Fred 
+··············································································
+                                     1991
+··············································································
+- karate.zip    73K : MOD 4 channels  BUARK !!!            / Magic Fred 
+- anitouni.zip 184K : MOD 4 channels                       / Type One 
+- at_mix.zip   243K : MOD 4 channels                       / Type One 
+- populair.zip 430K : MOD 4 channels                       / Type One 
+- direxe.zip    24K : nice util + SOURCE                   / Sam Le Pirate 
+··············································································
+                                     1992
+··············································································
+- bboys92.zip  384K : MOD 4 channels                       / Type One 
+- raster9.zip   30K : first try in Intel ASM + SOURCE      / Type One 
+- intro5.zip     9K : third try in Intel ASM + SOURCE      / Type One 
+- brosseur.zip 401K : MOD 4 channels                       / Type One 
+- autobus.zip  453K : MOD 4 channels                       / Type One 
+··············································································
+                                     1993
+··············································································
+- kukoo.zip     50K : kukoo intro for PA BBS with SOURCE   / Type One 
+- abdelmix.zip 368K : MOD 6 channels                       / Type One 
+- zoltaaan.zip 182K : MOD 4 channels                       / Zoltan 
+··············································································
+                                     1994
+··············································································
+- tfltdvka.zip 223K : Old intros package                   / Karma 
+- kukoo2.zip    62K : kukoo2 intro for P.A. BBS            / Type One 
+- kuk2src.zip  191K : kukoo2 SOURCE                        / Type One 
+- time3!.zip     7K : TSR clock + SOURCE                   / Sam Le Pirate 
+- contrast.zip  978K: CONTRAST MEGADEMO (2nd at Wired'94)  / TFL-TDV 
+- contrsrc.zip 1123K: CONTRAST's source code               / TFL-TDV 
+- lastmin.zip   56K : MOD 4 channels (Wired94)             / Magic Fred 
+- tarzan.zip    44K : Pic "Cruel law of the jungle" (W94)  / Magic Fred 
+- robot.zip     74K : Robot "Dark Vision" Pic (3rd at W94) / Youvi (ex member) 
+- flamoot.zip   14K : Flamoot VGA SetUp SOURCE             / Type One 
+- coolstuf.zip  34K : pack of some TSR progs (time37,...)  / Sam Le Pirate 
+- fmorf1.zip   331K : Girl 2 Cat Morphing                  / Fly
+- fmorf2.zip   163K : Madchen Annick 2 Michelle Pfeifer    / Fly
+- fmorf3.zip    65K : Magic Fred 2 Fred D'Hoop             / Fly
+- fmorf4.zip   259K : Manga Girl with pleasure             / Fly
+- fmorf5.zip   331K : Type One 2 Monkey                    / Fly
+··············································································
+                                     1995
+··············································································
+- fmorf6.zip   137K : TFL-TDV members morph                / Fly
+- tsr_xmpl.zip  36K : TSR maker + SOURCE                   / Sam Le Pirate 
+- !!time!!.zip   7K : TSR clock 48 bytes + SOURCE          / Sam Le Pirate 
+- happytxt.zip  12K : Happy Text v.0.96 + ASM src          / Fly 
+- analog_f.zip  33K : MOD 4 channels                       / Magic Fred 
+- martians.zip 117K : MOD 6 chan. (for Antares)            / Magic Fred  
+- cirboost.zip  88K : Cirrus 542x booster + SOURCE         / Type One  
+- chouette.zip  22K : MOD 6 chan. (composed live at X95)   / Magic Fred 
+- mod15ins.zip  19K : converter for old 15 instr. modules  / Magic Fred 
+- westerng.zip 258K : XM - multichannel for SIH'95         / Magic Fred  
+- surndtst.zip  46K : MOD for surround test                / Magic Fred 
+- df101.zip      1K : DiskFree 1.01 + ASM source           / Fly
+- flyre14.zip    6K : Classical Fire PAS source            / Fly    
+- fire.zip       5K : Classical Fire ASM source            / Fly
+- omfcht12.zip   7K : Cheater for OMF 2097                 / Fly
+- xit_v115.zip   9K : File Encryptor v.1.15/easy to crack  / Fly
+- ttk3ddo.zip   15K : 3D programming doc                   / Karma
+- t9440fix.zip  12K : Trident 9440AGi fix for UniVBE 5.1a  / Type One
+- tfltdvfx.zip 168K : kukoo2+Contrast fixed for Trid9440   / Type One
+- hurtless.zip 2meg : HURTLESS MEGADEMO (9th at Wired'95)  / TFL-TDV
+- mf-hurt2.zip 371K : XM - Second tune from HURTLESS       / Magic Fred
+- mf-hurt3.zip 199K : XM - Third tune from HURTLESS        / Magic Fred
+- mf-cretl.zip 180K : XM - Multichannel for The Party V    / Magic Fred
+- hurtprob.zip   8K : HURTLESS Stupid bug fix              / Type One
+··············································································
+                                     1996
+··············································································
+- mf-hurt1.zip 457K : XM - First tune from HURTLESS        / Magic Fred
+- mf-uha.zip   237K : MOD 8 channels - for Wired95 diskmag / Magic Fred
+- mod15v12.zip  38K : new ver of "mod15ins" + sources in C / Magic Fred
+- t1-nbuf.zip   15K : N-Buffering programming DOC          / Type One
+- t1-svga1.zip  17K : (S)VGA Tricks Part I                 / Type One
+··············································································
+
+You can find these files on cool FTP sites like :
+
+- ftp.cdrom.com             /pub/demos
+  ftp.luth.se         
+  ftp.uni-erlangen.de
+
+- ftp.arosnet.se            /pub/demos
+
+- ftp.uwp.edu               /pub/msdos/demos
+
+- hagar.arts.kuleuven.ac.be /pub/demos/tfl-tdv
+
+- x2ftp.oulu.fi             /pub/msdos/programming
+  ftp.infomagic.com
+
+and on our Dist/HQ sites !!!!!!
+
+··············································································
+
+╒═════════════════════════════════════════════════════════════════════════════╕
+│ G) GREETINGS                                                                │
+╘═════════════════════════════════════════════════════════════════════════════╛
+
+Private greetz to the following people:
+
+Magic Domi, Julia la pirate, Aldo The Sayie, Thierry, Mr Gun, Isa, Rod, Gopi,
+Candice, Nat, Bertrand, Neuman, Benoit, Yvan des frites, Abdel, Greg, Willy,
+Lolo, Lionel, Recu, Glu, Christian H., B.Socias, R.Cambrelin, JP.Floris,
+Cristina, D.Auquier... et tous les autres supporters que j'ai 
+malencontreusement oublie de mettre ... snif !!!
+
+
+Greetz to the following guyz (or girls ;-) in the scene: 
+
+Darkness, Wizard, PL, Sam & BenJ (Imphobia), Nic, Lem, Mesh & Sinew Shy (TRB),
+Nemrod & Nikopol (Channel 38), Emperor, Sleeping Dog & Purple Zebra (Natives),
+Access, Katana, White Tiger & Cobra (Antares), Hurricane, Big Bear, Cedric,
+Boris & Christophe (NameLess), Dush & Daneel (React), Seyda & Wonderboy (Realm),
+Unix & JMZ (Chryseis), Moebius & Spinal (Subnormals), Walken (Impact Studios),
+Barti, Karl & Ra (NoooN), Hoplite, Dune & Zeb (Orange), Execom & Toalnkor
+(Realtech), Fëanor, Elliot & Fub (Epsilon), LightShow (Eclipse), Ice (Pulse),
+Zeugma (Melting Pot), Scout (Success), Lizardking (Triton), Sandman & Big Jim
+(Valhalla), Wally, Evelred & Bladerunner (TLOTB), DEM (Zoran), Cider (N-Factor),
+Dark Avenger & White Shadow (DDD), Leinad (Avalanche), White Snake & Torlock
+(????)
+
+
+and all others we met at Wired 94, X95, SIH95, ASM95, Wired 95, TP5, Mekka 96, 
+Saturne 96 !!!
+
+Greetz to all guyz who support us !!!!!!!!! specially our sysops !!!!
+
+···············································································
+
+
+
+                                - The END -
+
+
+    ______________________ _____           ___________ ______   ____..____
+ ===\_   .____/\_        /=\   /===========\    .____/=\ ___ \==\   ||   /=====
+ ::°:/   |  \:::/    ___/::/   \:+::::::::°/    |  \:::/  |   \:/   |:   \::°::
+ +::/    :   \:/   ___|::+/     \/\:::___:/     :   \:/   :    \    :.    \WS::
+ ::/     .    \     |°:::/      /  \°/__//      .    \     \_   \   .∙     \:+:
+ :°\_____      \_   |::°:\____ :    \::+:\_____       \____      \___      /°::
+ ========\_____/=\__|=========\_____/==========\______/====\_____/===\____/====
+
+       !!!! Be lame is great, coz lamers live longer than the ELITEs !!!! 
+
+     -=  Ze true spirit of Ze (true) Scene (en orange vif sur fond kaki) =-
+
+                         -= The true soul à chicon =-
+
+
+AHU! AHU! AHU! AHU! AHU! AHU! AHU! AHU! AHU! AHU! AHU! AHU! AHU! AHU! AHU! AHU!
+
+
+
+
+
+
