@@ -131,7 +131,7 @@ local function DrawFile(inDrawDC)
 	-- defaults to decimal
 	--
 	for tag, sText in pairs(tFormat) do
-		if _find(thisApp.tConfig.Format, tag) then fmtStr = sText break end
+		if _find(thisApp.tConfig.Format, tag, 1, true) then fmtStr = sText break end
 	end
 
 	-- foreground
@@ -270,7 +270,7 @@ local function DrawFile(inDrawDC)
 	local iCntPrev = 0
 	local iCntNew	= 0
 	local iStart 	= 1
-	local iEnd	 	= sSource:find("\n", iStart)
+	local iEnd	 	= sSource:find("\n", iStart, true)
 	
 	while iEnd do
 		
@@ -313,7 +313,7 @@ local function DrawFile(inDrawDC)
 		iNumLines = iNumLines + 1
 		
 		iStart = iEnd + 1
-		iEnd	 = sSource:find("\n", iStart)
+		iEnd	 = sSource:find("\n", iStart, true)
 	end
 	
 	-- get the number of rows * font height and
@@ -346,7 +346,7 @@ local function DrawFile(inDrawDC)
 	iCurY = iOffY
 	
 	iStart 	= 1
-	iEnd	 	= sSource:find("\n", iStart)
+	iEnd	 	= sSource:find("\n", iStart, true)
 		
 	while iEnd do
 	
@@ -376,7 +376,7 @@ local function DrawFile(inDrawDC)
 		iCurLine = iCurLine + 1
 
 		iStart = iEnd + 1
-		iEnd	 = sSource:find("\n", iStart)
+		iEnd	 = sSource:find("\n", iStart, true)
 	end
 	
 	-- underline the corresponding letter for the cursor
@@ -623,11 +623,11 @@ local function OnReadFile(event)
 	m_MainFrame.iTextFirstRow	= 0
 	m_MainFrame.iTextRowCount	= 0
 	
-	local iBytes = thisApp.LoadFile()
+	local iBytes, sText = thisApp.LoadFile()
 	if 0 == iBytes then m_MainFrame.iCursor = 0 end
 		
 	SetStatusText("" .. m_MainFrame.iCursor, 3)
-	SetStatusText("" .. iBytes .. " bytes read", 2)
+	SetStatusText(sText, 2)
 	
 	Refresh()
 end
@@ -663,13 +663,6 @@ local function OnCreateFile(event)
 end
 
 -- ----------------------------------------------------------------------------
--- handle the mouse left button click
---
-local function OnLeftBtnDown(event)
-
-end
-
--- ----------------------------------------------------------------------------
 -- align view of file based on the current cursor position
 --
 local function AlignBytesToCursor(inNewValue)
@@ -694,9 +687,53 @@ local function AlignBytesToCursor(inNewValue)
 end
 
 -- ----------------------------------------------------------------------------
+-- handle the mouse left button click
+--
+local function OnLeftBtnDown(event)
+	if 0 >= thisApp.iMemorySize then return end
+	
+--	trace.line("OnLeftBtnDown")
+
+end
+
+-- ----------------------------------------------------------------------------
+-- handle the mouse left button click
+--
+local function OnLeftBtnUp(event)
+	if 0 >= thisApp.iMemorySize then return end
+
+--	trace.line("OnLeftBtnUp")
+
+end
+
+-- ----------------------------------------------------------------------------
+-- handle the mouse wheel
+--
+local function OnMouseWheel(event)
+	if 0 >= thisApp.iMemorySize then return end
+	
+--	trace.line("OnMouseWheel")
+	
+	local iCurrent	= m_MainFrame.iCursor
+	local iNumCols	= thisApp.tConfig.Columns
+	local iLines	= event:GetLinesPerAction()
+	local iScroll	= iNumCols * iLines
+
+	-- works reversed
+	--
+	if 0 < event:GetWheelRotation() then iScroll = -1 * iScroll end
+	
+	AlignBytesToCursor(iCurrent + iScroll)
+	
+	Refresh()
+end
+
+-- ----------------------------------------------------------------------------
 --
 local function OnKeyDown(event)
 	if 0 >= thisApp.iMemorySize then return end
+	
+--	trace.line("OnKeyDown")	
 	
 	local iCursor	= m_MainFrame.iCursor
 	local iNumCols	= thisApp.tConfig.Columns
@@ -733,9 +770,8 @@ local function OnKeyDown(event)
 	end
 	
 	AlignBytesToCursor(iCursor)
-	
+
 	Refresh()
-	
 end
 
 -- ----------------------------------------------------------------------------
@@ -760,7 +796,6 @@ local function OnSize(event)
 
 	local size = event:GetSize()
 
---	local rcClient = m_MainFrame.hWindow:GetSize()
 	m_MainFrame.rcClientW = size:GetWidth()
 	m_MainFrame.rcClientH = size:GetHeight() - 80	-- subtract the status bar height
 
@@ -801,7 +836,7 @@ end
 -- create the main window
 --
 local function CreateMainWindow()
-	  
+
 	-- read deafult positions for the dialogs
 	--
 	ReadSettings()
@@ -829,6 +864,8 @@ local function CreateMainWindow()
 	mnuFile:Append(rcMnuEnc_UTF_8,	"Encode UTF_8",			"Overwrite file with new encoding")
 	mnuFile:Append(wx.wxID_EXIT,		"E&xit\tAlt-X",			"Quit the program")
 
+	-- create the COMMANDS menu
+	--
 	local mnuCmds = wx.wxMenu("", wx.wxMENU_TEAROFF)
 	mnuCmds:Append(rcMnuCheckFmt,		"Check Format\tCtrl-F",	"Check bytes in current file")
 	mnuCmds:Append(rcMnuTestFile,		"Create File\tCtrl-T",	"Create a binary test file")
@@ -857,12 +894,14 @@ local function CreateMainWindow()
 
 	-- standard event handlers
 	--
-	frame:Connect(wx.wxEVT_PAINT,        OnPaint)
-	frame:Connect(wx.wxEVT_TIMER,        OnTimer)
-	frame:Connect(wx.wxEVT_SIZE,         OnSize)
-	frame:Connect(wx.wxEVT_KEY_DOWN,     OnKeyDown)
-	frame:Connect(wx.wxEVT_LEFT_UP,      OnLeftBtnDown)  	
-	frame:Connect(wx.wxEVT_CLOSE_WINDOW, OnClose)
+	frame:Connect(wx.wxEVT_PAINT,			OnPaint)
+	frame:Connect(wx.wxEVT_TIMER,			OnTimer)
+	frame:Connect(wx.wxEVT_SIZE,			OnSize)
+	frame:Connect(wx.wxEVT_KEY_DOWN,		OnKeyDown)
+	frame:Connect(wx.wxEVT_LEFT_UP,		OnLeftBtnUp)
+	frame:Connect(wx.wxEVT_LEFT_DOWN,	OnLeftBtnDown)
+	frame:Connect(wx.wxEVT_MOUSEWHEEL,	OnMouseWheel)	
+	frame:Connect(wx.wxEVT_CLOSE_WINDOW,OnClose)
       
 	-- menu event handlers
 	--
@@ -877,7 +916,6 @@ local function CreateMainWindow()
   
 	-- set up the frame
 	--
-
 	frame:SetMinSize(wx.wxSize(600, 250))  
 	frame:SetStatusBarPane(1)                   -- this is reserved for the menu
 	
