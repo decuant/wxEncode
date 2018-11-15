@@ -20,14 +20,14 @@ local function CountLines()
 	local iLimit	= thisApp.iMemorySize
 	local sSource	= thisApp.sFileMemory
 	local iRows		= 0 
-	local iEnd	 	= sSource:find("\n", 1)
+	local iEnd	 	= sSource:find("\n", 1, true)
 	
 	-- total rows
 	--
 	while iEnd do
 		
 		iRows = iRows + 1
-		iEnd	= sSource:find("\n", iEnd + 1)		
+		iEnd	= sSource:find("\n", iEnd + 1, true)
 	end
 	
 	-- update
@@ -40,7 +40,6 @@ end
 -- ----------------------------------------------------------------------------
 --
 local function OnLoadFile()
-	if not thisApp.tConfig then return 0 end
 	
 	-- reset content
 	--
@@ -49,7 +48,7 @@ local function OnLoadFile()
 	thisApp.iNumOfRows	= 0
 	
 	thisApp.tConfig = dofile(thisApp.sConfigIni)
-	if not thisApp.tConfig then return 0 end
+	if not thisApp.tConfig then return 0, "Configuration file not provided" end
 	
 	-- get names from configuration file
 	--
@@ -61,22 +60,24 @@ local function OnLoadFile()
 	local  fhSrc = io.open(sSourceFile, sOpenMode)
 	if not fhSrc then 
 		
-		trace.line("Unable to open [" .. sSourceFile .. "]")
-		return 0 
+		local sText = "Unable to open [" .. sSourceFile .. "]"
+		trace.line(sText)
+		return 0, sText
 	end
 	
 	thisApp.sFileMemory = fhSrc:read("*a")	
-	thisApp.iMemorySize = thisApp.sFileMemory:len()
+	thisApp.iMemorySize = rawlen(thisApp.sFileMemory)
 	fhSrc:close()
-	
-	local sText = _format("Read [file: %s] [mode: %s] [bytes: %d]", sSourceFile, sOpenMode, thisApp.iMemorySize)
-	trace.line(sText)
 	
 	-- do a scan of text
 	--
 	CountLines()
+	
+	local sText = _format("Read [file: %s] [mode: %s] [lines: %d] [bytes: %d]", 
+								 sSourceFile, sOpenMode, thisApp.iNumOfRows, thisApp.iMemorySize)
+	trace.line(sText)
 
-	return thisApp.iMemorySize
+	return thisApp.iMemorySize, sText
 end
 
 -- ----------------------------------------------------------------------------
@@ -190,7 +191,7 @@ local function OnCheckEncoding()
 	local sCurLine
 	local iLimit
 	local iStart 	= 1
-	local iEnd	 	= sSource:find("\n", iStart)
+	local iEnd	 	= sSource:find("\n", iStart, true)
 	local iLineNo	= 0
 	local iCheckLow = 1
 	local iNumUTF_8 = 0
@@ -287,7 +288,7 @@ local function OnCheckEncoding()
 		iLineNo		= iLineNo + 1
 		
 		iStart = iEnd + 1
-		iEnd	 = sSource:find("\n", iStart)
+		iEnd	 = sSource:find("\n", iStart, true)
 	end
 	
 	local sHits = _format("Check results ASCII: %4d UTF_8: %4d", tFileFmt[1], tFileFmt[2])
