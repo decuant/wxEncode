@@ -4,20 +4,17 @@
 --
 -- ----------------------------------------------------------------------------
 
--- ----------------------------------------------------------------------------
---
-module(..., package.seeall)
-
 local Trace = Trace or {}
-local _wrt  = io.write
-local _flush=io.flush
-local _fmt	= string.format
-local _cat	= table.concat
-local _clk	= os.clock
+
+local _write	= io.write
+local _flush	= io.flush
+local _format	= string.format
+local _concat	= table.concat
+local _clock	= os.clock
 
 local mLineCounter	= 0
-local mTickStart		= _clk()
-local mTickTimed		= _clk()
+local mTickStart	= _clock()
+local mTickTimed	= _clock()
 
 -- ----------------------------------------------------------------------------
 --
@@ -26,8 +23,8 @@ function Trace.msg(inMessage)
 	
 	mLineCounter = mLineCounter + 1
 	
-	_wrt(_fmt("%05d: ", mLineCounter))
-	_wrt(inMessage)
+	_write(_format("%05d: ", mLineCounter))
+	_write(inMessage)
 end
 
 -- ----------------------------------------------------------------------------
@@ -35,7 +32,7 @@ end
 function Trace.append(inMessage)
 	if not inMessage then return end
 	
-	_wrt(inMessage)
+	_write(inMessage)
 end
 
 -- ----------------------------------------------------------------------------
@@ -45,10 +42,10 @@ function Trace.numArray(inTable, inLabel)
 	local tStrings = {inLabel or ""}
 
 	for iIndex, number in ipairs(inTable) do
-		tStrings[iIndex + 1] = _fmt("%.04f", number)
+		tStrings[iIndex + 1] = _format("%.04f", number)
 	end
 
-	Trace.line(_cat(tStrings, " ")) 	
+	Trace.line(_concat(tStrings, " ")) 	
 end
 
 -- ----------------------------------------------------------------------------
@@ -57,7 +54,7 @@ function Trace.line(inMessage)
 	if not inMessage then return end
 		
 	Trace.msg(inMessage)
-	_wrt("\n")
+	_write("\n")
 	_flush()	
 end
 
@@ -66,19 +63,18 @@ end
 function Trace.lnTimeStart(inMessage)
 	if inMessage then Trace.line(inMessage) end
 	
-	mTickStart = _clk()
+	mTickStart = _clock()
 end
 
 -- ----------------------------------------------------------------------------
 --
 function Trace.lnTimeEnd(inMessage)
 	
-	mTickTimed = _clk()
+	mTickTimed = _clock()
 
 	inMessage = inMessage or "Stopwatch at"
-	local sText = _fmt("%s - %.03f secs\n", inMessage, (mTickTimed - mTickStart))
-	Trace.msg(sText)
-	_flush()
+
+	Trace.line(_format("%s (%.04f s.)", inMessage, (mTickTimed - mTickStart)))
 	
 	mTickStart = mTickTimed
 end
@@ -88,21 +84,23 @@ end
 --
 function Trace.dump(_title, buf)
   
-  local blockText = "---- [" .. _title .. "] ----\n"  
-  _wrt(blockText)
+	local blockText = "---- [" .. _title .. "] ----\n"  
+	_write(blockText)
 
-  for byte=1, #buf, 16 do
-     local chunk = buf:sub(byte, byte + 15)
+	for iIndex=1, #buf, 16 do
+		
+		local chunk = buf:sub(iIndex, iIndex + 15)
 
-     _wrt(string.format('%08X  ', byte - 1))
+		_write(_format('%08X  ', iIndex - 1))
 
-     chunk:gsub('.', function (c) io.write(string.format('%02X ', string.byte(c))) end)
-     _wrt(string.rep(' ', 3 * (16 - #chunk)))
-     _wrt(' ', chunk:gsub('%c','.'), "\n") 
-  end
+		chunk:gsub('.', function (c) _write(_format('%02X ', string.byte(c))) end)
+		_write(string.rep(' ', 3 * (16 - #chunk)))
+		_write(' ', chunk:gsub('%c','.'), "\n") 
+	end
 
-  _wrt(blockText)
-  io.flush()  
+	_write(blockText)
+	_flush()  
+	
 end
 
 -- ----------------------------------------------------------------------------
