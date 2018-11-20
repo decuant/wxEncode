@@ -4,11 +4,10 @@
 --
 -- ----------------------------------------------------------------------------
 
--- ----------------------------------------------------------------------------
---
-module(..., package.seeall)
-
 local Utility = Utility or {}
+
+local _insert	= table.insert
+local _concat	= table.concat
 
 -- ----------------------------------------------------------------------------
 -- remove leading whitespace from string.
@@ -45,12 +44,10 @@ end
 --
 function Utility.capitalize(inString)
 	
-	local index, sPre, sPost
-	
-	index = inString:find("^%s")
-	
+--	local iIndex  = inString:find("^%s")	
 	local chStart = inString:sub(1)
-	chStart = chStart:upper()
+	
+	chStart  = chStart:upper()
 	inString = inString:lower():sub(1)
 	
 	chStart = chStart .. inString
@@ -86,7 +83,7 @@ end
 --
 function Utility.fmtfind(inString)
 	
-	local sOutString = ""
+	local tOutString = { }
 	local chCurrent
 	
 	for i=1, #inString do
@@ -103,11 +100,10 @@ function Utility.fmtfind(inString)
 		
 		end
 	
-		sOutString = sOutString .. chCurrent
-	
+		_insert(tOutString, chCurrent)	
 	end
 
-	return sOutString	
+	return _concat(tOutString, nil)	
 end
 
 -- ----------------------------------------------------------------------------
@@ -249,7 +245,7 @@ end
 function protect(tbl)
   return setmetatable({}, {
     __index = tbl,
-    __newindex = function(t, key, value)
+    __newindex = function(_, key, value)
         error("attempting to change constant " ..
                tostring(key) .. " to " .. tostring(value), 2)
     end
