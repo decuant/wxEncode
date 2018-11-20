@@ -4,41 +4,63 @@
 --
 -- ----------------------------------------------------------------------------
 
-local wx 		= require "wx"				-- uses wxWidgets for Lua 5.1
-local trace 	= require "trace"			-- shortcut for tracing
+local wx 		= require "wx"			-- uses wxWidgets for Lua 5.1
+--local trace 	= require "trace"		-- shortcut for tracing
 local palette	= require "palette"		-- common colors definition in wxWidgets
-local bits  	= require "bits"			-- bit manipulators
+local bits  	= require "bits"		-- bit manipulators
 
 local _floor	= math.floor
-local _fmt		= string.format
+local _format	= string.format
 local _find		= string.find
 local _insert	= table.insert
 local _concat	= table.concat
+
+-- ----------------------------------------------------------------------------
+-- status bar panes width
+--
+local tStbarWidths =
+{
+	150, 			-- application
+	750, 			-- message
+	75,				-- file check format
+	75,				-- current line
+	100,			-- cursor position
+}
+
+-- ----------------------------------------------------------------------------
+--
+local tFormat =
+{
+	["Oct"] = {"%04o ", 5},
+	["Dec"] = {"%03d ", 4},
+	["Hex"] = {"%02x ", 3},
+}
 
 -- ----------------------------------------------------------------------------
 -- window's bag
 --
 local m_MainFrame = 
 {
-	hWindow		= nil,	-- main frame
-	hMemoryDC	= nil,	-- device context for the window
-	hTickTimer	= nil,	-- handle to the timer object
-	hStatusBar	= nil,	-- the status bar
-	hFontBytes	= nil,	-- the font for the bytes (left) pane
-	hFontText	= nil,	-- the font for the text (right) pane
+	hWindow		= nil,		-- main frame
+	hMemoryDC	= nil,		-- device context for the window
+	hTickTimer	= nil,		-- handle to the timer object
+	hStatusBar	= nil,		-- the status bar
+	hFontBytes	= nil,		-- the font for the bytes (left) pane
+	hFontText	= nil,		-- the font for the text (right) pane
 	
-	rcClientW	= 0,		-- client rect width
-	rcClientH	= 0,		-- client rect height
+	rcClientW		= 0,	-- client rect width
+	rcClientH		= 0,	-- client rect height
 
-	iTmInterval	= 3000,	-- diplay msg on status bar for much time
+	iTmInterval		= 3000,	-- diplay msg on status bar for much time
 	
-	iCursor		= 0,		-- where the cursor is
-
-	iByteRowCount	= 0,		-- number of visibles rows
-	iByteFirstRow	= 0,		-- first row visible, left rect
+	iCursor			= 0,	-- where the cursor is
+	tFormatBytes	= nil,	-- format string for the bytes display
+	iByteRowCount	= 0,	-- number of visibles rows
+	iByteFirstRow	= 0,	-- first row visible, left rect
 	
-	iTextRowCount	= 0,		-- number of visible rows
-	iTextFirstRow	= 0,		-- first row visible, right rect
+	iTextRowCount	= 0,	-- number of visible rows
+	iTextFirstRow	= 0,	-- first row visible, right rect
+	iStopLine		= -1,	-- line where the cursor is in
 }
 
 -- ----------------------------------------------------------------------------
@@ -60,18 +82,10 @@ dwMainFlags       = bits.bitoper(dwMainFlags,     wx.wxSYSTEM_MENU,         bits
 dwMainFlags       = bits.bitoper(dwMainFlags,     wx.wxCLOSE_BOX,           bits.OR)
 
 -- ----------------------------------------------------------------------------
---
-local tFormat =
-{
-	["Oct"] = {"%04o ", 5},
-	["Dec"] = {"%03d ", 4},
-	["Hex"] = {"%02x ", 3},
-}
-
--- ----------------------------------------------------------------------------
 -- draw a vertical bar of size of 1 page
 --
 local function DrawVerticalBar(inDrawDC)
+	
 	if not inDrawDC then return end
 	if 0 >= thisApp.iMemorySize then return end
 
@@ -86,19 +100,11 @@ local function DrawVerticalBar(inDrawDC)
 	local iCurPage	= (m_MainFrame.iTextFirstRow / m_MainFrame.iTextRowCount)
 	local iPages	= (thisApp.iNumOfRows / m_MainFrame.iTextRowCount)
 	local iPageLen	= (iHeight / iPages)
-	local iPosY		= 0
-		
-	if 0 < m_MainFrame.iTextFirstRow then
-		iPosY = (iPageLen * iCurPage)
-	end
-		
-	-- pretty align with some offset
-	--
-	iPosY = iPosY + iOffY
-	
+	local iPosY		= (iPageLen * iCurPage) + iOffY
+			
 	-- just fix it when too small
 	--
-	if 10 > iPageLen then iPageLen = 10 end
+	if 10 > iPageLen then iPageLen = 20 end
 	
 	inDrawDC:SetPen(wx.wxPen(palette.Gray15, 2, wx.wxSOLID))
 	inDrawDC:SetBrush(wx.wxBrush(palette.Moccasin, wx.wxFDIAGONAL_HATCH))
@@ -106,8 +112,46 @@ local function DrawVerticalBar(inDrawDC)
 end
 
 -- ----------------------------------------------------------------------------
+-- draw highlight for each even column
+--
+local function DrawColumns(inDrawDC)
+	
+	if not inDrawDC then return end
+	if 0 >= thisApp.iMemorySize then return end
+	
+	local iOffX 	= 20
+	local iOffY 	= 10
+	local iCurX		= iOffX
+	local iHeight	= m_MainFrame.rcClientH - iOffY * 2
+	local iWidth	= m_MainFrame.rcClientW - iOffX
+	
+	-- get the correct spacing here
+	--
+	inDrawDC:SetFont(m_MainFrame.hFontBytes)   
+ 	
+	local sTest		= _format(m_MainFrame.tFormatBytes[1], 0)
+	local iSpacerX	= inDrawDC:GetTextExtent(sTest)
+	
+	inDrawDC:SetPen(wx.wxPen(palette.PaleGoldenrod, 2, wx.wxTRANSPARENT))
+	inDrawDC:SetBrush(wx.wxBrush(palette.Snow2, wx.wxSOLID))
+
+	-- center the highlight on the number of chars written (hex/dec/oct)
+	--
+	iCurX = iCurX - (iSpacerX / (m_MainFrame.tFormatBytes[2] * 2)) + iSpacerX
+	
+	while iWidth > iCurX do
+		
+		inDrawDC:DrawRectangle(iCurX, iOffY, iSpacerX, iHeight)
+		
+		iCurX = iCurX + iSpacerX * 2
+	end
+	
+end
+
+-- ----------------------------------------------------------------------------
 --
 local function DrawFile(inDrawDC)
+	
 	if not inDrawDC then return end
 	if 0 == thisApp.iMemorySize then return end
 	
@@ -125,14 +169,7 @@ local function DrawFile(inDrawDC)
 	local iOffY 	= 10
 	local iCurX 	= iOffX
 	local iCurY 	= iOffY
-	local fmtStr 	= tFormat.Dec							
-	
-	-- format string to use (oct/dec/hex)
-	-- defaults to decimal
-	--
-	for tag, sText in pairs(tFormat) do
-		if _find(thisApp.tConfig.Format, tag, 1, true) then fmtStr = sText break end
-	end
+	local tFmtBytes	= m_MainFrame.tFormatBytes			-- format table to use (hex/dec/oct)
 
 	-- foreground
 	--
@@ -147,8 +184,12 @@ local function DrawFile(inDrawDC)
 	-- decide here the background color
 	--
 	inDrawDC:SetPen(wx.wxPen(palette.Gray30, 3, wx.wxSOLID))
-	inDrawDC:SetBrush(wx.wxBrush(palette.Ivory, wx.wxSOLID))
+	inDrawDC:SetBrush(wx.wxBrush(palette.LightYellow, wx.wxSOLID))
 	inDrawDC:DrawRectangle(0, 0, m_MainFrame.rcClientW, m_MainFrame.rcClientH)
+	
+	-- draw the colums' on/off color
+	--
+	DrawColumns(inDrawDC)
 	
 	------------------------
 	-- print all chars
@@ -171,7 +212,7 @@ local function DrawFile(inDrawDC)
 			-- append bytes
 			--
 			ch = sSource:byte(iIndex)
-			sToDraw = _fmt(fmtStr[1], ch)
+			sToDraw = _format(tFmtBytes[1], ch)
 
 			_insert(tChars, sToDraw)
 
@@ -179,9 +220,9 @@ local function DrawFile(inDrawDC)
 			--
 			if (0x20 > ch) or (0x7f < ch) or (iIndex == iCursor) then
 				
-				local xPos = iCurX + ((i - 1) * iSpacerX * fmtStr[2])
+				local xPos = iCurX + ((i - 1) * iSpacerX * tFmtBytes[2])
 				local yPos = iCurY + iSpacerY - 5
-				local xLen = iSpacerX * (fmtStr[2] - 1)
+				local xLen = iSpacerX * (tFmtBytes[2] - 1)
 				
 				if 0x0a == ch then
 					inDrawDC:SetPen(wx.wxPen(palette.Gray30, 3, wx.wxSOLID))
@@ -191,7 +232,7 @@ local function DrawFile(inDrawDC)
 					inDrawDC:SetPen(wx.wxPen(palette.DarkSalmon, 3, wx.wxSOLID))
 					inDrawDC:DrawLine(xPos, yPos, xPos + xLen, yPos)
 				
-				elseif 0xc1 < ch then
+				elseif 0xbf < ch then
 					inDrawDC:SetPen(wx.wxPen(palette.Gray30, 1, wx.wxTRANSPARENT))
 					inDrawDC:SetBrush(wx.wxBrush(palette.CadetBlue2, wx.wxSOLID))
 					inDrawDC:DrawRectangle(xPos, iCurY, xLen, iSpacerY)
@@ -237,7 +278,7 @@ local function DrawFile(inDrawDC)
 	-- -----------------------------------------------
 	-- this is the right part with the text formatting
 	--
-	iCurX = iOffX + iNumCols * iSpacerX * fmtStr[2]
+	iCurX = iOffX + iNumCols * iSpacerX * tFmtBytes[2]
 	
 	-- get the correct spacing here
 	--
@@ -255,10 +296,10 @@ local function DrawFile(inDrawDC)
 	-- check which line will be the first
 	--	
 	local iNumLines 	= 0
-	local iStopLine 	= -1
-	local iStopOffset = -1
+	local iStopLine		= -1
+	local iStopOffset	= -1
 	local iStopLength	= 0
-	local iFirstRow	= 0
+	local iFirstRow		= 0
 	
 	-- hook for possible further spacing
 	--
@@ -267,7 +308,7 @@ local function DrawFile(inDrawDC)
 	
 	-- perform a progressive scan of memory for newlines
 	--
-	local iCntPrev = 0
+	local iCntPrev	= 0
 	local iCntNew	= 0
 	local iStart 	= 1
 	local iEnd	 	= sSource:find("\n", iStart, true)
@@ -278,13 +319,14 @@ local function DrawFile(inDrawDC)
 		--
 		iCntNew = iCntPrev + (iEnd - iStart + 1)		
 		if iCntPrev < iCursor and iCursor <= iCntNew then
-			iStopLine	= iNumLines
+			
+			iStopLine = iNumLines
 	
 			-- get the underline to work properly when the cursor
 			-- is in one of the 2 bytes of the pair
 			--
-			local ch			= sSource:sub(iCursor, iCursor)
-			local iToByte = ch:byte()
+			local ch		= sSource:sub(iCursor, iCursor)
+			local iToByte	= ch:byte()
 			
 			if (iCursor < iLimit) and (0xc2 <= iToByte) then
 				ch =  sSource:sub(iCursor, iCursor + 1)
@@ -302,7 +344,7 @@ local function DrawFile(inDrawDC)
 				iStopOffset = inDrawDC:GetTextExtent(sSource:sub(iStart, iCursor - 1))
 			end
 			
-			-- here ch might be a duouble byte sequence
+			-- here ch might be a double byte sequence
 			--
 			iStopLength = inDrawDC:GetTextExtent(ch)
 
@@ -312,8 +354,12 @@ local function DrawFile(inDrawDC)
 			
 		iNumLines = iNumLines + 1
 		
-		iStart = iEnd + 1
-		iEnd	 = sSource:find("\n", iStart, true)
+		iStart	= iEnd + 1
+		iEnd	= sSource:find("\n", iStart, true)
+		
+		-- last check because a line might not be completed with a lf
+		--
+		if not iEnd and iStart < iLimit then iEnd = iLimit end
 	end
 	
 	-- get the number of rows * font height and
@@ -333,6 +379,7 @@ local function DrawFile(inDrawDC)
 	
 	m_MainFrame.iTextFirstRow = iFirstRow	
 	m_MainFrame.iTextRowCount = iNumRows
+	m_MainFrame.iStopLine	  = iStopLine + 1
 	
 	------------------
 	-- print all chars
@@ -345,8 +392,8 @@ local function DrawFile(inDrawDC)
 	iCurX = iCurX + iOffX
 	iCurY = iOffY
 	
-	iStart 	= 1
-	iEnd	 	= sSource:find("\n", iStart, true)
+	iStart	= 1
+	iEnd	= sSource:find("\n", iStart, true)
 		
 	while iEnd do
 	
@@ -375,18 +422,20 @@ local function DrawFile(inDrawDC)
 
 		iCurLine = iCurLine + 1
 
-		iStart = iEnd + 1
-		iEnd	 = sSource:find("\n", iStart, true)
+		iStart	= iEnd + 1
+		iEnd	= sSource:find("\n", iStart, true)
+		
+		if not iEnd and iStart < iLimit then iEnd = iLimit end
 	end
 	
 	-- underline the corresponding letter for the cursor
 	--
 	if 0 <= iStopOffset then
 		
-		local pStartX = iCurX + iStopOffset
-		local pStartY = iOffY + (iStopLine - iFirstRow) * iSpacerY + iSpacerY
-		local pEndX = pStartX + iStopLength
-		local pEndY = pStartY
+		local pStartX	= iCurX + iStopOffset
+		local pStartY	= iOffY + (iStopLine - iFirstRow) * iSpacerY + iSpacerY
+		local pEndX		= pStartX + iStopLength
+		local pEndY		= pStartY
 
 		inDrawDC:SetPen(wx.wxPen(palette.DarkSeaGreen, 5, wx.wxSOLID))
 		inDrawDC:DrawLine(pStartX, pStartY, pEndX, pEndY)		
@@ -399,21 +448,22 @@ end
 -- using the second cell as default position
 --
 local function SetStatusText(inText, inCellNo)
+	
 	local hCtrl = m_MainFrame.hStatusBar	
 	if not hCtrl then return end
 	
 --	trace.line("SetStatusText")
 
-	inText	= inText or ""
+	inText	 = inText or ""
 	inCellNo = inCellNo or 2
 	
 	inCellNo = inCellNo - 1
-	if 0 > inCellNo or 2 < inCellNo then inCellNo = 1 end
+	if 0 > inCellNo or #tStbarWidths < inCellNo then inCellNo = 2 end
 	
 	hCtrl:SetStatusText(inText, inCellNo)
 	
 	-- start a one-shot timer
-	--	
+	--
 	if 1 == inCellNo and 0 < #inText then m_MainFrame.hTickTimer:Start(m_MainFrame.iTmInterval, true) end
 end
 
@@ -451,7 +501,7 @@ local function Serialize(inFD, inObject)
 		inFD:write("{ ")
 		
 		local test = false
-		for k,v in pairs(inObject) do
+		for _, v in pairs(inObject) do
 
 	--      inFD:write("  [")
 	--      Serialize(inFD, k)      --  recurse key
@@ -505,20 +555,21 @@ end
 -- ----------------------------------------------------------------------------
 -- Generate a unique new wxWindowID
 --
-local ID_IDCOUNTER = wx.wxID_HIGHEST + 1
-local NewMenuID = function()
+local iRCEntry = wx.wxID_HIGHEST + 1
+
+local function UniqueID()
 	
-	ID_IDCOUNTER = ID_IDCOUNTER + 1
-	return ID_IDCOUNTER
-  
+	iRCEntry = iRCEntry + 1
+	return iRCEntry
 end
 
 -- ----------------------------------------------------------------------------
 -- Simple interface to pop up a message
 --
 local function DlgMessage(message)
+	
 	wx.wxMessageBox(message, thisApp.sAppName,
-						 wx.wxOK + wx.wxICON_INFORMATION, m_MainFrame.hWindow)  
+					wx.wxOK + wx.wxICON_INFORMATION, m_MainFrame.hWindow)  
 end
 
 -- ----------------------------------------------------------------------------
@@ -526,13 +577,14 @@ end
 local function OnAbout(event)
 	
 	wx.wxMessageBox(thisApp.sAppName .. " [" .. thisApp.sAppVersion .. "]\n" ..
-						 wxlua.wxLUA_VERSION_STRING.." built with "..wx.wxVERSION_STRING,
-						 thisApp.sAppName, wx.wxOK + wx.wxICON_INFORMATION, m_MainFrame.hWindow) 
+					wxlua.wxLUA_VERSION_STRING.." built with "..wx.wxVERSION_STRING,
+					thisApp.sAppName, wx.wxOK + wx.wxICON_INFORMATION, m_MainFrame.hWindow) 
 end
 
 -- ----------------------------------------------------------------------------
 --
 local function OnClose(event)
+	
 	if not m_MainFrame.hWindow then return end
 	
 --	trace.line("OnClose")
@@ -550,16 +602,17 @@ local function OnClose(event)
 	m_MainFrame.hWindow = nil
 end
 
--- wxPaintDC				-- drawing to the screen, during EVT_PAINT
--- wxClientDC				-- drawing to the screen, outside EVT_PAINT
--- wxBufferedPaintDC		-- drawing to a buffer, then the screen, during EVT_PAINT
+-- wxPaintDC			-- drawing to the screen, during EVT_PAINT
+-- wxClientDC			-- drawing to the screen, outside EVT_PAINT
+-- wxBufferedPaintDC	-- drawing to a buffer, then the screen, during EVT_PAINT
 -- wxBufferedDC			-- drawing to a buffer, then the screen, outside EVT_PAINT
--- wxMemoryDC				-- drawing to a bitmap
+-- wxMemoryDC			-- drawing to a bitmap
 
 -- ----------------------------------------------------------------------------
 -- we just splat the off screen dc over the current dc
 --
-local function OnPaint(event)  
+local function OnPaint(event) 
+	
 	if not m_MainFrame.hWindow then return end
 	
 --	trace.line("OnPaint")
@@ -575,7 +628,8 @@ local function OnPaint(event)
 end
 -- ----------------------------------------------------------------------------
 --
-local function NewMemDC()  
+local function NewMemDC() 
+	
 	if not m_MainFrame.hWindow then return end
 	
 --	trace.line("NewMemDC")
@@ -597,6 +651,7 @@ end
 -- ----------------------------------------------------------------------------
 --
 local function Refresh()
+	
 	if not m_MainFrame.hWindow then return end
 	
 --	trace.line("Refresh")
@@ -622,14 +677,16 @@ local function OnReadFile(event)
 	m_MainFrame.iByteRowCount	= 0
 	m_MainFrame.iTextFirstRow	= 0
 	m_MainFrame.iTextRowCount	= 0
+	m_MainFrame.iStopLine		= -1
 	
 	local iBytes, sText = thisApp.LoadFile()
 	if 0 == iBytes then m_MainFrame.iCursor = 0 end
-		
-	SetStatusText("" .. m_MainFrame.iCursor, 3)
-	SetStatusText(sText, 2)
 	
 	Refresh()
+	
+	SetStatusText("" .. m_MainFrame.iCursor, 5)
+	SetStatusText("" .. m_MainFrame.iStopLine, 4)
+	SetStatusText(sText, 2)
 end
 
 -- ----------------------------------------------------------------------------
@@ -637,7 +694,7 @@ end
 local function OnCheckEncoding(event)
 --	trace.line("OnCheckEncoding")
 
-	local r, sText = thisApp.CheckEncoding()
+	local _, sText = thisApp.CheckEncoding()
 	
 	SetStatusText(sText, 2)
 end
@@ -647,19 +704,24 @@ end
 local function OnEncode_UTF_8(event)
 --	trace.line("OnEncode_UTF_8")
 
-	local r, sText = thisApp.Encode_UTF_8()
+	local _, sText = thisApp.Encode_UTF_8()
 	
 	SetStatusText(sText, 2)
 end
 
 -- ----------------------------------------------------------------------------
 --
-local function OnCreateFile(event)
---	trace.line("OnCreateFile")
+local function OnCreateSamples(event)
+--	trace.line("OnCreateSamples")
 	
-	local iLines = thisApp.CreateTest()
+	local bRet = thisApp.CreateTest()
 	
-	SetStatusText("" .. iLines .. " lines written", 2)
+	if bRet then
+		SetStatusText("Samples file created", 2)
+	else
+		SetStatusText("Samples fle creation failed", 2)
+	end
+	
 end
 
 -- ----------------------------------------------------------------------------
@@ -667,9 +729,9 @@ end
 --
 local function AlignBytesToCursor(inNewValue)
 	
-	local iNumCols		= thisApp.tConfig.Columns
-	local iLimit		= thisApp.iMemorySize
-	local iNumRows		= m_MainFrame.iByteRowCount
+	local iNumCols	= thisApp.tConfig.Columns
+	local iLimit	= thisApp.iMemorySize
+	local iNumRows	= m_MainFrame.iByteRowCount
 	local iFirstRow	= m_MainFrame.iByteFirstRow
 
 	if 0 >= inNewValue then inNewValue = 1 end
@@ -682,24 +744,76 @@ local function AlignBytesToCursor(inNewValue)
 		
 	m_MainFrame.iCursor			= inNewValue
 	m_MainFrame.iByteFirstRow	= iFirstRow
-	
-	SetStatusText("" .. inNewValue, 3)
 end
 
 -- ----------------------------------------------------------------------------
--- handle the mouse left button click
+-- get the cell selected by the user
+-- this function works only if a monospaced font is used for the bytes pane
 --
 local function OnLeftBtnDown(event)
+	
 	if 0 >= thisApp.iMemorySize then return end
 	
 --	trace.line("OnLeftBtnDown")
 
+	-- get the position where the users made a choice
+	--
+	local dcClient = m_MainFrame.hMemoryDC
+	
+	local pos = event:GetLogicalPosition(dcClient)
+	local x, y = pos:GetXY()
+	
+	-- get the width and height of a byte display
+	-- (might be 2, 3 or 4 chars long)
+	--
+	dcClient:SetFont(m_MainFrame.hFontBytes)
+	
+	local sTest		= _format(m_MainFrame.tFormatBytes[1], 0)
+	local iSpacerX	= dcClient:GetTextExtent(sTest)
+	local iSpacerY	= dcClient:GetCharHeight()
+
+	-- (don't bother to resume the original font)
+	--
+
+	-- get the cell (row,col)
+	-- align to rectangle boundary
+	--
+	local iRow = _floor((y - y % iSpacerY) / iSpacerY)
+	local iCol = _floor((x + x % iSpacerX) / iSpacerX)
+	
+	-- check for the pane's boundaries
+	--
+	local iNumCols	= thisApp.tConfig.Columns
+	local rcWidth	= iSpacerX * iNumCols
+	local rcHeight	= iSpacerY * (m_MainFrame.iByteRowCount + 1)
+	
+	if x > rcWidth then return end
+	if y > rcHeight then return end
+	
+	-- get the logical selection
+	--	
+	local iFirstByte	= m_MainFrame.iByteFirstRow * iNumCols	
+	local iNewCursor	= iFirstByte + iCol + iRow * iNumCols
+	
+--	trace.line("Mouse on cell [" .. iRow .. ", " .. iCol .. "] --> " .. iNewCursor)
+	
+	if iNewCursor ~= m_MainFrame.iCursor then
+	
+		AlignBytesToCursor(iNewCursor)
+		
+		Refresh()
+		
+		SetStatusText("" .. m_MainFrame.iCursor, 5)
+		SetStatusText("" .. m_MainFrame.iStopLine, 4)
+	end
+	
 end
 
 -- ----------------------------------------------------------------------------
 -- handle the mouse left button click
 --
 local function OnLeftBtnUp(event)
+	
 	if 0 >= thisApp.iMemorySize then return end
 
 --	trace.line("OnLeftBtnUp")
@@ -710,6 +824,7 @@ end
 -- handle the mouse wheel
 --
 local function OnMouseWheel(event)
+	
 	if 0 >= thisApp.iMemorySize then return end
 	
 --	trace.line("OnMouseWheel")
@@ -726,11 +841,15 @@ local function OnMouseWheel(event)
 	AlignBytesToCursor(iCurrent + iScroll)
 	
 	Refresh()
+	
+	SetStatusText("" .. m_MainFrame.iCursor, 5)
+	SetStatusText("" .. m_MainFrame.iStopLine, 4)
 end
 
 -- ----------------------------------------------------------------------------
 --
 local function OnKeyDown(event)
+	
 	if 0 >= thisApp.iMemorySize then return end
 	
 --	trace.line("OnKeyDown")	
@@ -772,23 +891,27 @@ local function OnKeyDown(event)
 	AlignBytesToCursor(iCursor)
 
 	Refresh()
+	
+	SetStatusText("" .. m_MainFrame.iCursor, 5)
+	SetStatusText("" .. m_MainFrame.iStopLine, 4)
 end
 
 -- ----------------------------------------------------------------------------
 --
 local function OnTimer(event)
+	
 	if not m_MainFrame.hWindow then return end 
 
 	-- cleanup the status bar
 	--
 	SetStatusText(nil, 2)
-
 end
 
 -- ----------------------------------------------------------------------------
 --
 --
 local function OnSize(event)
+	
 	if not m_MainFrame.hWindow then return end
 	if not m_MainFrame.hStatusBar then return end
 
@@ -799,11 +922,24 @@ local function OnSize(event)
 	m_MainFrame.rcClientW = size:GetWidth()
 	m_MainFrame.rcClientH = size:GetHeight() - 80	-- subtract the status bar height
 
-	m_MainFrame.hStatusBar:SetStatusWidths({150, m_MainFrame.rcClientW - 150 - 100, 100})
+	-- -------------------
+	-- statusbar panes
+	-- get the sum of all panes except the second
+	--
+	local iWidth = tStbarWidths[1]
+	for i=3, #tStbarWidths do
+		iWidth = iWidth + tStbarWidths[i]
+	end
+	tStbarWidths[2] = m_MainFrame.rcClientW - iWidth
+	
+	m_MainFrame.hStatusBar:SetStatusWidths(tStbarWidths)
 	
 	-- regenerate the offscreen buffer
 	--
 	Refresh()
+	
+	SetStatusText("" .. m_MainFrame.iCursor, 5)
+	SetStatusText("" .. m_MainFrame.iStopLine, 4)
 end
 
 -- ----------------------------------------------------------------------------
@@ -815,6 +951,7 @@ local function SetupFonts()
 	--
 	local specBytes = thisApp.tConfig.ByteFont
 	local specText  = thisApp.tConfig.TextFont
+	local tFmtBytes = tFormat.Dec	
 	
 	-- allocate
 	--
@@ -824,10 +961,19 @@ local function SetupFonts()
 	local fText  = wx.wxFont(specText[1], wx.wxFONTFAMILY_DEFAULT, wx.wxFONTSTYLE_NORMAL,
 									 wx.wxFONTWEIGHT_NORMAL, false, specText[2])
 		
+	-- format string to use (oct/dec/hex)
+	-- defaults to decimal
+	--
+	for tag, tFormat in pairs(tFormat) do
+		if _find(thisApp.tConfig.Format, tag, 1, true) then tFmtBytes = tFormat break end
+	end	
+	
 	-- setup
 	--
 	m_MainFrame.hFontBytes	= fBytes
 	m_MainFrame.hFontText	= fText
+	m_MainFrame.tFormatBytes= tFmtBytes
+
 
 	return (fBytes and fText)
 end
@@ -843,10 +989,10 @@ local function CreateMainWindow()
   
 	-- unique IDs for the menu
 	--  
-	local rcMnuReadFile = NewMenuID()
-	local rcMnuTestFile = NewMenuID()
-	local rcMnuCheckFmt = NewMenuID()
-	local rcMnuEnc_UTF_8= NewMenuID()
+	local rcMnuReadFile = UniqueID()
+	local rcMnuTestFile = UniqueID()
+	local rcMnuCheckFmt = UniqueID()
+	local rcMnuEncUTF8  = UniqueID()
 	
 	-- create a window
 	--
@@ -860,20 +1006,20 @@ local function CreateMainWindow()
 	-- create the FILE menu
 	--
 	local mnuFile = wx.wxMenu("", wx.wxMENU_TEAROFF)
-	mnuFile:Append(rcMnuReadFile,		"Import File\tCtrl-L",	"Read the file in memory")
-	mnuFile:Append(rcMnuEnc_UTF_8,	"Encode UTF_8",			"Overwrite file with new encoding")
-	mnuFile:Append(wx.wxID_EXIT,		"E&xit\tAlt-X",			"Quit the program")
+	mnuFile:Append(rcMnuReadFile, "Import File\tCtrl-L",  "Read the file in memory")
+	mnuFile:Append(rcMnuEncUTF8,  "Encode UTF_8\tCtrl-U", "Overwrite file with new encoding")
+	mnuFile:Append(wx.wxID_EXIT,  "E&xit\tAlt-X",		  "Quit the program")
 
 	-- create the COMMANDS menu
 	--
 	local mnuCmds = wx.wxMenu("", wx.wxMENU_TEAROFF)
-	mnuCmds:Append(rcMnuCheckFmt,		"Check Format\tCtrl-F",	"Check bytes in current file")
-	mnuCmds:Append(rcMnuTestFile,		"Create File\tCtrl-T",	"Create a binary test file")
+	mnuCmds:Append(rcMnuCheckFmt, "Check Format\tCtrl-F", "Check bytes in current file")
+	mnuCmds:Append(rcMnuTestFile, "Create File\tCtrl-T",  "Create a binary test file")
 
 	-- create the HELP menu
 	--
 	local mnuHelp = wx.wxMenu("", wx.wxMENU_TEAROFF)  
-	mnuHelp:Append(wx.wxID_ABOUT,     "&About\tAlt-A",			"About Application")
+	mnuHelp:Append(wx.wxID_ABOUT, "&About\tAlt-A", "About Application")
 
 	-- create the menu bar and associate sub-menus
 	--
@@ -888,9 +1034,9 @@ local function CreateMainWindow()
 	-- create the bottom status bar
 	--
 	local hStatusBar	
-	hStatusBar = frame:CreateStatusBar(3, wx.wxST_SIZEGRIP)
+	hStatusBar = frame:CreateStatusBar(#tStbarWidths, wx.wxST_SIZEGRIP)
 	hStatusBar:SetFont(wx.wxFont(10, wx.wxFONTFAMILY_DEFAULT, wx.wxFONTSTYLE_NORMAL, wx.wxFONTWEIGHT_NORMAL))      
-	hStatusBar:SetStatusWidths({150, 750, 100}); 
+	hStatusBar:SetStatusWidths(tStbarWidths) 
 
 	-- standard event handlers
 	--
@@ -898,25 +1044,23 @@ local function CreateMainWindow()
 	frame:Connect(wx.wxEVT_TIMER,			OnTimer)
 	frame:Connect(wx.wxEVT_SIZE,			OnSize)
 	frame:Connect(wx.wxEVT_KEY_DOWN,		OnKeyDown)
-	frame:Connect(wx.wxEVT_LEFT_UP,		OnLeftBtnUp)
-	frame:Connect(wx.wxEVT_LEFT_DOWN,	OnLeftBtnDown)
-	frame:Connect(wx.wxEVT_MOUSEWHEEL,	OnMouseWheel)	
-	frame:Connect(wx.wxEVT_CLOSE_WINDOW,OnClose)
-      
+	frame:Connect(wx.wxEVT_LEFT_UP,			OnLeftBtnUp)
+	frame:Connect(wx.wxEVT_LEFT_DOWN,		OnLeftBtnDown)
+	frame:Connect(wx.wxEVT_MOUSEWHEEL,		OnMouseWheel)	
+	frame:Connect(wx.wxEVT_CLOSE_WINDOW,	OnClose)
+
 	-- menu event handlers
 	--
-	frame:Connect(rcMnuReadFile,	wx.wxEVT_COMMAND_MENU_SELECTED,	OnReadFile)
-	frame:Connect(rcMnuTestFile,	wx.wxEVT_COMMAND_MENU_SELECTED,	OnCreateFile)
-	frame:Connect(rcMnuCheckFmt,	wx.wxEVT_COMMAND_MENU_SELECTED,	OnCheckEncoding)
-	
-	frame:Connect(rcMnuEnc_UTF_8,	wx.wxEVT_COMMAND_MENU_SELECTED,	OnEncode_UTF_8)
-	
-	frame:Connect(wx.wxID_EXIT,	wx.wxEVT_COMMAND_MENU_SELECTED,   OnClose)
-	frame:Connect(wx.wxID_ABOUT,	wx.wxEVT_COMMAND_MENU_SELECTED,   OnAbout)
+	frame:Connect(rcMnuReadFile, wx.wxEVT_COMMAND_MENU_SELECTED, OnReadFile)
+	frame:Connect(rcMnuTestFile, wx.wxEVT_COMMAND_MENU_SELECTED, OnCreateSamples)
+	frame:Connect(rcMnuCheckFmt, wx.wxEVT_COMMAND_MENU_SELECTED, OnCheckEncoding)
+	frame:Connect(rcMnuEncUTF8,	 wx.wxEVT_COMMAND_MENU_SELECTED, OnEncode_UTF_8)
+	frame:Connect(wx.wxID_EXIT,	 wx.wxEVT_COMMAND_MENU_SELECTED, OnClose)
+	frame:Connect(wx.wxID_ABOUT, wx.wxEVT_COMMAND_MENU_SELECTED, OnAbout)
   
 	-- set up the frame
 	--
-	frame:SetMinSize(wx.wxSize(600, 250))  
+	frame:SetMinSize(wx.wxSize(500, 250))  
 	frame:SetStatusBarPane(1)                   -- this is reserved for the menu
 	
 	-- this is necessary to avoid flickering
@@ -926,7 +1070,7 @@ local function CreateMainWindow()
 	
 	--  store for later
 	--
-	m_MainFrame.hWindow 		= frame	
+	m_MainFrame.hWindow 	= frame	
 	m_MainFrame.hStatusBar	= hStatusBar
 	m_MainFrame.hMemoryDC	= NewMemDC()
 	
@@ -936,7 +1080,7 @@ end
 -- ----------------------------------------------------------------------------
 -- show the main window and runs the main loop
 --
-function ShowMainWindow()
+local function ShowMainWindow()
 --	trace.line("ShowMainWindow")
 	
 	if m_MainFrame.hWindow then return false end
@@ -968,7 +1112,7 @@ end
 
 -- ----------------------------------------------------------------------------
 --
-function CloseMainWindow()
+local function CloseMainWindow()
 --	trace.line("CloseMainWindow")
 	
 	SaveSettings(m_sSettingsIni, tWinProp) 
@@ -976,6 +1120,14 @@ function CloseMainWindow()
   if m_MainFrame.hWindow then OnClose() end
   
 end
+
+-- ----------------------------------------------------------------------------
+--
+return
+{
+	ShowMainWindow = ShowMainWindow,
+	CloseMainWindow= CloseMainWindow,
+}
 
 -- ----------------------------------------------------------------------------
 -- ----------------------------------------------------------------------------
