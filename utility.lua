@@ -1,109 +1,72 @@
 -- ----------------------------------------------------------------------------
 --
---  Utility
+--  Utility - helpers
 --
 -- ----------------------------------------------------------------------------
 
-local Utility = Utility or {}
+local Utility = _G.Utility or {}
 
 local _insert	= table.insert
-local _concat	= table.concat
+--local _concat	= table.concat
+local _format	= string.format
+--local _toChar	= string.char
 
 -- ----------------------------------------------------------------------------
--- remove leading whitespace from string.
--- http://en.wikipedia.org/wiki/Trim_(programming)
+-- check if the byte at inStart is a valid utf_8 code
+-- returns the full utf_8 code
 --
-function Utility.ltrim(inString)  
-	if not inString then return "" end
+function Utility.utf_8(inBytes, inStart, inEnd)
 	
-	return inString:gsub("^%s*", "")
-end
-
--- ----------------------------------------------------------------------------
--- remove trailing whitespace from string.
--- http://en.wikipedia.org/wiki/Trim_(programming)
---
-function Utility.rtrim(inString)	
-	if not inString then return "" end
+	local sNullCode = "\x00\x00\x00"
 	
-	local n = #inString
+	if not inBytes or 0 == #inBytes then return sNullCode end
 	
-	while n > 0 and inString:find("^%s", n) do n = n - 1 end
+	inStart = inStart or 1
+	inEnd	= inEnd or #inBytes
 	
-	return inString:sub(1, n)
-end
-
--- ----------------------------------------------------------------------------
---
-function Utility.trim(inString)
+	if 0 > inStart	 then inStart = -1 * inStart end
+	if 0 > inEnd	 then inEnd = -1 * inEnd end
+	if 1 > inStart	 then inStart = 1 end
+	if #inBytes > inEnd then inEnd = #inBytes end
+	if inStart > inEnd then inEnd, inStart = inStart, inEnd end
 	
-	return Utility.ltrim(Utility.rtrim(inString))	
-end
-
--- ----------------------------------------------------------------------------
---
-function Utility.capitalize(inString)
+	local ch1 = inBytes:sub(inStart, inStart):byte()
+--	local ch2 = inBytes:sub(inStart - 1, inStart - 1):byte()
 	
---	local iIndex  = inString:find("^%s")	
-	local chStart = inString:sub(1)
-	
-	chStart  = chStart:upper()
-	inString = inString:lower():sub(1)
-	
-	chStart = chStart .. inString
-	
-	return chStart
-end
-
--- ----------------------------------------------------------------------------
--- remove all occourrences of a character, with the option of replacing it
---
-function Utility.strip(inString, inChOld, inChNew)
-	
-	local sOutString = ""
-	local chCurrent
-	
-	for i=1, #inString do
+	if 0xc0 < ch1 then
 		
-		chCurrent = inString:sub(i, i)
+		local ch2 = inBytes:sub(inStart + 1, inStart + 1):byte()
 		
-		if inChOld == chCurrent then 
-			if inChNew then chCurrent = inChNew else chCurrent = "" end
-		end
+		if 0x7f < ch2 and ch2 < 0xc0 then
+			if 0xdf < ch1 then
+				local ch3 = inBytes:sub(inStart + 2, inStart + 2):byte()
+				
+				return _format("%c%c%c", ch1, ch2, ch3)
+				
+			else
+				return _format("%c%c", ch1, ch2)
+			end
 			
-		sOutString = sOutString .. chCurrent	
-	end
-
-	return sOutString
-end
-
-
--- ----------------------------------------------------------------------------
--- put a % before each char that must be escaped for the string.find function
---
-function Utility.fmtfind(inString)
-	
-	local tOutString = { }
-	local chCurrent
-	
-	for i=1, #inString do
-		
-		chCurrent = inString:sub(i, i)
-		
-		if     '.' == chCurrent then chCurrent = "%."
-		elseif '_' == chCurrent then chCurrent = "%_"
-		elseif '-' == chCurrent then chCurrent = "%-"
-		elseif '[' == chCurrent then chCurrent = "%["
-		elseif ']' == chCurrent then chCurrent = "%]"
-		elseif '(' == chCurrent then chCurrent = "%("
-		elseif ')' == chCurrent then chCurrent = "%)"
-		
+		else
+			
 		end
-	
-		_insert(tOutString, chCurrent)	
+		
+	elseif 1 < inStart then
+		
+		local ch2 = inBytes:sub(inStart - 1, inStart - 1):byte()
+		
+		if 0x7f < ch2 and ch2 < 0xc0 then
+		
+			ch1, ch2 = ch2, ch1
+		
+			if 0xc0 < ch1 then
+				return _format("%c%c", ch1, ch2)
+			else
+			end
+		end
 	end
 
-	return _concat(tOutString, nil)	
+	return sNullCode
 end
 
 -- ----------------------------------------------------------------------------
@@ -171,35 +134,36 @@ end
 --
 function Utility.makeArray(inText)
   
-  local floats  = {}
-  local pattern = "[+-]?%d+%.?%d*"
-  
-  local ind1, ind2 = string.find(inText, pattern)
-  
-  while ind1 and ind2 do
-    
-    local number = tonumber(string.sub(inText, ind1, ind2))
-    
-    if number then table.insert(floats, number) end
-    
-    ind1, ind2 = string.find(inText, pattern, ind2 + 1)
-  end
-  
-  return floats
+	local tNumbers  = { }
+	local fValue  
+	local sKeyword  = "[+-]?%d+%.?%d*"
+
+	local ind1, ind2 = inText:find(sKeyword)
+
+	while ind1 and ind2 do
+
+		fValue = tonumber(inText:sub(ind1, ind2))
+
+		if fValue then _insert(tNumbers, fValue) end
+
+		ind1, ind2 = inText:find(sKeyword, ind2 + 1)
+	end
+
+	return tNumbers
 end
 
 -- ----------------------------------------------------------------------------
 --
 function Utility.isFileReady(inFilename)
   
-  if not inFilename then return false end
-	
-  local hFile = io.open(inFilename, "r")  
-  if not hFile then return false end  
-  
+	if not inFilename then return false end
+
+	local hFile = io.open(inFilename, "r")  
+	if not hFile then return false end  
+
 	hFile:close()
-  
-  return true
+
+	return true
 end
 
 -- ----------------------------------------------------------------------------
@@ -214,7 +178,7 @@ function Utility.file2Table(inSrcName)
 	
 	for aLine in fhSrc:lines() do
 		if 1 < #aLine then
-			table.insert(tWords_0, aLine)
+			_insert(tWords_0, aLine)
 		end
 	end			
 	fhSrc:close()
