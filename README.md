@@ -3,9 +3,12 @@
 using wxLua display both a binary and text views of a file.  
 encode an ASCII file to utf_8.  
 create a sample file with some Unicode page blocks.  
+check file's UTF_8 code by blocks of validity [see Unicode RFC 3629](https://tools.ietf.org/html/rfc3629#section-4).  
+copy byte/UTF_8/Word/Line bytes to clipboard.  
+trace most of the operations on a logging file.  
 code is tested to run only on Windows 10.  
 
-! see List of Unicode characters - [Wikipedia](https://en.wikipedia.org/wiki/List_of_Unicode_characters)
+see List of Unicode characters - [Wikipedia](https://en.wikipedia.org/wiki/List_of_Unicode_characters)
 
 aim of the application originally was to convert an ASCII file containing accented letters to UTF_8 because of  
 the different codepages running on my laptop and the results of the 'dir' command
@@ -23,8 +26,6 @@ Issues:
 -------
 
 * cursor's alignement on the text box is correct only when displaying 2 bytes UTF_8, not with 3 bytes or 4 bytes encoding
-* check file's encoding is currently broken
-* can convert only Unicode points that will result in a 2 bytes sequence
 * window's dc refresh can become rather slow when there's a lot of colouring going on.  
 * text's scrollbar does not handle any mouse command.  
 
