@@ -8,8 +8,10 @@ local tSetupInf =
 {
 	-- importing the file
 	--
-	["InFile"]		= "testfiles\\__Test_2.txt",
+	["InFile"]		= "testfiles\\__Test_99.txt",
 	["ReadMode"]	= "r",
+	["Autoload"]	= true,
+	["AutoCheck"]	= true,
 
 	-- saving the file
 	--
@@ -22,10 +24,15 @@ local tSetupInf =
 
 	-- display
 	--
-	["ByteFont"]	= {13, "Liberation Mono"},			-- left display (codes)
-	["TextFont"]	= {17, "Source Code Pro"}, -- "Carlito"},					-- right display (text)
+	["ByteFont"]	= {14, "Liberation Mono"},			-- left display (codes)
+	["TextFont"]	= {14, "Liberation Mono"}, -- "Carlito"},					-- right display (text)
 	["Columns"]		= 16,								-- format number of columns
 	["Format"]		= "Hexadecimal",					-- Oct/Dec/Hex
+	["TabSize"]		= 4,								-- convert tab to 'n' chars
+	["Underline"]	= true,								-- underline bytes below 0x20
+	["ColorCodes"]	= true,								-- highlight Unicode bytes group
+	["Inverted"]	= false,							-- invert display colors
+	["CopyOption"]	= "Word",							-- Byte/UTF_8/Word/Line
 }
 
 -- ----------------------------------------------------------------------------
