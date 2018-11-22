@@ -28,6 +28,7 @@ Issues:
 * cursor's alignement on the text box is correct only when displaying 2 bytes UTF_8, not with 3 bytes or 4 bytes encoding
 * window's dc refresh can become rather slow when there's a lot of colouring going on.  
 * text's scrollbar does not handle any mouse command.  
-
-
+* encoding only works when a file isn't in a standard Unicode format.  
+  
+  
 to easily find help on formatting this very file then [click here](https://help.github.com/articles/basic-writing-and-formatting-syntax/)
