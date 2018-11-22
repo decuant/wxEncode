@@ -8,32 +8,166 @@ local trace		= require "trace"		-- shortcut for tracing
 local window	= require "window"		-- GUI for the application
 local tUtf8Code = require "Utf8Table"	-- utf_8 codes table
 local samples	= require "samples"		-- create a list of Unicode chars
+				  require "extrastr"	-- extra string processor
 
 local _toChar	= string.char
 local _format	= string.format
+local _utf8sub	= string.utf8sub
+local _gcount	= string.gcount
+local _wordsub	= string.wordsub
+local _insert	= table.insert
+local _concat	= table.concat
 
 -- ----------------------------------------------------------------------------
 --
-local function CountLines()
-	if 0 >= thisApp.iMemorySize then return 0 end
+local function OnGetTextAtPos(inStopStart, inOffset)
 	
-	local iLimit	= thisApp.iMemorySize
-	local sSource	= thisApp.sFileMemory
-	
-	if 0 >= iLimit then return 0 end
-	
-	local iRows	= 1
-	local iEnd	= sSource:find("\n", 1, true)
-	
-	-- total rows
-	--
-	while iEnd do
+	local iLimit = thisApp.iMemorySize
+	if 0 >= iLimit then return 0, "Nothing in memory" end
 		
-		iRows = iRows + 1
-		iEnd  = sSource:find("\n", iEnd + 1, true)
+	if 0 > inStopStart or iLimit < inStopStart	then return 0, "Error!" end
+	if 0 > inOffset or iLimit < inOffset 		then return 0, "Error!" end
+	if inOffset < inStopStart 					then return 0, "Error!" end
+	
+	local sCopyBuff
+	local sSource = thisApp.sFileMemory
+	local sOption = thisApp.tConfig.CopyOption
+	
+	if "Byte" == sOption then
+			
+		sCopyBuff = sSource:sub(inOffset, inOffset)
+		return 1, sCopyBuff
 	end
 	
-	return iRows
+	-- extract the whole line
+	--
+	local iLineEnd = sSource:find("\n", inStopStart)
+	
+	iLineEnd = iLineEnd or iLimit
+	sCopyBuff = sSource:sub(inStopStart, iLineEnd)
+	
+	-- check requested action
+	--
+	if "Line" == sOption then return #sCopyBuff, sCopyBuff end
+		
+	-- normalize offset
+	--
+	local iPosition = inOffset - inStopStart + 1
+--	iLineEnd = iLineEnd - inStopStart
+	
+	-- check action
+	--
+	if "UTF_8" == sOption then
+
+		sCopyBuff = _utf8sub(sCopyBuff, iPosition)
+		
+		return #sCopyBuff, sCopyBuff		
+	end
+	
+	sCopyBuff = _wordsub(sCopyBuff, iPosition)
+	if sCopyBuff then return #sCopyBuff, sCopyBuff end
+	
+	-- handle the Word selection
+	--
+--	local iStart = iPosition
+--	while 1 <= iStart do
+	
+--		local ch = sCopyBuff:sub(iStart, iStart)
+--		if " " == ch then break end
+		
+--		iStart = iStart - 1
+--	end
+	
+--	local iEnd = iPosition	
+--	while iEnd <= iLineEnd do
+		
+--		local ch = sCopyBuff:sub(iEnd, iEnd)
+--		if " " == ch then break end		
+		
+--		iEnd = iEnd + 1
+--	end
+	
+--	-- extract word from entire line
+--	--
+--	sCopyBuff = sCopyBuff:sub(iStart + 1, iEnd - 1)
+	return 0, "Error !"
+end
+
+-- ----------------------------------------------------------------------------
+--
+local function OnCheckEncoding()
+	
+	trace.lnTimeStart("Testing UTF_8 validity ...")
+	
+	local tCounters = {0, 0, 0, 0, 0}		-- UTF1, UTF2, UTF3, UTF4, ERRORS
+	
+	local sSource = thisApp.sFileMemory
+	local iLimit  = thisApp.iMemorySize
+
+	local iStart = 1
+	local iEnd	 = sSource:find("\n", iStart, true)
+	
+	local iCurLine = 1
+	local iIndex 
+	local chCurr
+	local sLine
+	local iRetCode
+	local tLineOut = { }
+	
+	while iEnd do
+		
+		sLine = sSource:sub(iStart, iEnd)
+		
+		-- tokenize
+		--
+		iIndex = 1
+		while #sLine >= iIndex do
+		
+			-- get next char, which might span from 1 byte to 4 bytes
+			--
+			chCurr, iRetCode = _utf8sub(sLine, iIndex)			
+			_insert(tLineOut, chCurr)			
+			
+			if 0 > iRetCode then
+				trace.line(_format("Line [%4d:%2d] -> [%s]", iCurLine, iIndex, chCurr))
+				
+				tCounters[5] = tCounters[5] + 1
+			else
+				tCounters[iRetCode] = tCounters[iRetCode] + 1
+			end
+			
+			iIndex = iIndex + #chCurr
+		end
+		
+		-- perform the test, old string compared to sum of tokens
+		--
+		local sTest = _concat(tLineOut, nil)
+		if sLine ~= sTest then
+			trace.line(_format("Line [%4d] fails test", iCurLine))
+		end
+
+		-- prepare for next line of text
+		--
+		tLineOut = { }
+		iCurLine = iCurLine + 1
+
+		iStart	= iEnd + 1
+		iEnd	= sSource:find("\n", iStart, true)
+		
+		if not iEnd and iStart < iLimit then iEnd = iLimit end
+	end
+	
+	-- number of characters below 0x20 (space) should be equal to the newline counter
+	--
+	local sText = _format("[UTF8 1: %d] [UTF8 2: %d] [UTF8 3: %d] [UTF8 4: %d] [ERRORS: %d]", 
+							tCounters[1], tCounters[2], tCounters[3], tCounters[4], tCounters[5])
+	trace.line(sText)	
+	
+	collectgarbage()
+	
+	trace.lnTimeEnd("UTF_8 test end")
+	
+	return true, sText
 end
 
 -- ----------------------------------------------------------------------------
@@ -46,34 +180,44 @@ local function OnLoadFile()
 	thisApp.iMemorySize	= 0
 	thisApp.iNumOfRows	= 0
 	
+	-- refresh setup
+	--
 	thisApp.tConfig = dofile(thisApp.sConfigIni)
-	if not thisApp.tConfig then return 0, "Configuration file not provided" end
+	if not thisApp.tConfig then return 0, "Configuration file load failed." end
 	
 	-- get names from configuration file
 	--
 	local sSourceFile = thisApp.tConfig.InFile
 	local sOpenMode = thisApp.tConfig.ReadMode
+	
+	local sText = _format("Loading [%s] (%s)", sSourceFile, sOpenMode)
+	trace.line(sText)
 		
 	-- get the file's content
 	--
 	local  fhSrc = io.open(sSourceFile, sOpenMode)
 	if not fhSrc then 
 		
-		local sText = "Unable to open [" .. sSourceFile .. "]"
+		sText = "Unable to open [" .. sSourceFile .. "] (" .. sOpenMode .. ")"
 		trace.line(sText)
 		return 0, sText
 	end
 	
+	-- set content in app.
+	--
 	thisApp.sFileMemory = fhSrc:read("*a")	
-	thisApp.iMemorySize = rawlen(thisApp.sFileMemory)
+	thisApp.iMemorySize = thisApp.sFileMemory:len()
+	thisApp.iNumOfRows  = _gcount(thisApp.sFileMemory, "\n")
 	fhSrc:close()
 	
-	-- do a scan of text
+	-- test for utf_8 validity
 	--
-	thisApp.iNumOfRows = CountLines()
+	if thisApp.tConfig.AutoCheck then OnCheckEncoding() end
 	
-	local sText = _format("Read [file: %s] [mode: %s] [lines: %d] [bytes: %d]", 
-								 sSourceFile, sOpenMode, thisApp.iNumOfRows, thisApp.iMemorySize)
+	-- give feedback
+	--
+	sText = _format("Read [file: %s] (%s) [lines: %d] [bytes: %d]", 
+					sSourceFile, sOpenMode, thisApp.iNumOfRows, thisApp.iMemorySize)
 	trace.line(sText)
 
 	return thisApp.iMemorySize, sText
@@ -167,8 +311,9 @@ local function OnEncode_UTF_8()
 end
 
 -- ----------------------------------------------------------------------------
---
+--[[
 local function OnCheckEncodingNew()
+
 	
 --	local iLimit = thisApp.iMemorySize
 	if 0 >= thisApp.iMemorySize then return 0, "Nothing in memory" end
@@ -286,9 +431,9 @@ local function OnCheckEncodingNew()
 	
 	return iLineNo, sText	
 end
-
+]]
 -- ----------------------------------------------------------------------------
---
+--[[
 local function OnCheckEncoding()
 	
 --	local iLimit = thisApp.iMemorySize
@@ -424,11 +569,12 @@ local function OnCheckEncoding()
 	
 	return iLineNo, sText
 end
+]]
 
 -- ----------------------------------------------------------------------------
 --
-local function OnCreateTest()
---	trace.line("OnCreateTest")
+local function OnCreateSamples()
+--	trace.line("OnCreateSamples")
 
 	local sTargetFile = thisApp.tConfig.OutFile
 	local sOpenMode = thisApp.tConfig.WriteMode
@@ -445,7 +591,7 @@ local function OnCreateTest()
 	--
 	local bRet = samples.Create(sTargetFile, sOpenMode, iFormat)
 	
-	trace.lnTimeEnd("Create file end")
+	trace.lnTimeEnd("Create samples end")
 	
 	collectgarbage()
 	
@@ -459,8 +605,6 @@ local function SetUpApplication()
 
 	trace.line(thisApp.sAppName .. " (Ver. " .. thisApp.sAppVersion .. ")")
 	trace.line("Released " .. thisApp.sAppRelDate)
-
---	rnd.initialize()
 	
 	assert(os.setlocale('ita', 'all'))
 	trace.line("Current locale is [" .. os.setlocale() .. "]")
@@ -479,7 +623,7 @@ local function QuitApplication()
 	
 	-- call the close 
 	--
-	window.CloseMainWindow()
+	window.Close()
 	
 	trace.line(thisApp.sAppName .. " terminated")
 end
@@ -493,7 +637,10 @@ local function main()
 	io.output(thisApp.sLogFilename)
 
 	if SetUpApplication() then 
-		window.ShowMainWindow()
+		
+		if thisApp.tConfig.Autoload then OnLoadFile() end
+		
+		window.Show()
 	end
 
 	-- we'll get here only when the main window loop closes
@@ -507,8 +654,8 @@ end
 --
 thisApp =
 {
-	sAppVersion		= "0.0.3",				-- application's version
-	sAppRelDate		= "10-nov-18",			-- date of release update
+	sAppVersion		= "0.0.4",				-- application's version
+	sAppRelDate		= "20-nov-18",			-- date of release update
 	sAppName		= "Encode",				-- name for the application
 	
 	sLogFilename	= "Encode.log",			-- logging filename
@@ -520,9 +667,10 @@ thisApp =
 	iNumOfRows		= 0,					-- number of new lines chars
 	
 	LoadFile		= OnLoadFile,			-- load the config file in memory
-	CheckEncoding	= OnCheckEncodingNew,	-- check chars in current file
+	CheckEncoding	= OnCheckEncoding,		-- check chars in current file
 	Encode_UTF_8	= OnEncode_UTF_8,		-- save the current file UTF_8
-	CreateTest		= OnCreateTest,			-- create a 256 lines binary file
+	CreateTest		= OnCreateSamples,		-- create a file with samples
+	GetTextAtPos	= OnGetTextAtPos,		-- get text at pos (see setupinf.lua)
 }
 
 -- ----------------------------------------------------------------------------
