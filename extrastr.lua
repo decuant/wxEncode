@@ -4,9 +4,11 @@
 --
 -- ----------------------------------------------------------------------------
 
+local _floor	= math.floor
 local _insert	= table.insert
 local _concat	= table.concat
 local _toChar	= string.char
+local _format	= string.format
 
 -- ----------------------------------------------------------------------------
 -- count the number of occurrences of the specified text
@@ -14,7 +16,7 @@ local _toChar	= string.char
 local function str_gcount(inBytes, inValue)
 	
 	local iCount = 0
-	
+
 	if inBytes and inValue then
 	
 		local iEnd	 = inBytes:find(inValue, 1, true)
@@ -98,12 +100,30 @@ local function str_fmtfind(inString)
 end
 
 -- ----------------------------------------------------------------------------
--- check if the byte at inStart is a valid utf_8 code
--- returns the full utf_8 code or the best available
--- the second returned value is
--- -1 		error
---  [1..4] 	length of full Unicode char
+-- given a natural number returns a string where
+-- 1024 	-> 1 kb
+-- 1024^2	-> 1 Mb
+-- 1024^3	-> 1 Gb
 --
+local function str_fmtkilo(inNum)
+	
+	if 0 < inNum then
+	
+		local iKilo = _floor(inNum / 1024)
+		local iMega = _floor(iKilo / 1024)
+		local iGiga	= _floor(iMega / 1024)
+		local iTera	= _floor(iGiga / 1024)
+		
+		if 0 < iTera then return _format("%d Tb", iTera) end
+		if 0 < iGiga then return _format("%d Gb", iGiga) end
+		if 0 < iMega then return _format("%d Mb", iMega) end
+		if 0 < iKilo then return _format("%d Kb", iKilo) end
+	end
+
+	return _format("%d b", inNum)
+end
+
+-- ----------------------------------------------------------------------------
 -- ABNF from RFC 3629
 --
 -- UTF8-octets = *( UTF8-char )
@@ -118,65 +138,68 @@ end
 --
 local tUTF8Lookup =
 {
-	{0x00, 0x7f, 0},
-	{0xc2, 0xdf, 1, 0x80, 0xbf},	
-	{0xe0, 0xe0, 2, 0xa0, 0xbf, 0x80, 0xbf},
-	{0xe1, 0xec, 2, 0x80, 0xbf, 0x80, 0xbf},
-	{0xed, 0xed, 2, 0x80, 0x9f, 0x80, 0xbf},	
-	{0xee, 0xef, 2, 0x80, 0xbf, 0x80, 0xbf},
-	{0xf0, 0xf0, 3, 0x90, 0xbf, 0x80, 0xbf, 0x80, 0xbf},
-	{0xf1, 0xf3, 3, 0x80, 0xbf, 0x80, 0xbf, 0x80, 0xbf},
-	{0xf4, 0xf4, 3, 0x80, 0x8f, 0x80, 0xbf, 0x80, 0xbf},
+	{0x00, 0x7f},
+	{0xc2, 0xdf, 0x80, 0xbf},	
+	{0xe0, 0xe0, 0xa0, 0xbf, 0x80, 0xbf},
+	{0xe1, 0xec, 0x80, 0xbf, 0x80, 0xbf},
+	{0xed, 0xed, 0x80, 0x9f, 0x80, 0xbf},	
+	{0xee, 0xef, 0x80, 0xbf, 0x80, 0xbf},
+	{0xf0, 0xf0, 0x90, 0xbf, 0x80, 0xbf, 0x80, 0xbf},
+	{0xf1, 0xf3, 0x80, 0xbf, 0x80, 0xbf, 0x80, 0xbf},
+	{0xf4, 0xf4, 0x80, 0x8f, 0x80, 0xbf, 0x80, 0xbf},
 }
 
+-- ----------------------------------------------------------------------------
+-- return the row that contains the parameter
+-- of the lookup table only the first 2 entries are used
+--
 local function str_lkp_utf_8(inCode)
 	
-	for _, row in ipairs(tUTF8Lookup) do
-		if row[1] <= inCode and inCode <= row[2] then return row end
+	for iIndex=1, #tUTF8Lookup do
+		if tUTF8Lookup[iIndex][1] <= inCode and inCode <= tUTF8Lookup[iIndex][2] then 
+			return tUTF8Lookup[iIndex] 
+		end
 	end
 	
 	return nil
 end
 
-
+-- ----------------------------------------------------------------------------
+-- check if the byte at inStart is a valid utf_8 code
+-- returns the full utf_8 code or the best available
+-- the second returned value is
+-- -1 		error
+--  [1..4] 	length of full Unicode char
+--
 local function str_sub_utf_8(inBytes, inStart)
-
-	-- sanity check
-	--
-	if not inBytes then return "\x00", -1 end
-	
-	inStart = inStart or 1
-	if (1 > inStart) or (inStart > #inBytes) then return "\x00", -1 end
 	
 	-- check if start of a Unicode point
 	-- get the Unicode row description, if any
 	--
-	local ch1		= inBytes:sub(inStart, inStart):byte()
-	local utf8Codes = str_lkp_utf_8(ch1)	
+	local chMark	= inBytes:sub(inStart, inStart)
+	local utf8Codes = str_lkp_utf_8(chMark:byte())	
 	
-	if not utf8Codes then return _toChar(ch1), -1 end
+	if not utf8Codes then return chMark, -1 end
 	
 	-- quick shot to return when no check needed
 	--
-	local iChkLen = utf8Codes[3]
-	if 0 == iChkLen then return _toChar(ch1), 1 end
+	local iChkLen = (#utf8Codes / 2) - 1
+	if 0 == iChkLen then return chMark, 1 end
 	
 	-- check if enough bytes to complete the request
-	-- when at the end must return too
-	-- but here the Unicode point is correct, thus
-	-- has to return with an error
 	--
-	if #inBytes == inStart 	then return _toChar(ch1), -1 end
-	if #inBytes < (inStart + iChkLen) then return _toChar(ch1), -1 end
+	if #inBytes < (inStart + iChkLen) then return chMark, -1 end
 	
 	-- check each byte if in list of intervals
 	--
-	local iOffset = 3
+	local chCode
+	local iOffset = 2
 	
 	for j=1, iChkLen do
-		local chTest = inBytes:sub(inStart + j, inStart + j):byte()
 		
-		if not (utf8Codes[iOffset + j] <= chTest and chTest <= utf8Codes[iOffset + j + 1]) then
+		chCode = inBytes:sub(inStart + j, inStart + j):byte()
+		
+		if not (utf8Codes[iOffset + j] <= chCode and chCode <= utf8Codes[iOffset + j + 1]) then
 			
 			-- this is an error, byte out of bounds
 			--
@@ -186,14 +209,13 @@ local function str_sub_utf_8(inBytes, inStart)
 		iOffset = iOffset + 1
 	end
 	
-	-- this a complete Unicode string of lenght > 1
+	-- this a complete Unicode string of length > 1
 	--
 	return inBytes:sub(inStart, inStart + iChkLen), (iChkLen + 1)
 end
 
 -- ----------------------------------------------------------------------------
--- extract an entire alfa-word (with punctuation) from a buffer
--- stops start and end at reject character
+-- boolean test if a given byte value is an ASCII punctuation character
 --
 local function str_ispunct(inByte)
 	
@@ -258,6 +280,7 @@ if not string.fmtfind then string.fmtfind = str_fmtfind end
 if not string.utf8sub then string.utf8sub = str_sub_utf_8 end
 if not string.ispunct then string.ispunct = str_ispunct end
 if not string.wordsub then string.wordsub = str_wordsub end
+if not string.fmtkilo then string.fmtkilo = str_fmtkilo end
 
 -- ----------------------------------------------------------------------------
 -- ----------------------------------------------------------------------------
