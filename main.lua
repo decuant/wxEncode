@@ -270,7 +270,6 @@ local function OnEncode_UTF_8()
 	
 	trace.lnTimeStart("Encoding memory as UTF_8")	
 	
---	local sSource = thisApp.sFileMemory
 	local tFile = thisApp.tFileLines
 	local sLine
 	local iIndex
@@ -376,38 +375,12 @@ end
 
 -- ----------------------------------------------------------------------------
 --
-local function OnCreateSamples()
---	trace.line("OnCreateSamples")
-
-	local sTargetFile = thisApp.tConfig.SamplesFile
-	local sOpenMode = "w"
-	
-	-- check which encoding to use
-	--
-	local iFormat	= 1
-
-	if thisApp.tConfig.SamplesEnc == "UTF_8" then iFormat = 2 end
-	
-	trace.lnTimeStart("Creating samples file ...")
-	
-	-- call the function to create the samples
-	--
-	local bRet = samples.Create(sTargetFile, sOpenMode, iFormat, 
-								thisApp.tConfig.Compact, thisApp.tConfig.CompactCols)
-	
-	trace.lnTimeEnd("Create samples end")
-	
-	return bRet
-end
-
--- ----------------------------------------------------------------------------
---
 local function OnCreateByBlock()
 --	trace.line("OnCreateByBlock")
 
 	local sTargetFile = thisApp.tConfig.SamplesFile
-	local sOpenMode = "a+"
-	local tBlocks	= thisApp.tConfig.ByBlocksRow
+	local sOpenMode	  = "a+"
+	local tBlocks	  = thisApp.tConfig.ByBlocksRow
 	
 	if not tBlocks then return false end
 		
@@ -423,13 +396,24 @@ local function OnCreateByBlock()
 	trace.lnTimeStart("Creating samples file ...")		
 		
 	-- scan the table, each row is a table itself
-	-- where the first element is the row number
+	-- where the first element is enable flag
 	-- and the second element is a generic label
 	--
-	for _, iBlock in ipairs(thisApp.tConfig.ByBlocksRow) do
+	local iAlignAt = thisApp.tConfig.AlignByCols
+	local bCompact = thisApp.tConfig.OnlyGroups
+	
+	for iRow, iBlock in ipairs(thisApp.tConfig.ByBlocksRow) do
 
-		if not samples.ByBlock(iBlock[1], iBlock[2], sTargetFile, sOpenMode, thisApp.tConfig.CompactCols) then
-			break
+		if iBlock[1] then
+			
+--			local sLine = _format("Sampling row: [%3d] title: [%s]", iRow, iBlock[2])
+--			trace.line(sLine)			
+			
+			if not samples.ByBlock(iRow, iBlock[2], sTargetFile, sOpenMode, iAlignAt, bCompact) then
+				
+				trace.lnTimeEnd("Create samples interrupted, quitting...")
+				break
+			end		
 		end		
 	end			
 
@@ -482,6 +466,8 @@ local function SetUpApplication()
 	
 	assert(os.setlocale('ita', 'all'))
 	trace.line("Current locale is [" .. os.setlocale() .. "]")
+	
+	samples.Init()
 
 	if not OnReadSetupInf() then return false end
 	
@@ -545,11 +531,10 @@ thisApp =
 	SaveFile		= OnSaveFile,			-- save memory to file
 	CheckEncoding	= OnCheckEncoding,		-- check chars in current file
 	Encode_UTF_8	= OnEncode_UTF_8,		-- save the current file UTF_8
-	CreateSamples	= OnCreateSamples,		-- create a file with samples
-	CreateByBlock	= OnCreateByBlock,
-	LookupInterval	= OnLookupInterval,
+	CreateByBlock	= OnCreateByBlock,		-- crate samples of characters
+	LookupInterval	= OnLookupInterval,		-- test find the row of index
 	GetTextAtPos	= OnGetTextAtPos,		-- get text at pos (see setupinf.lua)
-	GarbageTest		= OnGarbageTest,
+	GarbageTest		= OnGarbageTest,		-- test memory and call collect
 }
 
 -- ----------------------------------------------------------------------------
