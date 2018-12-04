@@ -9,7 +9,7 @@ create a sample file with some Unicode page blocks.
 check file's UTF_8 code by blocks of validity [see Unicode RFC 3629](https://tools.ietf.org/html/rfc3629#section-4).  
 copy byte/UTF_8/Word/Line bytes to clipboard.  
 trace most of the operations on a logging file.  
-code is tested to run only on Windows 10, but there shall no issues on Linux.  
+code is tested to run only on Windows 10, but there shall be no issues on Linux.  
 
 see List of Unicode characters - [Wikipedia](https://en.wikipedia.org/wiki/List_of_Unicode_characters)
 
@@ -22,6 +22,8 @@ import filename is read from the config file each time the import is launched.
 bytes display can be selected as oct/dec/hex.  
 can refresh setting by menu command and update the view on the fly.  
 having a wxWidget timer available it will call a cycle of garbage collection when a ticktimer fires.  
+the application can create a number of samples char from the Unicode segmented list, just enable the creation in the setupinf file and run a Create Samples.  
+there's an optional small window to display the current character with a very big size font.  
 
 I worked out this application using ZeroBrane, from within I usually start it, this makes easy for me to leave the setupinf.lua file open on the editor and modify the import name on the fly.  
 
@@ -40,8 +42,8 @@ Issues:
 * the window's client area height is correct only when running from ZeroBrane, if using the lua.exe interpreter than a fix must be applied at OnSize event (actually there is no way to get the statusbar's height)
   
 file utf8table.lua is still used but deprecated.  
-file utility.lua is no more used and deprecated.
-file random.lua is not used at all and deprecated.
+file utility.lua is no more used and deprecated.  
+file random.lua is not used at all and deprecated.  
 
-  
+--------------------------  
 to easily find help on formatting this very file then [click here](https://help.github.com/articles/basic-writing-and-formatting-syntax/)
