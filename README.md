@@ -4,6 +4,8 @@ using wxLua display both a binary and text views of a file.
 
 the application uses wxLua 2.8.12.3 - Lua 5.2.2
 
+to run the application simply install the wxLua package in your machine, download this application, make the wxLua package visible in the execution environment (PATH in Windows) and run it with this very command: lua wxMain  
+
 encode an ASCII file to utf_8.  
 create a sample file with some Unicode page blocks.  
 check file's UTF_8 code by blocks of validity [see Unicode RFC 3629](https://tools.ietf.org/html/rfc3629#section-4).  
@@ -24,6 +26,9 @@ can refresh setting by menu command and update the view on the fly.
 having a wxWidget timer available it will call a cycle of garbage collection when a ticktimer fires.  
 the application can create a number of samples char from the Unicode segmented list, just enable the creation in the setupinf file and run a Create Samples.  
 there's an optional small window to display the current character with a very big size font.  
+there's an optional small window to calculate the UTF_8 bytes sequence from Unicode and vice versa.  
+
+shortly I will add some screenshots to display what the application capabilities are, but it's such a small step to install it on your machine that I ask you why not donwload it and give it a try?
 
 I worked out this application using ZeroBrane, from within I usually start it, this makes easy for me to leave the setupinf.lua file open on the editor and modify the import name on the fly.  
 
