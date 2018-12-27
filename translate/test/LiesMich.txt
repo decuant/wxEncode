@@ -1,0 +1,122 @@
+===============================================================================
+LiesMich.txt
+
+PCAN-USB
+Copyright (c) 2008 PEAK-System Technik GmbH, Darmstadt
+Alle Rechte vorbehalten.
+===============================================================================
+
+Maximieren Sie das Editor-Fenster, um diese Datei leichter lesen zu können.
+
+
+Inhalt:
+-------
+  * Einleitung
+  * Systemvoraussetzungen
+  * Inhalt des Verzeichnisses
+  * Inbetriebnahme unter Windows
+  * PEAK-System Technik GmbH kontaktieren
+
+
+Einleitung
+----------
+Der PCAN-USB-Adapter ermöglicht den Anschluss eines CAN-Busses an eine
+USB-Schnittstelle eines IBM-kompatiblen PCs. Er ist besonders für den Einsatz
+mit Notebooks geeignet, da diese selten über ISA- oder PCI-Steckplätze
+verfügen. Mit Hilfe dieses Adapters kann jeder PC in ein High-Speed-CAN
+(HS-CAN) eingebunden werden.
+
+Bei der so genannten ISO-Ausführung des PCAN-USB-Adapters wird mittels
+eingebautem DC/DC-Wandler und Optokoppler eine galvanische Trennung bis max.
+500 V zwischen der PC- und der CAN-Seite gewährleistet
+
+Die mitgelieferten Treiber, die PCAN-Light API und die CAN-Bus Monitor
+Software "PCAN-View" sind die im Funktionsumfang reduzierten Versionen
+der käuflich zu erwerbenden Software-Pakete PCAN-Evaluation,
+PCAN-Developer und PCAN-Explorer.
+
+
+Systemvoraussetzungen
+---------------------
+- Ein freier USB-Anschluss (USB 1.1 oder USB 2.0) am PC oder an einem am
+  PC angeschlossenen USB-Hub
+- Betriebssysteme: Windows (2000 SP4, XP, Vista) und Linux
+
+
+Inhalt des Verzeichnisses
+-------------------------
+LiesMich.txt
+    Diese Textdatei.
+
+ReadMe.txt
+    Diese Textdatei in englischer Übersetzung.
+
+Pcan_usb.dll
+    Die Interface-DLL, welche die API-Funktionen implementiert.
+
+\API
+    API-Definitionen für die verschiedenen Entwicklungsumgebungen.
+
+\Lib
+    Import-Bibliotheken für Microsoft Visual C++ und Borland C++ Builder.
+
+
+Inbetriebnahme unter Windows
+----------------------------
+Wir empfehlen, dass Sie vor dem erstmaligen Anschließen des PCAN-USB-Adapters
+an den PC den Treiber installieren.
+
+
+> So installieren Sie den Treiber und ggf. zusätzliche Software:
+
+1.  Stellen Sie bitte sicher, dass Sie mit Administratoren-Rechten angemeldet
+    sind (nicht notwendig bei der späteren Verwendung des PCAN-USB-Adapters).
+
+2.  Legen Sie die mitgelieferte CD-ROM in den Computer ein. In der Regel
+    erscheint kurze Zeit später selbständig das Navigationsprogramm. Falls
+    nicht, starten Sie bitte die Datei Intro.exe aus dem Hauptverzeichnis der
+    CD-ROM.
+
+3.  Navigieren Sie durch die Menüs zur Treiberinstallation für den PCAN-USB-
+    Adapter (Deutsch > Treiber > PCAN-USB). Klicken Sie anschließend auf "Jetzt
+    installieren". Das Treiberinstallationsprogramm wird gestartet.
+
+4.  Befolgen Sie die Anweisungen des Installationsprogramms.
+
+Tipp:
+    Während der Installationsprozedur haben Sie die Möglichkeit, zusätzlich den
+    CAN-Monitor PCAN-View für Windows zu installieren.
+
+> So schließen Sie den PCAN-USB-Adapter an und führen die abschließende
+  Initialisierung durch:
+
+1.  Schließen Sie den PCAN-USB-Adapter an einen USB-Port am PC an. Der PC kann
+    dabei eingeschaltet bleiben.
+
+2.  Windows meldet, dass neue Hardware entdeckt worden ist und startet unter
+    Umständen einen Installationsassistenten. Dies ist abhängig von der
+    verwendeten Windows-Version. Bestätigen Sie ggf. die Schritte zur Treiber-
+    initialisierung.
+
+3.  Nach Abschluss der Installation können Sie ggf. wieder als Anwender mit
+    eingeschränkten Rechten arbeiten.
+
+Nach erfolgreicher Installation des Treibers leuchtet die rote LED am PCAN-USB-
+Adapter.
+
+
+PEAK-System Technik GmbH kontaktieren
+-------------------------------------
+Haben Sie Fragen bezüglich der Inbetriebnahme des PCAN-USB-Adapters, oder
+benötigen Sie Informationen über weitere PEAK CAN-Produkte, wenden Sie sich
+bitte an:
+
+PEAK-System Technik GmbH
+Otto-Röhm-Str. 69
+64293 Darmstadt
+
+Tel. +49 6151 / 8173-20
+FAX  +49 6151 / 8173-29
+
+support@peak-system.com
+http://www.peak-system.com
