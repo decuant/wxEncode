@@ -7,18 +7,22 @@
 
 local wx 		= require "wx"			-- uses wxWidgets for Lua 5.2
 local palette	= require "wxPalette"	-- common colours definition in wxWidgets
-local trace 	= require "trace"		-- shortcut for tracing
+--local trace 	= require "trace"		-- shortcut for tracing
 local ticktime  = require "ticktimer"	-- timer object constructor
 local wxLoupe 	= require "wxLoupe"		-- display magnification of current char
 local wxCalc	= require "wxCalc"		-- dialog for conversion bytes <-> Unicode
 local wxFind	= require "wxFind"		-- find text within the file
+				  require "extrastr"	-- extra string processor
 
 local _floor	= math.floor
+local _max		= math.max
+local _min		= math.min
+local _concat	= table.concat
 local _format	= string.format
 local _find		= string.find
 local _strrep	= string.rep
 local _byte		= string.byte
-local _concat	= table.concat
+local _utf8sub	= string.utf8sub		-- extract utf8 bytes (1-4)
 
 -- ----------------------------------------------------------------------------
 -- status bar panes width
@@ -40,25 +44,27 @@ local tSchemeWhite =
 	["ColourColumn"]= palette.Honeydew,
 	["LeftText"]	= palette.Black,
 	["LeftCursor"]	= palette.Orchid2,
-	["Linefeed"]	= palette.Gray20,
+	["Linefeed"]	= palette.Red,
 	["Unprintable"]	= palette.Purple3,
 	["MarkStart"]	= palette.CadetBlue2,
 	["HighBits"]	= palette.NavajoWhite1,
-	
+
 	["RightBack"]	= palette.White,
 	["RightText"]	= palette.Black,
-	["RightCursor"]	= palette.Blue1,	
+	["RightCursor"]	= palette.Blue1,
 	["VerticalBar"]	= palette.SlateGray2,
 	["StopRow"]		= palette.Wheat2,
 
 	["Gutter"] 		= palette.Gray70,
 	["SlideActive"] = palette.Black,
-	
-	["LoupeBack"]	= palette.White,
+
+	["LoupeBack"]	= palette.Ivory,
 	["LoupeFore"]	= palette.Black,
-	
-	["DialogsBack"] = palette.Gray90,
-	["DialogsFore"] = palette.Black,	
+	["LoupeExtra"]	= palette.Goldenrod2,
+
+	["DialogsBack"] = palette.GhostWhite,
+	["DialogsFore"] = palette.Black,
+	["DialogsExtra"]= palette.Turquoise3,
 }
 
 local tSchemeLight =
@@ -71,48 +77,52 @@ local tSchemeLight =
 	["Unprintable"]	= palette.Magenta,
 	["MarkStart"]	= palette.LightPink2,
 	["HighBits"]	= palette.LightBlue2,
-	
+
 	["RightBack"]	= palette.Seashell2,
 	["RightText"]	= palette.Gray40,
-	["RightCursor"]	= palette.Black,	
+	["RightCursor"]	= palette.Black,
 	["VerticalBar"]	= palette.Khaki3,
 	["StopRow"]		= palette.Burlywood1,
-	
+
 	["Gutter"] 		= palette.Snow3,
 	["SlideActive"] = palette.Black,
 
 	["LoupeBack"]	= palette.Seashell2,
 	["LoupeFore"]	= palette.Gray30,
-	
+	["LoupeExtra"]	= palette.SteelBlue3,
+
 	["DialogsBack"] = palette.Cornsilk,
-	["DialogsFore"] = palette.Black,		
+	["DialogsFore"] = palette.Black,
+	["DialogsExtra"]= palette.DarkOrchid,
 }
 
 local tSchemeDark =
 {
 	["LeftBack"]	= palette.SlateBlue4,
 	["ColourColumn"]= palette.NavyBlue,
-	["LeftText"]	= palette.Gray75,
+	["LeftText"]	= palette.Gray80,
 	["LeftCursor"]	= palette.VioletRed1,
-	["Linefeed"]	= palette.Gray80,
+	["Linefeed"]	= palette.DeepPink2,
 	["Unprintable"]	= palette.Magenta,
 	["MarkStart"]	= palette.Sienna,
-	["HighBits"]	= palette.SeaGreen4,
-	
+	["HighBits"]	= palette.Cyan4,
+
 	["RightBack"]	= palette.DarkSlateGray,
 	["RightText"]	= palette.Gray70,
-	["RightCursor"]	= palette.Azure1,	
-	["VerticalBar"]	= palette.Ivory3,
-	["StopRow"]		= palette.Firebrick4,
-	
-	["Gutter"] 		= palette.SteelBlue2,
-	["SlideActive"] = palette.SlateBlue1,
+	["RightCursor"]	= palette.Azure1,
+	["VerticalBar"]	= palette.PeachPuff,
+	["StopRow"]		= palette.Salmon4,
 
-	["LoupeBack"]	= palette.DarkSlateGray,
+	["Gutter"] 		= palette.SteelBlue2,
+	["SlideActive"] = palette.Yellow,
+
+	["LoupeBack"]	= palette.MediumPurple4,
 	["LoupeFore"]	= palette.White,
-	
+	["LoupeExtra"]	= palette.PaleGoldenrod,
+
 	["DialogsBack"] = palette.NavyBlue,
-	["DialogsFore"] = palette.White,	
+	["DialogsFore"] = palette.White,
+	["DialogsExtra"]= palette.DeepPink,
 }
 
 local tSchemeBlack =
@@ -125,46 +135,50 @@ local tSchemeBlack =
 	["Unprintable"]	= palette.Magenta,
 	["MarkStart"]	= palette.SlateBlue,
 	["HighBits"]	= palette.DarkGoldenrod,
-	
+
 	["RightBack"]	= palette.Black,
 	["RightText"]	= palette.Gray80,
-	["RightCursor"]	= palette.LightGoldenrod,	
-	["VerticalBar"]	= palette.Tan,
+	["RightCursor"]	= palette.LightGoldenrod,
+	["VerticalBar"]	= palette.Wheat3,
 	["StopRow"]		= palette.IndianRed4,
-	
+
 	["Gutter"] 		= palette.MediumSlateBlue,
 	["SlideActive"] = palette.MediumAquamarine,
-	
-	["LoupeBack"]	= palette.Black,
-	["LoupeFore"]	= palette.Gray90,
-	
+
+	["LoupeBack"]	= palette.Gray6,
+	["LoupeFore"]	= palette.LightYellow2,
+	["LoupeExtra"]	= palette.OrangeRed,
+
 	["DialogsBack"] = palette.Gray15,
-	["DialogsFore"] = palette.White,	
+	["DialogsFore"] = palette.White,
+	["DialogsExtra"]= palette.Green,
 }
 
 -- ----------------------------------------------------------------------------
--- prealloc pens and brushes
+-- (pre)allocate pens and brushes
 --
-local m_PenNull = wx.wxPen(palette.Black, 1, wx.wxTRANSPARENT)
+local m_PenNull   = wx.wxPen(palette.Black, 1, wx.wxTRANSPARENT)
+local m_BrushNull = wx.wxBrush(palette.Black, wx.wxTRANSPARENT)
 
 -- bytes pane
 --
-local penLF = wx.wxPen(tSchemeWhite.Linefeed, 3, wx.wxSOLID)
-local penXX = wx.wxPen(tSchemeWhite.Unprintable, 3, wx.wxSOLID)
-local brMrk = wx.wxBrush(tSchemeWhite.MarkStart, wx.wxSOLID)
-local brHBt = wx.wxBrush(tSchemeWhite.HighBits, wx.wxSOLID)
-local brCur = wx.wxBrush(tSchemeWhite.LeftCursor, wx.wxSOLID)
+local m_penLF 	= wx.wxPen(tSchemeWhite.Linefeed, 3, wx.wxSOLID)
+local m_penXX 	= wx.wxPen(tSchemeWhite.Unprintable, 3, wx.wxSOLID)
+local m_brMrk 	= wx.wxBrush(tSchemeWhite.MarkStart, wx.wxSOLID)
+local m_brHBt 	= wx.wxBrush(tSchemeWhite.HighBits, wx.wxSOLID)
+local m_brCur 	= wx.wxBrush(tSchemeWhite.LeftCursor, wx.wxSOLID)
 
 -- text pane
 --
-local penUnd= wx.wxPen(tSchemeWhite.RightCursor, 6, wx.wxSOLID)
-local brStp	= wx.wxBrush(tSchemeWhite.StopRow, wx.wxSOLID)
-local penBar= wx.wxPen(tSchemeWhite.VerticalBar, 1, wx.wxSOLID)
-local brBar	= wx.wxBrush(tSchemeWhite.VerticalBar, wx.wxSOLID)
+local m_penUnd	= wx.wxPen(tSchemeWhite.RightCursor, 6, wx.wxSOLID)
+local m_brStp	= wx.wxBrush(tSchemeWhite.StopRow, wx.wxSOLID)
+local m_penBar	= wx.wxPen(tSchemeWhite.VerticalBar, 1, wx.wxSOLID)
+local m_brBar	= wx.wxBrush(tSchemeWhite.VerticalBar, wx.wxSOLID)
 
 -- ----------------------------------------------------------------------------
 -- format to use for the bytes pane
 -- (the 2nd element is a precalc of the lenght)
+--
 local tFormat =
 {
 	["Oct"] = {"%04o ", 5},
@@ -178,7 +192,7 @@ local tFormat =
 local iRCEntry = wx.wxID_HIGHEST + 1
 
 local function UniqueID()
-	
+
 	iRCEntry = iRCEntry + 1
 	return iRCEntry
 end
@@ -195,9 +209,14 @@ local tTimers =
 }
 
 -- ----------------------------------------------------------------------------
+-- reference to the application
+--
+local m_App = nil
+
+-- ----------------------------------------------------------------------------
 -- window's private members
 --
-local m_MainFrame = 
+local m_Frame =
 {
 	hWindow			= nil,	-- main frame
 	hLoupe			= nil,	-- loupe window
@@ -206,7 +225,7 @@ local m_MainFrame =
 	bVisible		= false,-- last visibile status
 	hStatusBar		= nil,	-- the status bar
 	hSlidesDC		= nil,	-- background for the 2 slides
-	hMemoryDC		= nil,	-- device context for the window	
+	hMemoryDC		= nil,	-- device context for the window
 	hTickTimer		= nil,	-- timer for messages in the statusbar
 	iTmInterval		= 3000,	-- diplay msg on status bar for much time
 
@@ -219,30 +238,43 @@ local m_MainFrame =
 	rcClientH		= 0,	-- client rect height
 	iOffsetX		= 6,	-- offset for writing text
 	iOffsetY		= 14,	-- offset for writing text
-	
+
 	iLeftMonoWidth	= 0,	-- pixels for 1 byte display
 	iLeftSpacerX	= 0,	-- pixels for formatted string (oct/dec/hex)
 	iLeftSpacerY	= 0,	-- pixels for the height
-	
+
 	iRightSpacerX	= 0,	-- not used
 	iRightSpacerY	= 0,	-- height in pixels of character
-	
+
 	iCursor			= 0,	-- where the cursor is
 	tFormatBytes	= nil,	-- format string for the bytes display
 	sTabReplace		= "",	-- replacement for tab on text slide
 	iByteRowCount	= 0,	-- number of visibles rows
 	iByteFirstRow	= 0,	-- first row visible, left rect
-	
+
 	iTextRowCount	= 0,	-- number of visible rows
 	iTextFirstRow	= 0,	-- first row visible, right rect
 	iStopLine		= -1,	-- line where the cursor is in
 	iStopStart		= 0,	-- byte offset of stopline in buffer
-	
+
 	sCurrCharacter	= "",	-- current character (1 to 4 bytes)
+	iCurrCharStart	= 0,	-- offset within the stopline
 }
 
 -- ----------------------------------------------------------------------------
--- default dialogs' rectangles andvisibility
+--
+local m_Marker =
+{
+	bMouseDown	= false,	-- the left mouse button is down
+--	bMouseMove	= false,	-- mouse is moving
+	bShiftDown	= false,	-- shift key is down
+
+	iPosStart	= 1,		-- start marker
+	iPosStop	= 1,		-- stop marker
+}
+
+-- ----------------------------------------------------------------------------
+-- default dialogs' rectangles and visibility
 --
 local m_WinIni = "winini.lua"
 local tWindows = nil
@@ -266,54 +298,55 @@ local function LoadDlgRects()
 		fhSrc:close()
 		tWindows = dofile(m_WinIni)
 	end
-	
+
 	if not tWindows then
-		
-		tWindows = 
+
+		tWindows =
 		{
 			["Main"]	= {   0,   0, 1000, 1500, 1},
 			["Loupe"]	= {1000, 650,  500,  560, 0},
 			["Calc"]	= {1000, 150,  500,  280, 0},
 			["Find"]	= {1000, 430,  500,  250, 0},
-		}		
+		}
 	end
 end
 
 -- ----------------------------------------------------------------------------
--- format 
+-- format values for writing to a Lua's syntax file
+--
 local function DlgRect2Lua(inLabel, inFrame, inConfig)
 
 	local t = inConfig
-	
+	local sLine
+
 	if inFrame then
-			
+
 		local iPosX		= inFrame:GetPosition().x
 		local iPosY  	= inFrame:GetPosition().y
 		local iWidth  	= inFrame:GetSize():GetWidth()
 		local iHeight 	= inFrame:GetSize():GetHeight()
 		local iVisible	= 0
-		
+
 		if inFrame:IsShown() then iVisible = 1 end
-		
+
 		-- correct negative offsets
 		--
 		if 0 > iPosX then iPosX	= 0 end
 		if 0 > iPosY then iPosY	= 0 end
-		
+
 		-- check minimum sizes
 		--
 		if 0 >= iWidth  then iWidth  = 50 end
 		if 0 >= iHeight then iHeight = 50 end
-		
+
 		t = {iPosX, iPosY, iWidth, iHeight, iVisible}
 	end
-	
+
 	-- returned line of text
-	--	
+	--
 	sLine = "{" .. _concat(t, ", ") .. "},\n"
---	sLine = "{" .. t[1] .. ", " .. t[2] .. ", " .. t[3] .. ", " .. t[4] .. ", " .. t[5] .. "},\n"
 	sLine = "\t[\"" .. inLabel .. "\"]\t= " .. sLine
-	
+
 	return sLine
 end
 
@@ -325,41 +358,42 @@ local function SaveDlgRects()
 
 	local  fhTgt = io.open(m_WinIni, "w")
 	if not fhTgt then  return false end
-	
+
 	local sSep	= "-- " .. _strrep("-", 77) .. "\n"
 	local sLine
-	
+
 	fhTgt:write(sSep)
-	sLine = "-- last used dialogs\' rectangles\n--\n\n"
+	sLine = "-- last used dialogs\' rectangles\n--\n"
 	fhTgt:write(sLine)
-	
+
 	-- start of table's defintion
 	--
-	sLine = "local tWindows = \n{\n"
+	sLine = "local tWindows =\n{\n"
 	fhTgt:write(sLine)
-	
-	sLine = DlgRect2Lua("Main", m_MainFrame.hWindow, tWindows.Main)
+
+	sLine = DlgRect2Lua("Main", m_Frame.hWindow, tWindows.Main)
 	fhTgt:write(sLine)
-	
-	sLine = DlgRect2Lua("Loupe", m_MainFrame.hLoupe, tWindows.Loupe)
+
+	sLine = DlgRect2Lua("Loupe", m_Frame.hLoupe, tWindows.Loupe)
 	fhTgt:write(sLine)
-	
-	sLine = DlgRect2Lua("Calc", m_MainFrame.hCalcUni, tWindows.Calc)
+
+	sLine = DlgRect2Lua("Calc", m_Frame.hCalcUni, tWindows.Calc)
 	fhTgt:write(sLine)
-	
-	sLine = DlgRect2Lua("Find", m_MainFrame.hFindText, tWindows.Find)
+
+	sLine = DlgRect2Lua("Find", m_Frame.hFindText, tWindows.Find)
 	fhTgt:write(sLine)
-	
+
 	-- end of table's defintion
 	--
 	sLine = "}\n\nreturn tWindows\n\n"
 	fhTgt:write(sLine)
-	
+
 	fhTgt:write(sSep)
 	fhTgt:write(sSep)
 	fhTgt:close()
+
 	return true
-end	
+end
 
 -- ----------------------------------------------------------------------------
 -- get the correct spacing
@@ -368,25 +402,25 @@ local function CalcFontSpacing(inDrawDC)
 --	trace.line("CalcFontSpacing")
 
 	if not inDrawDC then return end
-	if not m_MainFrame.hFontBytes then return end
-	if not m_MainFrame.hFontText then return end
-	
-	-- left pane
+	if not m_Frame.hFontBytes then return end
+	if not m_Frame.hFontText then return end
+
+	-- left pane, presume a mono-spaced font used
 	--
-	inDrawDC:SetFont(m_MainFrame.hFontBytes)   
- 	
-	local sTest	= _format(m_MainFrame.tFormatBytes[1], 0)
-	
-	m_MainFrame.iLeftMonoWidth	= inDrawDC:GetTextExtent("0")
-	m_MainFrame.iLeftSpacerX	= inDrawDC:GetTextExtent(sTest)
-	m_MainFrame.iLeftSpacerY	= inDrawDC:GetCharHeight()	
-	
+	inDrawDC:SetFont(m_Frame.hFontBytes)
+
+	local sTest	= _format(m_Frame.tFormatBytes[1], 0x00)
+
+	m_Frame.iLeftMonoWidth	= inDrawDC:GetTextExtent("0")
+	m_Frame.iLeftSpacerX	= inDrawDC:GetTextExtent(sTest)
+	m_Frame.iLeftSpacerY	= inDrawDC:GetCharHeight()
+
 	-- right pane
 	--
-	inDrawDC:SetFont(m_MainFrame.hFontText)   
- 	
-	m_MainFrame.iRightSpacerX	= 0
-	m_MainFrame.iRightSpacerY	= inDrawDC:GetCharHeight()		
+	inDrawDC:SetFont(m_Frame.hFontText)
+
+	m_Frame.iRightSpacerX	= 0
+	m_Frame.iRightSpacerY	= inDrawDC:GetCharHeight()
 end
 
 -- ----------------------------------------------------------------------------
@@ -397,33 +431,36 @@ local function DrawVerticalBar(inDrawDC)
 --	trace.line("DrawVerticalBar")
 
 	if not inDrawDC then return end
-	if 0 == thisApp.iFileBytes then return end
+	if 0 == m_App.iFileBytes then return end
 
 	-- get the correct spacing here
-	-- 	
-	local iSpacerY	= m_MainFrame.iRightSpacerY
-	local iOffY 	= m_MainFrame.iOffsetY
-	local iHeight	= m_MainFrame.rcClientH - iOffY * 2
-	
-	local iNumRows	= #thisApp.tFileLines
-	local iVIORows	= m_MainFrame.iTextRowCount
-	local iCurPage	= (m_MainFrame.iTextFirstRow / iVIORows)
-	local iTotPages	= (iNumRows / iVIORows)
-	local iPageLen	= (iHeight / iTotPages)
-	local iPosY		= (iPageLen * iCurPage)
-			
+	--
+	local iOffY 	= m_Frame.iOffsetY
+	local iHeight	= m_Frame.rcClientH - iOffY * 2
+
+	local iNumRows	= #m_App.tFileLines						-- total file's lines
+	local iVIORows	= m_Frame.iTextRowCount					-- max visible rows
+	local iCurPage	= (m_Frame.iTextFirstRow / iVIORows)	-- current page shown
+	local iTotPages	= (iNumRows / iVIORows)					-- pages making the file
+	local iPageLen	= (iHeight / iTotPages)					-- hieght of the bar
+	local iPosY		= (iPageLen * iCurPage)					-- absolute position
+
 	-- just fix it when too small
 	-- (it affects only the appereance)
 	--
-	iPageLen = math.max(iPageLen, 25)
-	
+	iPageLen = _max(iPageLen, 25)
+
+	-- fix for not rounding divisions
+	--
+	if iHeight <= (iPosY + iPageLen) then iPosY = iHeight - iPageLen end
+
 	-- draw a rect for the bar itself and a line all through the slide's height
 	--
-	inDrawDC:SetPen(penBar)
-	inDrawDC:SetBrush(brBar)
-	
-	inDrawDC:DrawRectangle(m_MainFrame.rcClientW - 20, iOffY, 2, iHeight)
-	inDrawDC:DrawRectangle(m_MainFrame.rcClientW - 30, iPosY, 20, iPageLen)
+	inDrawDC:SetPen(m_penBar)
+	inDrawDC:SetBrush(m_brBar)
+
+	inDrawDC:DrawRectangle(m_Frame.rcClientW - 20, iOffY, 2, iHeight - iOffY)
+	inDrawDC:DrawRoundedRectangle(m_Frame.rcClientW - 30, iPosY, 20, iPageLen, 5)
 end
 
 -- ----------------------------------------------------------------------------
@@ -431,205 +468,258 @@ end
 --
 local function DrawColumns(inDrawDC)
 --	trace.line("DrawColumns")
-	
+
 	if not inDrawDC then return end
-	if not m_MainFrame.hFontBytes then return end
-	
-	local iCurX		= m_MainFrame.iOffsetX
-	local iColumns	= thisApp.tConfig.Columns
-	local iSpacerX	= m_MainFrame.iLeftSpacerX
-	local tScheme	= m_MainFrame.tColourScheme
-	
+	if not m_Frame.hFontBytes then return end
+
+	local iCurX		= m_Frame.iOffsetX
+	local iColumns	= m_App.tConfig.Columns
+	local iSpacerX	= m_Frame.iLeftSpacerX
+	local tScheme	= m_Frame.tColourScheme
+
 	inDrawDC:SetPen(m_PenNull)
 	inDrawDC:SetBrush(wx.wxBrush(tScheme.ColourColumn, wx.wxSOLID))
 
 	-- center the highlight on the number of chars written (hex/dec/oct)
 	--
-	iCurX = iCurX - (iSpacerX / (m_MainFrame.tFormatBytes[2] * 2)) + iSpacerX
-	
+	iCurX = iCurX - (iSpacerX / (m_Frame.tFormatBytes[2] * 2)) + iSpacerX
+
 	while iColumns > 0 do
-		
-		inDrawDC:DrawRectangle(iCurX, 0, iSpacerX, m_MainFrame.rcClientH)
-		
+
+		inDrawDC:DrawRectangle(iCurX, 0, iSpacerX, m_Frame.rcClientH)
+
 		iCurX = iCurX + iSpacerX * 2
-		
+
 		iColumns = iColumns - 2
-	end	
+	end
+end
+
+-- ----------------------------------------------------------------------------
+-- extract the current char at offset's position within the current line
+-- works backward to find the starting index
+-- (the character's composition will span from 1 to 4 bytes)
+--
+local function SetCurrentChar(inBUffer, inOffset)
+--	trace.line("SetCurrentChar")
+
+	local sUTF_8, iRetCode = _utf8sub(inBUffer, inOffset)
+	local iSignal = iRetCode
+	local iStart  = inOffset
+
+	while (0 > iRetCode) and (0 < iStart) do
+
+		iStart = iStart - 1
+
+		sUTF_8, iRetCode = _utf8sub(inBUffer, iStart)
+	end
+
+	-- this is an error case, the character is not a valid
+	-- UTF_8 code and the algorithm felt on a previous char
+	-- which happened to be valid by chance
+	--
+	if ((0 > iSignal) and (1 == sUTF_8:len())) then
+
+		m_Frame.iCurrCharStart = inOffset
+		m_Frame.sCurrCharacter = inBUffer:sub(inOffset, inOffset)
+		return
+	end
+
+	if 0 < iRetCode then
+		-- the character is valid
+		--
+		m_Frame.iCurrCharStart = iStart
+		m_Frame.sCurrCharacter = sUTF_8
+
+	else
+		-- try to handle an error case
+		--
+		m_Frame.iCurrCharStart = inOffset
+		m_Frame.sCurrCharacter = inBUffer:sub(inOffset, inOffset)
+
+	end
 end
 
 -- ----------------------------------------------------------------------------
 -- drawing the left pane
+-- will also set the current char selected
 --
 local function DrawBytes(inDrawDC)
 --	trace.line("DrawBytes")
-	
+
 	-- quit if no data
 	--
-	if 0 >= thisApp.iFileBytes then return end
+	if 0 >= m_App.iFileBytes then return end
+	if 0 >= m_Frame.iCursor then return end
 
 	-- here we go
 	--
-	local iCursor	= m_MainFrame.iCursor
-	local iNumCols	= thisApp.tConfig.Columns
-	local tFile		= thisApp.tFileLines
-	local iOffX 	= m_MainFrame.iOffsetX
-	local iOffY 	= m_MainFrame.iOffsetY
+	local iCursor	= m_Frame.iCursor
+	local iNumCols	= m_App.tConfig.Columns
+	local tFile		= m_App.tFileLines
+	local iOffX 	= m_Frame.iOffsetX
+	local iOffY 	= m_Frame.iOffsetY
 	local iCurX 	= iOffX
 	local iCurY 	= iOffY
-	local tFmtBytes	= m_MainFrame.tFormatBytes			-- format table to use (hex/dec/oct)
-	local bUnderline = thisApp.tConfig.Underline		-- underline bytes below 0x20
-	local bUnicode	= thisApp.tConfig.ColourCodes		-- highlight Unicode codes
-	local tScheme	= m_MainFrame.tColourScheme			-- colour scheme in use
-		
+	local tFmtBytes	= m_Frame.tFormatBytes			-- format table to use (hex/dec/oct)
+	local bUnderline = m_App.tConfig.Underline		-- underline bytes below 0x20
+	local bUnicode	= m_App.tConfig.ColourCodes		-- highlight Unicode codes
+	local tScheme	= m_Frame.tColourScheme			-- colour scheme in use
+
 	-- this is the number of visible rows in the drawing area
 	-- refresh it now
 	--
-	m_MainFrame.iByteRowCount = 0
+	m_Frame.iByteRowCount = 0
 
 	-- foreground
 	--
-	inDrawDC:SetFont(m_MainFrame.hFontBytes)
+	inDrawDC:SetFont(m_Frame.hFontBytes)
 	inDrawDC:SetTextForeground(tScheme.LeftText)
 
 	-- get the correct spacing here
 	--
-	local iSpacerX	= m_MainFrame.iLeftMonoWidth
-	local iSpacerY	= m_MainFrame.iLeftSpacerY
-	local iRectH	= m_MainFrame.rcClientH - iOffY * 2 - iSpacerY
-	
+	local iSpacerX	= m_Frame.iLeftMonoWidth
+	local iSpacerY	= m_Frame.iLeftSpacerY
+	local iRectH	= m_Frame.rcClientH - iOffY * 2 - iSpacerY
+
 	------------------------
 	-- fill tables to flush
 	--
 	local tChars = { }						-- current set of tokens
-	local tDraw1 = { }						-- underline \n
+	local tDraw1 = { }						-- underline \n \r
 	local tDraw2 = { }						-- underline unprintable
 	local tDraw3 = { }						-- rect under UTF_8 mark byte
 	local tDraw4 = { }						-- rect under UTF_8 code
 	local tDraw5 = { }						-- cursor
-	
+
 	-- start from first visible row
-	--	
-	local iOffset 	 = iNumCols * m_MainFrame.iByteFirstRow
-	local iFileIndex = thisApp.LookupInterval(tFile, iOffset)
+	--
+	local iOffset 	 = iNumCols * m_Frame.iByteFirstRow
+	local iFileIndex = m_App.LookupInterval(tFile, iOffset)
 	local tCurrLine	 = tFile[iFileIndex]
 	local iCurColumn = 1
 	local iBufIndex  = iOffset - tCurrLine[1] + 1
 	local sSpaceSub  = _strrep(" ", tFmtBytes[2])
-	local bHideSpace = thisApp.tConfig.HideSpaces
+	local bHideSpace = m_App.tConfig.HideSpaces
 	local sToDraw
 	local ch
-	
+
 	while tCurrLine do
-		
+
 		while iNumCols >= iCurColumn do
-			
+
 			if #tCurrLine[2] < iBufIndex then
-				
+
 				-- query next row in table
 				--
 				iFileIndex	= iFileIndex + 1
 				tCurrLine	= tFile[iFileIndex]
 				iBufIndex	= 1
-				
+
 				-- safety check
 				--
-				if not tCurrLine then break end				
+				if not tCurrLine then break end
 			end
-			
+
 			ch = tCurrLine[2]:byte(iBufIndex)
-			
+
 			-- check for replacing the space byte
 			--
-			if bHideSpace and 0x20 == ch then 
+			if bHideSpace and 0x20 == ch then
 				sToDraw = sSpaceSub
 			else
 				sToDraw = _format(tFmtBytes[1], ch)
 			end
-			
+
 			tChars[#tChars + 1] = sToDraw		-- add string to coll.
-			
+
 			-- highlight chars
-			--				
+			--
 			if (0x20 > ch) or (0x7f < ch) or (tCurrLine[1] + iBufIndex) == iCursor then
-				
+
 				local xPos = iCurX + ((iCurColumn - 1) * iSpacerX * tFmtBytes[2])
 				local yPos = iCurY + iSpacerY - 3
 				local xLen = iSpacerX * (tFmtBytes[2] - 1)
-				
+
 				if bUnderline then
 					if 0x0a == ch 	 then tDraw1[#tDraw1 + 1] = {xPos, yPos, xPos + xLen, yPos}
 					elseif 0x20 > ch then tDraw2[#tDraw2 + 1] = {xPos, yPos, xPos + xLen, yPos} end
 				end
-				
+
 				if bUnicode then
 					if 0xbf < ch 	 then tDraw3[#tDraw3 + 1] = {xPos, iCurY, xLen, iSpacerY}
 					elseif 0x7f < ch then tDraw4[#tDraw4 + 1] = {xPos, iCurY, xLen, iSpacerY} end
 				end
-				
+
 				-- draw the cursor
 				-- (make it slightly bigger)
 				--
-				if (tCurrLine[1] + iBufIndex) == iCursor then tDraw5 = {xPos - 2, iCurY - 2, xLen + 4, iSpacerY + 4} end				
-			end		
-			
+				if (tCurrLine[1] + iBufIndex) == iCursor then
+					tDraw5 = {xPos - 2, iCurY - 2, xLen + 4, iSpacerY + 4}
+
+					-- extract the current UTF_8 char
+					--
+					SetCurrentChar(tCurrLine[2], iBufIndex)
+				end
+			end
+
 			-- get next
 			--
-			iBufIndex	= iBufIndex + 1			
+			iBufIndex	= iBufIndex + 1
 			iCurColumn	= iCurColumn + 1
 		end
-		
+
 		-- draw all the cosmetics
 		--
 		if 0 < #tDraw1 then
-			inDrawDC:SetPen(penLF)
+			inDrawDC:SetPen(m_penLF)
 			for _, coords in ipairs(tDraw1) do inDrawDC:DrawLine(coords[1], coords[2], coords[3], coords[4]) end
 			tDraw1 = { }
 		end
 
 		if 0 < #tDraw2 then
-			inDrawDC:SetPen(penXX)
+			inDrawDC:SetPen(m_penXX)
 			for _, coords in ipairs(tDraw2) do inDrawDC:DrawLine(coords[1], coords[2], coords[3], coords[4]) end
 			tDraw2 = { }
 		end
-		
-		inDrawDC:SetPen(m_PenNull)	-- remove bounding box
+
+		inDrawDC:SetPen(m_PenNull)	-- remove rectangle's bounding box
 
 		if 0 < #tDraw3 then
-			inDrawDC:SetBrush(brMrk)
+			inDrawDC:SetBrush(m_brMrk)
 			for _, coords in ipairs(tDraw3) do inDrawDC:DrawRectangle(coords[1], coords[2], coords[3], coords[4]) end
 			tDraw3 = { }
 		end
-		
+
 		if 0 < #tDraw4 then
-			inDrawDC:SetBrush(brHBt)
+			inDrawDC:SetBrush(m_brHBt)
 			for _, coords in ipairs(tDraw4) do inDrawDC:DrawRectangle(coords[1], coords[2], coords[3], coords[4]) end
 			tDraw4 = { }
 		end
-		
+
 		if 0 < #tDraw5 then
-			inDrawDC:SetBrush(brCur)
+			inDrawDC:SetBrush(m_brCur)
 			inDrawDC:DrawRectangle(tDraw5[1], tDraw5[2], tDraw5[3], tDraw5[4])
 			tDraw5 = { }
-		end		
-		
+		end
+
 		-- draw all the text line
 		--
 		inDrawDC:DrawText(_concat(tChars), iCurX, iCurY)
 		tChars = { }
-		
+
 		-- check if we are writing off the client area
 		--
 		iCurY = iCurY + iSpacerY
-		
+
 		if iRectH < iCurY then break end
 
 		-- restart from first column
 		--
 		iCurColumn = 1
-		
+
 		-- update the number of visible rows
 		--
-		m_MainFrame.iByteRowCount = m_MainFrame.iByteRowCount + 1		
+		m_Frame.iByteRowCount = m_Frame.iByteRowCount + 1
 	end
 end
 
@@ -638,165 +728,82 @@ end
 --
 local function DrawText(inDrawDC)
 --	trace.line("DrawText")
-	
-	if 0 >= thisApp.iFileBytes then return end
-	if 0 >= m_MainFrame.iCursor then return end
 
-	local iCursor	= m_MainFrame.iCursor
-	local tScheme	= m_MainFrame.tColourScheme						-- colour scheme in use
-	local sTabRep	= m_MainFrame.sTabReplace						-- replace tab with chars
-	local iOffX 	= m_MainFrame.iOffsetX
-	local iOffY 	= m_MainFrame.iOffsetY
+	if 0 >= m_App.iFileBytes then return end
+	if 0 >= m_Frame.iCursor then return end
+
+	local iCursor	= m_Frame.iCursor
+	local tScheme	= m_Frame.tColourScheme						-- colour scheme in use
+	local sTabRep	= m_Frame.sTabReplace						-- replace tab with chars
+	local iOffX 	= m_Frame.iOffsetX
+	local iOffY 	= m_Frame.iOffsetY
 --	local iSpacerX	= m_MainFrame.iRightSpacerX
-	local iSpacerY	= m_MainFrame.iRightSpacerY						-- height of each line
-	local iNumCols	= thisApp.tConfig.Columns
-	local iCurX		= iOffX + iNumCols * m_MainFrame.iLeftSpacerX	-- use left spacer
+	local iSpacerY	= m_Frame.iRightSpacerY						-- height of each line
+	local iNumCols	= m_App.tConfig.Columns
+	local iCurX		= iOffX + iNumCols * m_Frame.iLeftSpacerX	-- use left spacer
 	local iCurY		= iOffY
-	
+
 	-- check which line will be the first
-	--	
-	local tFile			= thisApp.tFileLines
-	local iStopLine		= thisApp.LookupInterval(tFile, iCursor - 1)
-	if 0 == iStopLine then return end								-- failed to get text
-	
-	local tCurrent		= tFile[iStopLine]
-	local iStopStart	= tCurrent[1]
---	local iStopOffset	= -1
---	local iStopLength	= 0
-
-	
---	iExtEnd = iExtEnd + iNumSubs * #sTabRep - iNumSubs	
-	
---[[	
-	-- perform a progressive scan of memory for newlines
 	--
-	local iCntPrev	= 0
-	local iCntNew	= 0
-	local iStart 	= 1
-	local iEnd	 	= sSource:find("\n", iStart, true)
-	
-	while iEnd do
-		
-		-- understand if the cursor is in the current line
-		--
-		iCntNew = iCntPrev + (iEnd - iStart + 1)		
-		if iCntPrev < iCursor and iCursor <= iCntNew then
-			
-			iStopLine	= iNumLines
-			iStopStart	= iStart 
-			
-			-- here the trick to handle tab(s) conversion to spaces
-			--
-			local sExtract  = sSource:sub(iStart, iCursor)
-			local iExtEnd	= iCursor - iStart + 1
-			local iNumSubs	
-			
-			sExtract, iNumSubs = sExtract:gsub("\t", sTabRep)
-			
-			iExtEnd = iExtEnd + iNumSubs * #sTabRep - iNumSubs
-			
-			-- get 2 more bytes to check for a Unicode value
-			--
-			sExtract  = sSource:sub(iStart, iCursor + 2):gsub("\t", sTabRep)
-			
-			-- get the underline to work properly when the cursor
-			-- is in one of the 2 bytes of the pair
-			--
-			local ch		= sExtract:sub(iExtEnd, iExtEnd)
-			local iToByte	= ch:byte()
-			
-			if (iExtEnd < #sExtract) and (0xc0 < iToByte) then
-				
-				if 0xdf < iToByte then
-					ch =  sExtract:sub(iExtEnd, iExtEnd + 2)
-				else
-					ch =  sExtract:sub(iExtEnd, iExtEnd + 1)
-				end
-							
-				iStopOffset = inDrawDC:GetTextExtent(sExtract:sub(1, iExtEnd - 1))	
-				
-			elseif (iExtEnd > 1) and (0x7f < iToByte and 0xc0 > iToByte) then
-				
-				ch =  sExtract:sub(iExtEnd - 1, iExtEnd)
-				
-				iStopOffset = inDrawDC:GetTextExtent(sExtract:sub(1, iExtEnd - 2))
-				
-			else
-				
-				iStopOffset = inDrawDC:GetTextExtent(sExtract:sub(1, iExtEnd - 1))
-			end
-			
-			-- here ch might be a double byte sequence
-			--
-			iStopLength = inDrawDC:GetTextExtent(ch)
+	local tFile		= m_App.tFileLines
+	local iStopLine	= m_App.LookupInterval(tFile, iCursor - 1)
+	if 0 == iStopLine then return end								-- failed to get text
 
-			break
-		end
-		iCntPrev = iCntNew
-			
-		iNumLines = iNumLines + 1
-		
-		iStart	= iEnd + 1
-		iEnd	= sSource:find("\n", iStart, true)
-		
-		-- last check because a line might not be completed with a lf
-		--
-		if not iEnd and iStart < iLimit then iEnd = iLimit end
-	end
-]]	
 	-- get the number of rows * font height and
 	-- correct the y offset
 	--
-	local iLowLimit= m_MainFrame.rcClientH - (iOffY * 2) - iSpacerY			-- drawing height bound
+	local iLowLimit= m_Frame.rcClientH - (iOffY * 2) - iSpacerY			-- drawing height bound
 	local iNumRows = _floor(iLowLimit / iSpacerY)							-- allowed rows
-	
+
 	-- update
 	--
 	iOffY	  = math.ceil(((iLowLimit - (iSpacerY * iNumRows)) / 2))		-- vertical offset updated
-	iLowLimit = m_MainFrame.rcClientH - iOffY - iSpacerY					-- vertical limit
-	
+	iLowLimit = m_Frame.rcClientH - iOffY - iSpacerY					-- vertical limit
+
 	-- align indexes for the line currently highlighted
 	-- (basically a list view)
-	--	
-	local iFirstRow = m_MainFrame.iTextFirstRow
+	--
+	local iFirstRow = m_Frame.iTextFirstRow
 	if iFirstRow > iStopLine then iFirstRow = iStopLine end								-- passing the top
 	if iStopLine > (iFirstRow + iNumRows) then iFirstRow = (iStopLine - iNumRows) end	-- passing the bottom
 	if 0 >= iFirstRow then iFirstRow = 1 end
 
 	-- store for later use outside the drawing function
 	--
-	m_MainFrame.iTextFirstRow = iFirstRow	
-	m_MainFrame.iTextRowCount = iNumRows
-	m_MainFrame.iStopLine	  = iStopLine
-	m_MainFrame.iStopStart 	  = iStopStart
-	
+	local tCurrent = tFile[iStopLine]
+
+	m_Frame.iTextFirstRow = iFirstRow
+	m_Frame.iTextRowCount = iNumRows
+	m_Frame.iStopLine	  = iStopLine
+	m_Frame.iStopStart 	  = tCurrent[1]
+
 	-- set the clipping region
 	--
-	inDrawDC:SetClippingRegion(iCurX, iOffY, m_MainFrame.rcClientW - iCurX - 20, m_MainFrame.rcClientH - 10)
-	
+	inDrawDC:SetClippingRegion(iCurX, iOffY, m_Frame.rcClientW - iCurX - 20, m_Frame.rcClientH - 10)
+
 	------------------
 	-- print all chars
 	--
 	iCurX = iCurX + iOffX
-	iCurY = iOffY -- + iSpacerY
-	
+	iCurY = iOffY
+
 	-- highlight the background of the stopline
 	--
 	if 0 < iStopLine then
-		
+
 		local pStartX	= iCurX
 		local pStartY	= iOffY + (iStopLine - iFirstRow) * iSpacerY
-		local iWidth	= m_MainFrame.rcClientW - pStartX
+		local iWidth	= m_Frame.rcClientW - pStartX
 		local iHeight	= iSpacerY
-		
+
 		inDrawDC:SetPen(m_PenNull)
-		inDrawDC:SetBrush(brStp)
-		inDrawDC:DrawRectangle(pStartX, pStartY, iWidth, iHeight)		
+		inDrawDC:SetBrush(m_brStp)
+		inDrawDC:DrawRectangle(pStartX, pStartY, iWidth, iHeight)
 	end
 
 	-- assign font for drawing text
 	--
-	inDrawDC:SetFont(m_MainFrame.hFontText)
+	inDrawDC:SetFont(m_Frame.hFontText)
 	inDrawDC:SetTextForeground(tScheme.RightText)
 
 	-- draw the list
@@ -804,59 +811,44 @@ local function DrawText(inDrawDC)
 	local sToDraw
 	local iCurLine = iFirstRow
 	local iLastLine= iFirstRow + iNumRows + 1
-	
+
 	while tFile[iCurLine] and (iLastLine > iCurLine) do
-		
+
 		sToDraw = tFile[iCurLine][2]
 		sToDraw = sToDraw:gsub("\t", sTabRep)
-		
+
 		inDrawDC:DrawText(sToDraw, iCurX, iCurY)
 		iCurY = iCurY + iSpacerY
-		
+
 		iCurLine = iCurLine + 1
 	end
-	
-	-- here the trick to handle tab(s) conversion to spaces
+
+	-- underline the current character
 	--
-	local iOffset	= m_MainFrame.iCursor - tCurrent[1]
-	local sExtract  -- = tCurrent[2]:sub(1, iOffset - 1)	
---	local iExtEnd
-	local iNumSubs	
-			
-	local iStopOffset = -1
-	local iRoller1 = iOffset -- + 1
-	
-	while 0 >= iStopOffset and 0 < iRoller1 do
-		
-		iRoller1  = iRoller1 - 1
-		sExtract  = tCurrent[2]:sub(1, iRoller1)	
-		sExtract, iNumSubs = sExtract:gsub("\t", sTabRep)
-		
-		iStopOffset = inDrawDC:GetTextExtent(sExtract)
-	end
-	
-	local iStopLength = -1
-	local iRoller2 = iOffset + 1
-	
-	while 0 >= iStopLength and 0 < iRoller2 do
-		
-		iRoller2	= iRoller2 - 1
-		sExtract 	= tCurrent[2]:sub(iRoller2, iOffset)
-		
-		iStopLength = inDrawDC:GetTextExtent(sExtract)	
-	end
-	
-	-- underline the corresponding letter for the cursor
-	--
-	if 0 < iStopLength then
-		
-		local pStartX	= iCurX + iStopOffset
-		local pStartY	= iOffY + (iStopLine - iFirstRow + 1) * iSpacerY
-		local pEndX		= pStartX + iStopLength
-		local pEndY		= pStartY
-		
-		inDrawDC:SetPen(penUnd)
-		inDrawDC:DrawLine(pStartX, pStartY, pEndX, pEndY)		
+	if 0 < iStopLine then
+
+		local sUTF_8  = m_Frame.sCurrCharacter
+		local iStop   = m_Frame.iCurrCharStart - 1
+
+		-- extract the string before the current char
+		--
+		sToDraw = ""
+		if 0 < iStop then
+			sToDraw = tFile[iStopLine][2]:sub(1, iStop)
+			sToDraw = sToDraw:gsub("\t", sTabRep)
+		end
+
+		-- get both the extents
+		--
+		local iStopOffset = inDrawDC:GetTextExtent(sToDraw)
+		local iStopLength = inDrawDC:GetTextExtent(sUTF_8)
+
+		local pTopY	  = iOffY + (iStopLine - iFirstRow + 1) * iSpacerY
+		local pStartX = iCurX + iStopOffset
+		local pEndX	  = pStartX + iStopLength
+
+		inDrawDC:SetPen(m_penUnd)
+		inDrawDC:DrawLine(pStartX, pTopY, pEndX, pTopY)
 	end
 
 	-- remove clipping
@@ -866,20 +858,104 @@ end
 
 -- ----------------------------------------------------------------------------
 --
+local function DrawSelection(inDrawDC)
+--	trace.line("DrawSelection")
+
+	if 0 >= m_App.iFileBytes then return end
+	if m_Marker.iPosStart == m_Marker.iPosStop then return end
+
+	-- realign the marker's positions
+	-- (must work on a copy)
+	--
+	local iPosStart = m_Marker.iPosStart
+	local iPosStop  = m_Marker.iPosStop
+
+	if iPosStart > iPosStop then
+		iPosStart, iPosStop = iPosStop, iPosStart
+	end
+
+	local iNumCols	= m_App.tConfig.Columns
+	local iFirstRow = m_Frame.iByteFirstRow
+	local iLastRow  = m_Frame.iByteRowCount + iFirstRow
+
+	-- positions
+	--
+	local iStartX = _floor(iPosStart % iNumCols)		-- relative start of selection
+	local iStartY = _floor(iPosStart / iNumCols)
+	local iStopX  = _floor(iPosStop % iNumCols)			-- relative end of selection
+	local iStopY  = _floor(iPosStop / iNumCols)
+
+	if iStartY > iLastRow then return end				-- selection is not visible
+	if iStopY < iFirstRow then return end				-- idem
+
+	-- get the correct spacing here
+	--
+	local iOffX 	= m_Frame.iOffsetX
+	local iOffY 	= m_Frame.iOffsetY
+	local tFmtBytes	= m_Frame.tFormatBytes
+	local iSpacerX	= m_Frame.iLeftMonoWidth * tFmtBytes[2]
+	local iSpacerY	= m_Frame.iLeftSpacerY
+	local iHeight	= m_Frame.rcClientH
+
+	-- select graphic properties
+	--
+	local iOldFx = inDrawDC:GetLogicalFunction()
+	inDrawDC:SetLogicalFunction(wx.wxROP_NOT)
+
+	inDrawDC:SetPen(m_PenNull)
+	inDrawDC:SetBrush(m_brBar)
+
+	-- draw line by line
+	--
+	local iTopY = (iStartY - iFirstRow) * iSpacerY + iOffY
+	local iLeft, iWidth
+
+	repeat
+		-- skip drawing rows that are not visible
+		--
+		if iOffY <= iTopY and iTopY < iHeight then
+
+			iLeft = ((iStartX - 1) * iSpacerX) + iOffX
+
+			if iStartY == iStopY then
+				iWidth = (iStopX - iStartX + 1) * iSpacerX
+			else
+				iWidth = (iNumCols - iStartX + 1) * iSpacerX
+			end
+
+			inDrawDC:DrawRectangle(iLeft, iTopY, iWidth, iSpacerY)
+		end
+
+		iTopY	= iTopY + iSpacerY
+		iStartX = 1
+		iStartY = iStartY + 1
+
+	until iStopY < iStartY
+
+	inDrawDC:SetLogicalFunction(iOldFx)		-- restore old ROP
+end
+
+-- ----------------------------------------------------------------------------
+--
 local function DrawFile(inDrawDC)
 --	trace.line("DrawFile")
-	
+
 	-- draw the background
 	--
-	if not m_MainFrame.hSlidesDC then return end
-	inDrawDC:Blit(0, 0, m_MainFrame.rcClientW, m_MainFrame.rcClientH, m_MainFrame.hSlidesDC, 0, 0, wx.wxBLIT_SRCCOPY)
-	
-	if not m_MainFrame.bVisible then return end
-	
-	if not m_MainFrame.hFontBytes then return end
-	DrawBytes(inDrawDC)
+	if not m_Frame.hSlidesDC then return end
+	inDrawDC:Blit(0, 0, m_Frame.rcClientW, m_Frame.rcClientH, m_Frame.hSlidesDC, 0, 0, wx.wxBLIT_SRCCOPY)
 
-	if not m_MainFrame.hFontText then return end
+	if not m_Frame.bVisible then return end
+
+	-- left pane (bytes)
+	--
+	if not m_Frame.hFontBytes then return end
+	DrawBytes(inDrawDC)
+	DrawSelection(inDrawDC)
+
+	-- right pane (text)
+	--
+	if not m_Frame.hFontText then return end
 	DrawText(inDrawDC)
 	DrawVerticalBar(inDrawDC)
 end
@@ -890,40 +966,48 @@ end
 --
 local function SetStatusText(inText, inCellNo)
 --	trace.line("SetStatusText")
-	
-	local hCtrl = m_MainFrame.hStatusBar	
+
+	local hCtrl = m_Frame.hStatusBar
 	if not hCtrl then return end
 
 	inText	 = inText or ""
 	inCellNo = inCellNo or 2
-	
+
 	inCellNo = inCellNo - 1
 	if 0 > inCellNo or #tStbarWidths < inCellNo then inCellNo = 1 end
-	
+
 	hCtrl:SetStatusText(inText, inCellNo)
 
 	-- start a one-shot timer
 	--
-	if 1 == inCellNo and 0 < #inText then 
+	if 1 == inCellNo and 0 < #inText then
 		tTimers.Display:Reset()
-		tTimers.Display:Enable(true) 
+		tTimers.Display:Enable(true)
 	end
+end
+
+-- ----------------------------------------------------------------------------
+--
+local function SetStatusIndices()
+
+	SetStatusText(_format("%d", m_Frame.iCursor), 5)
+	SetStatusText(_format("%d", m_Frame.iStopLine), 4)
 end
 
 -- ----------------------------------------------------------------------------
 -- Simple interface to pop up a message
 --
 local function DlgMessage(message)
-	
-	wx.wxMessageBox(message, thisApp.sAppName,
-					wx.wxOK + wx.wxICON_INFORMATION, m_MainFrame.hWindow)  
+
+	wx.wxMessageBox(message, m_App.sAppName,
+					wx.wxOK + wx.wxICON_INFORMATION, m_Frame.hWindow)
 end
 
 -- ----------------------------------------------------------------------------
 --
 local function OnAbout()
 
-	DlgMessage(thisApp.sAppName .. " [" .. thisApp.sAppVersion .. "]\n" ..
+	DlgMessage(m_App.sAppName .. " [" .. m_App.sAppVersion .. "]\n" ..
 				wxlua.wxLUA_VERSION_STRING.." built with "..wx.wxVERSION_STRING)
 end
 
@@ -931,118 +1015,98 @@ end
 --
 local function OnClose()
 --	trace.line("OnClose")
-	
-	local m_Frame = m_MainFrame.hWindow
-	if not m_Frame then return end
+
+	local m_Window = m_Frame.hWindow
+	if not m_Window then return end
 
 	wx.wxGetApp():Disconnect(wx.wxEVT_TIMER)
-	
+
 	SaveDlgRects()
-	
-	if m_MainFrame.hLoupe then
+
+	if m_Frame.hLoupe then
 		wxLoupe.Close()
-		m_MainFrame.hLoupe = nil
+		m_Frame.hLoupe = nil
 	end
-	
-	if m_MainFrame.hCalcUni then
+
+	if m_Frame.hCalcUni then
 		wxCalc.Close()
-		m_MainFrame.hCalcUni = nil
+		m_Frame.hCalcUni = nil
 	end
-	
-	if m_MainFrame.hFindText then
+
+	if m_Frame.hFindText then
 		wxFind.Close()
-		m_MainFrame.hFindText = nil
+		m_Frame.hFindText = nil
 	end
 
 	-- finally destroy the window
 	--
-	m_Frame.Destroy(m_Frame)
-	m_MainFrame.hWindow = nil
-end
-
--- wxPaintDC			-- drawing to the screen, during EVT_PAINT
--- wxClientDC			-- drawing to the screen, outside EVT_PAINT
--- wxBufferedPaintDC	-- drawing to a buffer, then the screen, during EVT_PAINT
--- wxBufferedDC			-- drawing to a buffer, then the screen, outside EVT_PAINT
--- wxMemoryDC			-- drawing to a bitmap
-
--- ----------------------------------------------------------------------------
--- we just splat the off screen dc over the current dc
---
-local function OnPaint() 
---	trace.line("OnPaint")
-	
-	if not m_MainFrame.hMemoryDC then return end
-
-	local dc = wx.wxPaintDC(m_MainFrame.hWindow)
-	
-	dc:Blit(0, 0, m_MainFrame.rcClientW, m_MainFrame.rcClientH, m_MainFrame.hMemoryDC, 0, 0, wx.wxBLIT_SRCCOPY)
-	dc:delete()
+	m_Window.Destroy(m_Window)
+	m_Frame.hWindow = nil
 end
 
 -- ----------------------------------------------------------------------------
 --
-local function DrawSlides(inDrawDC) 
+local function DrawSlides(inDrawDC)
 --	trace.line("DrawSlides")
 
-	if not m_MainFrame.hWindow then return end
-	
-	if not inDrawDC then return end
-	if not m_MainFrame.hFontBytes then return end
+	if not m_Frame.hWindow then return end
 
-	local iNumCols	= thisApp.tConfig.Columns
-	local iOffX 	= m_MainFrame.iOffsetX
-	local iOffY 	= m_MainFrame.iOffsetY
+	if not inDrawDC then return end
+	if not m_Frame.hFontBytes then return end
+
+	local iNumCols	= m_App.tConfig.Columns
+	local iOffX 	= m_Frame.iOffsetX
+	local iOffY 	= m_Frame.iOffsetY
 	local iCurX 	= iOffX
 --	local iCurY 	= iOffY
-	local tFmtBytes	= m_MainFrame.tFormatBytes			-- format table to use (hex/dec/oct)
-	local tScheme	= m_MainFrame.tColourScheme			-- Colour scheme in use
+	local tFmtBytes	= m_Frame.tFormatBytes			-- format table to use (hex/dec/oct)
+	local tScheme	= m_Frame.tColourScheme			-- Colour scheme in use
 
 	-- get the correct spacing here
 	--
-	local iSpacerX = m_MainFrame.iLeftMonoWidth
-	local iSpacerY = m_MainFrame.iLeftSpacerY
-	
+	local iSpacerX = m_Frame.iLeftMonoWidth
+	local iSpacerY = m_Frame.iLeftSpacerY
+
 	-- decide here the background Colour
 	--
 	local iRectW = iOffX + iNumCols * tFmtBytes[2] * iSpacerX
-	local iRectH = m_MainFrame.rcClientH - iOffY * 2 - iSpacerY
+	local iRectH = m_Frame.rcClientH - iOffY * 2 - iSpacerY
 	local iLeftW = iRectW
 
 	-- background
 	--
 	inDrawDC:SetPen(m_PenNull)
 	inDrawDC:SetBrush(wx.wxBrush(tScheme.LeftBack, wx.wxSOLID))
-	inDrawDC:DrawRectangle(0, 0, iRectW, m_MainFrame.rcClientH)
-	
+	inDrawDC:DrawRectangle(0, 0, iRectW, m_Frame.rcClientH)
+
 	-- draw the colums' on/off colour
 	--
-	if thisApp.tConfig.Interleave then DrawColumns(inDrawDC) end
-	
+	if m_App.tConfig.Interleave then DrawColumns(inDrawDC) end
+
 	-- -----------------------------------------------
 	-- this is the right part with the text formatting
 	--
-	
+
 	-- still use the left pane font for correct start offset
 	--
-	iCurX	= iLeftW
+	iCurX = iLeftW
 
 	-- get the correct spacing here
 	--
-	iSpacerX = m_MainFrame.iRightSpacerX
-	iSpacerY = m_MainFrame.iRightSpacerY
+	iSpacerX = m_Frame.iRightSpacerX
+	iSpacerY = m_Frame.iRightSpacerY
 
 	-- bounds
 	--
-	iRectW	= m_MainFrame.rcClientW - iLeftW - 8
-	iRectH	= m_MainFrame.rcClientH - 28
+	iRectW = m_Frame.rcClientW - iLeftW - 8
+	iRectH = m_Frame.rcClientH - 28
 
 	-- background colour
 	--
-	inDrawDC:SetPen(m_PenNull)	
+	inDrawDC:SetPen(m_PenNull)
 	inDrawDC:SetBrush(wx.wxBrush(tScheme.RightBack, wx.wxSOLID))
 	inDrawDC:DrawRectangle(iCurX, 0, iRectW, iRectH)
-	
+
 	-- gutter
 	--
 	inDrawDC:SetBrush(wx.wxBrush(tScheme.Gutter, wx.wxSOLID))
@@ -1050,34 +1114,33 @@ local function DrawSlides(inDrawDC)
 
 	-- check if the current slide
 	--
-	inDrawDC:SetPen(wx.wxPen(tScheme.SlideActive, 4, wx.wxSOLID))
-	
-	if 1 == m_MainFrame.iCurrentSlide then
-		
-		inDrawDC:DrawLine(0, 2, iLeftW, 2)
-		
-	elseif 2 == m_MainFrame.iCurrentSlide then
-		
-		inDrawDC:DrawLine(iCurX, 2, iCurX + iRectW, 2)
-		
+	local penActive = wx.wxPen(tScheme.SlideActive, 20, wx.wxSOLID)
+	penActive:SetCap(wx.wxCAP_BUTT)
+
+	inDrawDC:SetPen(penActive)
+
+	if 1 == m_Frame.iCurrentSlide then
+		inDrawDC:DrawLine(0, 0, iLeftW, 0)
+	else
+		inDrawDC:DrawLine(iCurX, 0, iCurX + iRectW, 0)
 	end
 end
 
 -- ----------------------------------------------------------------------------
 --
-local function NewSlidesDC() 
+local function NewSlidesDC()
 --	trace.line("NewSlidesDC")
 
 	-- create a bitmap wide as the client area
 	--
 	local memDC  = wx.wxMemoryDC()
- 	local bitmap = wx.wxBitmap(m_MainFrame.rcClientW, m_MainFrame.rcClientH)
+ 	local bitmap = wx.wxBitmap(m_Frame.rcClientW, m_Frame.rcClientH)
 	memDC:SelectObject(bitmap)
-	
+
 	-- refresh the font spacing
 	--
-	if 0 == m_MainFrame.iLeftSpacerX then CalcFontSpacing(memDC) end
-	
+	if 0 == m_Frame.iLeftSpacerX then CalcFontSpacing(memDC) end
+
 	-- if file is open then handle the draw
 	--
 	DrawSlides(memDC)
@@ -1087,19 +1150,19 @@ end
 
 -- ----------------------------------------------------------------------------
 --
-local function NewMemDC() 
+local function NewMemDC()
 --	trace.line("NewMemDC")
 
 	-- create a bitmap wide as the client area
 	--
 	local memDC  = wx.wxMemoryDC()
- 	local bitmap = wx.wxBitmap(m_MainFrame.rcClientW, m_MainFrame.rcClientH)
+ 	local bitmap = wx.wxBitmap(m_Frame.rcClientW, m_Frame.rcClientH)
 	memDC:SelectObject(bitmap)
-	
+
 	-- refresh the font spacing
 	--
-	if 0 == m_MainFrame.iLeftSpacerX then CalcFontSpacing(memDC) end
-	
+	if 0 == m_Frame.iLeftSpacerX then CalcFontSpacing(memDC) end
+
 	-- if file is open then handle the draw
 	--
 	DrawFile(memDC)
@@ -1112,12 +1175,22 @@ end
 local function RefreshSlides()
 --	trace.line("RefreshSlides")
 
-	if m_MainFrame.hSlidesDC then
-		m_MainFrame.hSlidesDC:delete()
-		m_MainFrame.hSlidesDC = nil
+	if m_Frame.hSlidesDC then
+		m_Frame.hSlidesDC:delete()
+		m_Frame.hSlidesDC = nil
 	end
 
-	m_MainFrame.hSlidesDC = NewSlidesDC()
+	m_Frame.hSlidesDC = NewSlidesDC()
+end
+
+-- ----------------------------------------------------------------------------
+--
+local function Invalidate()
+--	trace.line("Invalidate")
+
+	if m_Frame.hWindow then
+		m_Frame.hWindow:Refresh()
+	end
 end
 
 -- ----------------------------------------------------------------------------
@@ -1125,16 +1198,35 @@ end
 local function Refresh()
 --	trace.line("Refresh")
 
-	if m_MainFrame.hMemoryDC then
-		m_MainFrame.hMemoryDC:delete()
-		m_MainFrame.hMemoryDC = nil
+	if m_Frame.hMemoryDC then
+		m_Frame.hMemoryDC:delete()
+		m_Frame.hMemoryDC = nil
 	end
 
-	m_MainFrame.hMemoryDC = NewMemDC()
-	
-	if m_MainFrame.hWindow then
-		m_MainFrame.hWindow:Refresh()   
-	end	
+	m_Frame.hMemoryDC = NewMemDC()
+
+	Invalidate()
+end
+
+-- ----------------------------------------------------------------------------
+-- wxPaintDC			-- drawing to the screen, during EVT_PAINT
+-- wxClientDC			-- drawing to the screen, outside EVT_PAINT
+-- wxBufferedPaintDC	-- drawing to a buffer, then the screen, during EVT_PAINT
+-- wxBufferedDC			-- drawing to a buffer, then the screen, outside EVT_PAINT
+-- wxMemoryDC			-- drawing to a bitmap
+--
+-- ----------------------------------------------------------------------------
+-- we just splat the off screen dc over the current dc
+--
+local function OnPaint()
+--	trace.line("OnPaint")
+
+	if not m_Frame.hMemoryDC then return end
+
+	local dc = wx.wxPaintDC(m_Frame.hWindow)
+
+	dc:Blit(0, 0, m_Frame.rcClientW, m_Frame.rcClientH, m_Frame.hMemoryDC, 0, 0, wx.wxBLIT_SRCCOPY)
+	dc:delete()
 end
 
 -- ----------------------------------------------------------------------------
@@ -1146,103 +1238,111 @@ local function SetupDisplay()
 
 	-- font properties read from the config file
 	--
-	local specBytes = thisApp.tConfig.ByteFont		-- left pane font
-	local specText  = thisApp.tConfig.TextFont		-- right ----
+	local specBytes = m_App.tConfig.ByteFont		-- left pane font
+	local specText  = m_App.tConfig.TextFont		-- right ----
 	local tScheme	= tSchemeLight					-- colour scheme
 	local tFmtBytes = tFormat.Dec					-- left pane text format
 	local sDefault	= "Source Code Pro"				-- default font
-	
+
 	-- fonts sanity check
 	-- (note that the minimum size differs for each panel)
 	--
 	specBytes[1] = specBytes[1] or 5
 	if 5 > specBytes[1] then specBytes[1] = 5 end
-	
+
 	specText[1] = specText[1] or 12
 	if 3 > specText[1] then specText[1] = 3 end
-	
+
 	specBytes[2] = specBytes[2] or sDefault
 	if 0 == #specBytes[2] then specBytes[2] = sDefault end
-		
+
 	specText[2]  = specText[2]  or sDefault
 	if 0 == #specText[2] then specText[2] = sDefault end
-		
+
 	-- allocate
-	--	
+	--
 	local fBytes = wx.wxFont(-1 * specBytes[1], wx.wxFONTFAMILY_MODERN, wx.wxFONTFLAG_ANTIALIASED,
 							 wx.wxFONTWEIGHT_NORMAL, false, specBytes[2], wx.wxFONTENCODING_SYSTEM)
-					
+
 	local fText  = wx.wxFont(-1 * specText[1], wx.wxFONTFAMILY_DEFAULT, wx.wxFONTFLAG_ANTIALIASED,
 							 wx.wxFONTWEIGHT_NORMAL, false, specText[2], wx.wxFONTENCODING_SYSTEM)
-		
+
 	-- format string to use (oct/dec/hex)
 	--
 	for tag, tFormat in pairs(tFormat) do
-		if _find(thisApp.tConfig.Format, tag, 1, true) then tFmtBytes = tFormat break end
-	end	
-	
+		if _find(m_App.tConfig.Format, tag, 1, true) then tFmtBytes = tFormat break end
+	end
+
 	-- colours setup
 	--
-	if "White" == thisApp.tConfig.Scheme 	 then tScheme = tSchemeWhite
-	elseif "Dark" == thisApp.tConfig.Scheme  then tScheme = tSchemeDark
-	elseif "Black" == thisApp.tConfig.Scheme then tScheme = tSchemeBlack end
+	if "White" == m_App.tConfig.Scheme 	 then tScheme = tSchemeWhite
+	elseif "Dark" == m_App.tConfig.Scheme  then tScheme = tSchemeDark
+	elseif "Black" == m_App.tConfig.Scheme then tScheme = tSchemeBlack end
 
 	-- prealloc the pens and brushes
 	--
-	penLF = wx.wxPen(tScheme.Linefeed, 3, wx.wxSOLID)
-	penXX = wx.wxPen(tScheme.Unprintable, 3, wx.wxSOLID)
-	brMrk = wx.wxBrush(tScheme.MarkStart, wx.wxSOLID)
-	brHBt = wx.wxBrush(tScheme.HighBits, wx.wxSOLID)
-	brCur = wx.wxBrush(tScheme.LeftCursor, wx.wxSOLID)
-	
-	penUnd= wx.wxPen(tScheme.RightCursor, 6, wx.wxSOLID)
-	brStp = wx.wxBrush(tScheme.StopRow, wx.wxSOLID)
-	
-	penBar= wx.wxPen(tScheme.VerticalBar, 1, wx.wxSOLID)
-	brBar = wx.wxBrush(tScheme.VerticalBar, wx.wxSOLID)
+	m_penLF = wx.wxPen(tScheme.Linefeed, 3, wx.wxSOLID)			-- line feed or carriage return
+	m_penXX = wx.wxPen(tScheme.Unprintable, 3, wx.wxSOLID)		-- unprintable characters
+	m_brMrk = wx.wxBrush(tScheme.MarkStart, wx.wxSOLID)			-- UTF_8 first byte
+	m_brHBt = wx.wxBrush(tScheme.HighBits, wx.wxSOLID)			-- UTF_8 remaining bytes
+	m_brCur = wx.wxBrush(tScheme.LeftCursor, wx.wxSOLID)		-- left pane cursor
+
+	m_penUnd= wx.wxPen(tScheme.RightCursor, 6, wx.wxSOLID)		-- right pane cursor
+	m_brStp = wx.wxBrush(tScheme.StopRow, wx.wxSOLID)			-- highlight current line
+
+	m_penBar= wx.wxPen(tScheme.VerticalBar, 1, wx.wxSOLID)		-- vertical bar
+	m_brBar = wx.wxBrush(tScheme.VerticalBar, wx.wxSOLID)		-- vertical bar indicator
+
+	-- default CAP for pens is rounded
+	--
+	m_penLF:SetCap(wx.wxCAP_BUTT)
+	m_penXX:SetCap(wx.wxCAP_BUTT)
+	m_penUnd:SetCap(wx.wxCAP_BUTT)
+	m_penBar:SetCap(wx.wxCAP_BUTT)
 
 	-- time interval for displaying messages
 	--
-	local iShowTime = _floor(thisApp.tConfig.TimeDisplay * 1000)
+	local iShowTime = _floor(m_App.tConfig.TimeDisplay * 1000)
 	if 500 > iShowTime then iShowTime = 1500 end
-	
+
 	-- replace tabulation with spaces
 	--
-	local iTabSize = thisApp.tConfig.TabSize
+	local iTabSize = m_App.tConfig.TabSize
 	local sTabRep  = _strrep(" ", iTabSize)
-	
+
 	-- setup
 	--
-	m_MainFrame.hFontBytes	 = fBytes
-	m_MainFrame.hFontText	 = fText
-	m_MainFrame.tFormatBytes = tFmtBytes
-	m_MainFrame.tColourScheme= tScheme
-	m_MainFrame.iTmInterval	 = iShowTime
-	m_MainFrame.sTabReplace	 = sTabRep
-	m_MainFrame.iLeftSpacerX = 0				-- ask for a recalc of spacing
-	
+	m_Frame.hFontBytes	 = fBytes
+	m_Frame.hFontText	 = fText
+	m_Frame.tFormatBytes = tFmtBytes
+	m_Frame.tColourScheme= tScheme
+	m_Frame.iTmInterval	 = iShowTime
+	m_Frame.sTabReplace	 = sTabRep
+	m_Frame.iLeftSpacerX = 0				-- ask for a recalc of spacing
+
 	-- redraw
 	--
-	m_MainFrame.hSlidesDC = NewSlidesDC()
-	m_MainFrame.hMemoryDC = NewMemDC()
-	
+	m_Frame.hSlidesDC = NewSlidesDC()
+	m_Frame.hMemoryDC = NewMemDC()
+
 	-- update dialogs
+	-- (does not care if visible or not, but valid handles)
 	--
-	if m_MainFrame.hLoupe then
-		
-		local font = thisApp.tConfig.Loupe
-		
-		wxLoupe.SetupColour(tScheme.LoupeBack, tScheme.LoupeFore)
-		wxLoupe.SetupFont(font[1], font[2])	
+	if m_Frame.hLoupe then
+
+		local font = m_App.tConfig.Loupe
+
+		wxLoupe.SetupColour(tScheme.LoupeBack, tScheme.LoupeFore, tScheme.LoupeExtra)
+		wxLoupe.SetupFont(font[1], font[2])
 	end
-	
-	if m_MainFrame.hCalcUni then
-		wxCalc.SetupColour(tScheme.DialogsBack, tScheme.DialogsFore)
+
+	if m_Frame.hCalcUni then
+		wxCalc.SetupColour(tScheme.DialogsBack, tScheme.DialogsFore, tScheme.DialogsExtra)
 	end
-	
-	if m_MainFrame.hFindText then
-		wxFind.SetupColour(tScheme.DialogsBack, tScheme.DialogsFore)
-	end	
+
+	if m_Frame.hFindText then
+		wxFind.SetupColour(tScheme.DialogsBack, tScheme.DialogsFore, tScheme.DialogsExtra)
+	end
 
 	return (fBytes and fText)
 end
@@ -1251,12 +1351,12 @@ end
 --
 local function SetWindowTitle(inString)
 --	trace.line("SetWindowTitle")
-	
-	if not m_MainFrame.hWindow then return false end
-	
-	inString = inString or thisApp.sAppName
-	m_MainFrame.hWindow:SetTitle(inString)
-	
+
+	if not m_Frame.hWindow then return false end
+
+	inString = inString or m_App.sAppName
+	m_Frame.hWindow:SetTitle(inString)
+
 	return true
 end
 
@@ -1271,10 +1371,10 @@ end
 --
 local function OnEditCopy()
 --	trace.line("OnEditCopy")
-	
-	if 0 >= m_MainFrame.iStopLine then return end
-	
-	local iRetCode, sCopyBuff = thisApp.GetTextAtPos(m_MainFrame.iStopStart, m_MainFrame.iCursor - 1)
+
+	if 0 >= m_Frame.iStopLine then return end
+
+	local iRetCode, sCopyBuff = m_App.GetTextAtPos(m_Frame.iStopStart, m_Frame.iCursor - 1)
 
 	if 0 < iRetCode then
 		local clipBoard = wx.wxClipboard.Get()
@@ -1303,52 +1403,124 @@ local function OnEditSelectAll()
 end
 
 -- ----------------------------------------------------------------------------
+--
+local function UpdateLoupe()
+--	trace.line("UpdateLoupe")
+
+	if m_Frame.hLoupe and m_Frame.sCurrCharacter then
+		-- update display
+		--
+		wxLoupe.SetData(m_Frame.sCurrCharacter)
+	end
+end
+
+-- ----------------------------------------------------------------------------
 -- read file into memory
 --
-local function OnReadFile()
+local function OnReadFile(event, inOptFilename)
 --	trace.line("OnReadFile")
-	
+
 	wx.wxBeginBusyCursor()
-	
+
 	-- reset the cursor position
 	--
-	m_MainFrame.iCursor			= 1
-	m_MainFrame.iByteFirstRow	= 0
-	m_MainFrame.iByteRowCount	= 0
-	m_MainFrame.iTextFirstRow	= 0
-	m_MainFrame.iTextRowCount	= 0
-	m_MainFrame.iStopLine		= -1
-	
-	local iBytes, sText = thisApp.LoadFile()
-	
-	if 0 == iBytes then 
-		m_MainFrame.iCursor = 0
+	m_Frame.iCursor			= 1
+	m_Frame.iByteFirstRow	= 0
+	m_Frame.iByteRowCount	= 0
+	m_Frame.iTextFirstRow	= 0
+	m_Frame.iTextRowCount	= 0
+	m_Frame.iStopLine		= -1
+	m_Frame.sCurrCharacter	= ""
+
+	local iBytes, sText = m_App.LoadFile(inOptFilename)
+
+	if 0 == iBytes then
+		m_Frame.iCursor = 0
 		SetWindowTitle()
 	else
-		SetWindowTitle(thisApp.tConfig.InFile)
+		inOptFilename = inOptFilename or m_App.tConfig.InFile
+		SetWindowTitle(inOptFilename)
 	end
-	
+
 	Refresh()
-	
-	SetStatusText("" .. m_MainFrame.iCursor, 5)
-	SetStatusText("" .. m_MainFrame.iStopLine, 4)
-	SetStatusText(sText, 2)
-	
+	UpdateLoupe()								-- refresh if open
+
+	SetStatusIndices()
+	SetStatusText(sText)
+
+	wx.wxEndBusyCursor()
+end
+
+-- ----------------------------------------------------------------------------
+--
+local function OnOpenDlgFile(event)
+--	trace.line("OnOpenDlgFile")
+
+	local sFilename = wx.wxFileSelector("Select File", "",  "", "", "*.*", 0, m_Frame.hWindow)
+
+	if 0 < sFilename:len() then OnReadFile(event, sFilename) end
+end
+
+-- ----------------------------------------------------------------------------
+-- save memory to file
+--
+local function CallSaveFile(inOpt, inOptFilename)
+--	trace.line("CallSaveFile")
+
+	wx.wxBeginBusyCursor()
+
+	local _, sText = m_App.SaveFile(inOpt, inOptFilename)
+
+	SetStatusText(sText)
+
+	if inOptFilename then SetWindowTitle(inOptFilename) end
+
 	wx.wxEndBusyCursor()
 end
 
 -- ----------------------------------------------------------------------------
 -- save memory to file
 --
-local function OnSaveFile()
---	trace.line("OnSaveFile")
+local function OnExportFile()
+--	trace.line("OnExportFile")
+
+	CallSaveFile(1, nil)
+end
+
+-- ----------------------------------------------------------------------------
+-- save memory to file
+--
+local function OnOverwriteFile()
+--	trace.line("OnOverwriteFile")
+
+	CallSaveFile(2, nil)
+end
+
+-- ----------------------------------------------------------------------------
+-- save memory to file
+--
+local function OnSaveDlgFile()
+--	trace.line("OnSaveDlgFile")
+
+	local sFilename = wx.wxFileSelector("Save File As", "",  "", "", "*.*", 0, m_Frame.hWindow)
+
+	if 0 < sFilename:len() then
+		CallSaveFile(3, sFilename)
+		SetWindowTitle(sFilename)
+	end
+end
+
+-- ----------------------------------------------------------------------------
+--
+local function OnEnumCodepages()
+--	trace.line("OnEnumCodepages")
 
 	wx.wxBeginBusyCursor()
-	
-	local _, sText = thisApp.SaveFile()
-	
-	SetStatusText(sText, 2)
-	
+
+	local _, sText = m_App.EnumCodepages()
+
+	SetStatusText(sText)
+
 	wx.wxEndBusyCursor()
 end
 
@@ -1358,11 +1530,11 @@ local function OnCheckEncoding()
 --	trace.line("OnCheckEncoding")
 
 	wx.wxBeginBusyCursor()
-	
-	local _, sText = thisApp.CheckEncoding()
-	
-	SetStatusText(sText, 2)
-	
+
+	local _, sText = m_App.CheckEncoding()
+
+	SetStatusText(sText)
+
 	wx.wxEndBusyCursor()
 end
 
@@ -1370,89 +1542,70 @@ end
 --
 local function OnCreateByBlock()
 --	trace.line("OnCreateByBlock")
-	
+
 	wx.wxBeginBusyCursor()
-	
-	local bRet = thisApp.CreateByBlock()
-	
+
+	local bRet = m_App.CreateByBlock()
+
 	if bRet then
-		SetStatusText("Samples file created", 2)
+		SetStatusText("Samples file created")
 	else
-		SetStatusText("Samples fle creation failed", 2)
+		SetStatusText("Samples fle creation failed")
 	end
-	
+
 	wx.wxEndBusyCursor()
 end
 
 -- ----------------------------------------------------------------------------
 -- align view of file based on the current cursor position
 --
-local function AlignBytesToCursor(inNewValue)
+local function AlignBytesToCursor(inValue)
 --	trace.line("AlignBytesToCursor")
 
-	local iNumCols	= thisApp.tConfig.Columns
-	local iLimit	= thisApp.iFileBytes
-	local iNumRows	= m_MainFrame.iByteRowCount
-	local iFirstRow	= m_MainFrame.iByteFirstRow
+	local iNumCols	= m_App.tConfig.Columns
+	local iLimit	= m_App.iFileBytes
+	local iNumRows	= m_Frame.iByteRowCount
+	local iFirstRow	= m_Frame.iByteFirstRow
 
-	if 0 >= inNewValue then inNewValue = 1 end
-	if iLimit < inNewValue then inNewValue = iLimit end
+	if 0 >= inValue then inValue = 1 end
+	if iLimit < inValue then inValue = iLimit end
 
-	local iTopLine = _floor((inNewValue - 1) / iNumCols)
+	local iTopLine = _floor((inValue - 1) / iNumCols)
 
 	if iFirstRow < (iTopLine - iNumRows) then iFirstRow = (iTopLine - iNumRows) end
 	if iFirstRow > iTopLine then iFirstRow = iTopLine end
-		
-	m_MainFrame.iCursor			= inNewValue
-	m_MainFrame.iByteFirstRow	= iFirstRow
-end
 
--- ----------------------------------------------------------------------------
---
-local function UpdateLoupe()
---	trace.line("UpdateLoupe")
+	m_Frame.iCursor		  = inValue
+	m_Frame.iByteFirstRow = iFirstRow
 
-	if not m_MainFrame.hLoupe then return end
-	
-	local iCursor		= m_MainFrame.iCursor
-	local tFile			= thisApp.tFileLines
-	local iStopLine		= thisApp.LookupInterval(tFile, iCursor - 1)
-	if 0 == iStopLine then return end								-- failed to get text
-	
-	local tCurrent  = tFile[iStopLine]
-	local iOffset	= iCursor - tCurrent[1]
-	local chCurrent = tCurrent[2]:sub(iOffset, iOffset)
-	
-	-- update display
-	--
-	wxLoupe.SetData(chCurrent)
+	if m_Marker.bShiftDown then					-- update stop marker
+		m_Marker.iPosStop  = inValue
+	end
 end
 
 -- ----------------------------------------------------------------------------
 -- retrieve the current position
 --
 local function OnGetCursorPos()
-	
-	return m_MainFrame.iCursor
+
+	return m_Frame.iCursor
 end
 
 -- ----------------------------------------------------------------------------
 -- realign view to the new cursor position
 --
-local function OnCursorPosChanged(inNewValue)
---	trace.line("OnCursorPosChanged")
+local function OnCursorChanged(inValue)
+--	trace.line("OnCursorChanged")
 
 	-- check changed
 	--
-	if inNewValue == m_MainFrame.iCursor then return end
-		
-	AlignBytesToCursor(inNewValue)
+	if inValue == m_Frame.iCursor then return end
+
+	AlignBytesToCursor(inValue)
 
 	Refresh()
 	UpdateLoupe()
-
-	SetStatusText("" .. m_MainFrame.iCursor, 5)
-	SetStatusText("" .. m_MainFrame.iStopLine, 4)
+	SetStatusIndices()
 end
 
 -- ----------------------------------------------------------------------------
@@ -1461,19 +1614,110 @@ local function OnEncode_UTF_8()
 --	trace.line("OnEncode_UTF_8")
 
 	wx.wxBeginBusyCursor()
-	
-	local _, sText = thisApp.Encode_UTF_8()
-	
-	-- do a complete redraw
-	--	
-	m_MainFrame.iCursor = m_MainFrame.iCursor + 1
-	OnCursorPosChanged(m_MainFrame.iCursor - 1)
-	
+
+	local iRetCode, sText = m_App.Encode_UTF_8()
+
+	if 0 < iRetCode then
+		-- do a complete redraw
+		--
+		m_Frame.iCursor = m_Frame.iCursor + 1
+		OnCursorChanged(m_Frame.iCursor - 1)
+	end
+
 	-- display encode function result
 	--
-	SetStatusText(sText, 2)
-	
+	SetStatusText(sText)
+
 	wx.wxEndBusyCursor()
+end
+
+-- ----------------------------------------------------------------------------
+-- check if the current slide has changed
+--
+local function IsSlideChange(event)
+--	trace.line("IsSlideChange")
+
+	-- get the position where the users made a choice
+	--
+	local iOffX		 = m_Frame.iOffsetX
+	local iOffY		 = m_Frame.iOffsetY
+	local iSpacerX	 = m_Frame.iLeftSpacerX
+	local iSpacerY	 = m_Frame.iLeftSpacerY
+	local iPtX, iPtY = event:GetLogicalPosition(m_Frame.hMemoryDC):GetXY()
+
+	-- check for the left pane's boundaries
+	--
+	local iNumCols	= m_App.tConfig.Columns
+	local rcWidth	= iSpacerX * iNumCols + iOffX
+	local rcHeight	= iSpacerY * (m_Frame.iByteRowCount + 1)
+
+	local iSlide = 2
+
+	if rcWidth > iPtX then iSlide = 1 end
+
+	if m_Frame.iCurrentSlide ~= iSlide then
+
+		-- signal slide selection changed
+		--
+		m_Frame.iCurrentSlide = iSlide
+		return true
+	end
+
+	return false
+end
+
+-- ----------------------------------------------------------------------------
+--
+local function PointToCell(inPtX, inPtY)
+--	trace.line("PointToCell")
+
+	local iOffX		= m_Frame.iOffsetX
+	local iOffY		= m_Frame.iOffsetY
+	local iSpacerX	= m_Frame.iLeftSpacerX
+	local iSpacerY	= m_Frame.iLeftSpacerY
+	local tFmtBytes	= m_Frame.tFormatBytes			-- format table to use (hex/dec/oct)
+
+	-- align to offsets
+	--
+	inPtX = inPtX + (iOffX * tFmtBytes[2])
+	inPtY = inPtY - iOffY
+
+	-- get the cell (row,col)
+	-- align to rectangle boundary
+	--
+	local iRow = _floor((inPtY - inPtY % iSpacerY) / iSpacerY)
+	local iCol = _floor((inPtX + inPtX % iSpacerX) / iSpacerX)
+
+	-- get the logical selection
+	--
+	local iNumCols	 = m_App.tConfig.Columns
+	local iFirstByte = m_Frame.iByteFirstRow * iNumCols
+	local iNewCursor = iFirstByte + iCol + (iRow * iNumCols)
+
+	return iNewCursor
+end
+
+-- ----------------------------------------------------------------------------
+--
+local function OnMouseMove(event)
+--	trace.line("OnMouseMove")
+
+	if not m_Marker.bMouseDown then return end
+
+	-- don't accept cursor's position change clicking
+	-- on the right pane (text)
+	--
+	if 1 ~= m_Frame.iCurrentSlide then return end
+
+	-- update the markers
+	--
+	local drawDC = m_Frame.hMemoryDC
+	local iPtX, iPtY = event:GetLogicalPosition(drawDC):GetXY()
+
+	DrawSelection(drawDC)						-- remove old drawing
+	m_Marker.iPosStop = PointToCell(iPtX, iPtY)	-- stop marker
+	DrawSelection(drawDC)						-- do new drawing
+	Invalidate()
 end
 
 -- ----------------------------------------------------------------------------
@@ -1483,78 +1727,68 @@ end
 local function OnLeftBtnDown(event)
 --	trace.line("OnLeftBtnDown")
 
-	if 0 >= thisApp.iFileBytes then return end
+	if 0 >= m_App.iFileBytes then return end
 
-	-- get the position where the users made a choice
+	-- avoid a selection if just changing active slide
 	--
-	local iOffX		 = m_MainFrame.iOffsetX
-	local iOffY		 = m_MainFrame.iOffsetY
-	local iSpacerX	 = m_MainFrame.iLeftSpacerX
-	local iSpacerY	 = m_MainFrame.iLeftSpacerY
-
-	local dcClient	 = m_MainFrame.hMemoryDC
-	local iPtX, iPtY = event:GetLogicalPosition(dcClient):GetXY()
-
-	-- check for the left pane's boundaries
-	--
-	local iNumCols	= thisApp.tConfig.Columns
-	local rcWidth	= iSpacerX * iNumCols + iOffX
-	local rcHeight	= iSpacerY * (m_MainFrame.iByteRowCount + 1) -- - iOffY
-	
-	local iSlide = 2
-	if rcWidth > iPtX then iSlide = 1 end
-	if m_MainFrame.iCurrentSlide ~= iSlide then
-		
-		-- signal slide selection changed
-		--
-		m_MainFrame.iCurrentSlide = iSlide
+	if IsSlideChange(event) then
 		RefreshSlides()
 		Refresh()
-		return				-- avoid a selection if just changing active slide
+		return
 	end
 
-	-- check limits
+	-- don't accept cursor's position change clicking
+	-- on the right pane (text)
 	--
-	if iOffX > iPtX then return end
-	if iOffY > iPtY then return end	
-	if iPtX  > rcWidth then return end
-	if iPtY  > rcHeight then return end
-	
-	-- align to offsets
-	--
-	iPtX = iPtX + iOffX
-	iPtY = iPtY - iOffY
+	if 1 ~= m_Frame.iCurrentSlide then return end
 
-	-- get the cell (row,col)
-	-- align to rectangle boundary
-	--
-	local iRow = _floor((iPtY - iPtY % iSpacerY) / iSpacerY)
-	local iCol = _floor((iPtX + iPtX % iSpacerX) / iSpacerX)
+	local drawDC = m_Frame.hMemoryDC
+	local iPtX, iPtY = event:GetLogicalPosition(drawDC):GetXY()
 
-	-- get the logical selection
-	--	
-	local iFirstByte = m_MainFrame.iByteFirstRow * iNumCols	
-	local iNewCursor = iFirstByte + iCol + iRow * iNumCols
+	DrawSelection(drawDC)						-- remove old drawing
+	local iCursor = PointToCell(iPtX, iPtY)		-- disengage the markers
 
-	-- query refresh if new selection
-	--
-	OnCursorPosChanged(iNewCursor)
+	m_Marker.bMouseDown = true
+	m_Marker.iPosStart  = iCursor
+	m_Marker.iPosStop   = iCursor
+
+	OnCursorChanged(iCursor)
 end
 
 -- ----------------------------------------------------------------------------
+-- register the end of marking a selection
+--
+local function OnLeftBtnUp(event)
+--	trace.line("OnLeftBtnUp")
+
+	-- don't accept cursor's position change clicking
+	-- on the right pane (text)
+	--
+	if 1 ~= m_Frame.iCurrentSlide then return end
+
+	m_Marker.bMouseDown = false
+
+	local drawDC = m_Frame.hMemoryDC
+	local iPtX, iPtY = event:GetLogicalPosition(drawDC):GetXY()
+
+	OnCursorChanged(PointToCell(iPtX, iPtY))
+end
+
+-- ----------------------------------------------------------------------------
+-- handler to change the font
 --
 local function HandleKeybFont(key)
 --	trace.line("HandleKeybFont")
 
-	local iStep = thisApp.tConfig.FontStep
+	local iStep = m_App.tConfig.FontStep
 	iStep = iStep or 5
 	if 0 > iStep then iStep = 5 end
-	
+
 	-- check for which pane updating font
 	--
-	local wSlide = thisApp.tConfig.TextFont
-	if 1 == m_MainFrame.iCurrentSlide then wSlide = thisApp.tConfig.ByteFont end
-	
+	local wSlide = m_App.tConfig.TextFont
+	if 1 == m_Frame.iCurrentSlide then wSlide = m_App.tConfig.ByteFont end
+
 	-- configuration item for the font has:
 	-- [1] font size, [2] font name
 	--
@@ -1563,67 +1797,99 @@ local function HandleKeybFont(key)
 	else
 		wSlide[1] = wSlide[1] - iStep
 	end
-	
+
 	if false == SetupDisplay() then
-		SetStatusText("Cannot set fonts", 2)
+		SetStatusText("Cannot set fonts")
 		return
 	end
-	
+
 	-- query a repaint
 	--
 	Refresh()
-	SetStatusText("Text Font: " .. wSlide[1] .. "  " .. wSlide[2], 2)
+	SetStatusText(_format("Text Font: %d  %s", wSlide[1], wSlide[2]))
 end
 
 -- ----------------------------------------------------------------------------
 -- handle the mouse wheel
+-- if key press CTRL together with the wheel then cahnge font and quit
 --
 local function OnMouseWheel(event)
 --	trace.line("OnMouseWheel")
 
-	if 0 == thisApp.iFileBytes then return end
-	
+	if 0 == m_App.iFileBytes then return end
+
 	-- --------------------
 	-- change the font size
 	--
 	if event:ControlDown() then
-		
-		if 0 > event:GetWheelRotation() then 
+
+		if 0 > event:GetWheelRotation() then
 			HandleKeybFont(_byte("-"))
 		else
 			HandleKeybFont(_byte("+"))
 		end
-		
+
 		return
 	end
-	
+
 	-- -----------------
 	-- perform scrolling
 	--
-	local iCurrent	= m_MainFrame.iCursor
-	local iLines	= thisApp.tConfig.WheelMult
-	local iScroll	= iLines * thisApp.tConfig.Columns
-	
-	-- works reversed
-	--
-	if 0 < event:GetWheelRotation() then iScroll = -1 * iScroll end
-	
-	OnCursorPosChanged(iCurrent + iScroll)
+	local iCurrent	= m_Frame.iCursor
+	local iLines	= m_App.tConfig.WheelMult
+	local iNewCursor= 0
+
+	if 1 == m_Frame.iCurrentSlide then
+
+		-- left pane
+		--
+		local iScroll = iLines * m_App.tConfig.Columns
+		if 0 < event:GetWheelRotation() then iScroll = -1 * iScroll end
+
+		iNewCursor = iCurrent + iScroll
+	else
+
+		-- right pane
+		--
+		local iStopLine = m_Frame.iStopLine
+		local tLines	= m_App.tFileLines
+		local iOffset	= m_Frame.iCursor - tLines[iStopLine][1]
+		local iTgtline
+
+		if 0 < event:GetWheelRotation() then
+			iTgtline = iStopLine - iLines
+			iTgtline = _max(1, iTgtline)
+		else
+			iTgtline = iStopLine + iLines
+			iTgtline = _min(#tLines, iTgtline)
+		end
+
+		-- normally it will drift toward column 1
+		-- (offset counts bytes but should count characters instead
+		-- because a Unicode character might be 4 bytes long)
+		--
+		m_Frame.iStopLine = iTgtline
+		iNewCursor = tLines[iTgtline][1] + iOffset
+	end
+
+	OnCursorChanged(iNewCursor)			-- do the update
 end
 
 -- ----------------------------------------------------------------------------
+-- handler for key press on the left pane (bytes)
 --
 local function KeyPressedBytes(event)
 --	trace.line("KeyPressedBytes")
-	
-	local iCursor	= m_MainFrame.iCursor
-	local iNumCols	= thisApp.tConfig.Columns
-	local iPgJump	= _floor((iNumCols * m_MainFrame.iByteRowCount) / 2)
-	
+
+	local iCursor	= m_Frame.iCursor
+	local iOldCursor= iCursor
+	local iNumCols	= m_App.tConfig.Columns
+	local iPgJump	= _floor((iNumCols * m_Frame.iByteRowCount) / 2)
+
 	local key	= event:GetKeyCode()
 	local ctrl	= event:ControlDown()
---	local shift	= event:ShiftDown()
-	
+	local shift	= event:ShiftDown()
+
 	-- cursor navigation
 	--
 	if wx.WXK_LEFT == key then
@@ -1639,230 +1905,252 @@ local function KeyPressedBytes(event)
 		iCursor = iCursor + iNumCols
 
 	elseif wx.WXK_PAGEDOWN == key then
-	
+
 		if ctrl then
 			iCursor = iCursor + iPgJump * 2
 		else
 			iCursor = iCursor + iPgJump
-		end		
+		end
 
 	elseif wx.WXK_PAGEUP == key then
-	
+
 		if ctrl then
 			iCursor = iCursor - iPgJump * 2
 		else
 			iCursor = iCursor - iPgJump
 		end
-		
+
 	elseif wx.WXK_HOME == key then
-		
-		if ctrl then 
+
+		if ctrl then
 			iCursor = 1 									-- start of file
-		else 
+		else
 			iCursor = iCursor - ((iCursor - 1) % iNumCols) 	-- start of line
 		end
 
 	elseif wx.WXK_END == key then
-	
-		if ctrl then 
-			iCursor = thisApp.iFileBytes 					-- end of file
-		else 
+
+		if ctrl then
+			iCursor = m_App.iFileBytes 						-- end of file
+		else
 			if 0 ~= (iCursor % iNumCols) then				-- end of line
-				iCursor = iCursor + (iNumCols - (iCursor % iNumCols)) 
+				iCursor = iCursor + (iNumCols - (iCursor % iNumCols))
 			end
-				
 		end
 
 	else
-		return 0, false
-	end	
-	
+		return 0, false										-- key not processed
+	end
+
+	-- update the markers
+	--
+	if shift and not m_Marker.bShiftDown then
+
+		m_Marker.bShiftDown = true
+		m_Marker.iPosStart  = iOldCursor
+	end
+
 	return iCursor, true
 end
 
 -- ----------------------------------------------------------------------------
+-- handler for key press on the right pane (text)
 --
 local function KeyPressedText(event)
 --	trace.line("KeyPressedText")
 
-	local iStopLine = m_MainFrame.iStopLine
-	local iCursor	= m_MainFrame.iCursor
-	local iOffset	= iCursor - thisApp.tFileLines[iStopLine][1]
-	local iNumRows	= m_MainFrame.iTextRowCount
+	local iStopLine = m_Frame.iStopLine
+	local iCursor	= m_Frame.iCursor
+	local tLines	= m_App.tFileLines
+	local iOffset	= iCursor - tLines[iStopLine][1]
+	local iNumRows	= m_Frame.iTextRowCount
 	local iPgJump	= _floor(iNumRows / 2)
-	
+
 	local key	= event:GetKeyCode()
 	local ctrl	= event:ControlDown()
---	local shift	= event:ShiftDown()
-		
+
 	if wx.WXK_UP == key then
-		
+
 		if 1 == iStopLine then return iCursor, false end
-			
+
 		iStopLine = iStopLine - 1
-		iCursor = thisApp.tFileLines[iStopLine][1] + math.min(iOffset, #thisApp.tFileLines[iStopLine][2])
-		
+		iCursor = tLines[iStopLine][1] + _min(iOffset, #tLines[iStopLine][2])
+
 	elseif wx.WXK_DOWN == key then
-		
-		if #thisApp.tFileLines <= iStopLine then return iCursor, false end
-		
+
+		if #tLines <= iStopLine then return iCursor, false end
+
 		iStopLine = iStopLine + 1
-		iCursor = thisApp.tFileLines[iStopLine][1] + math.min(iOffset, #thisApp.tFileLines[iStopLine][2])
-		
+		iCursor = tLines[iStopLine][1] + _min(iOffset, #tLines[iStopLine][2])
+
 	elseif wx.WXK_LEFT == key then
-		
+
 		if 1 == iOffset and 1 == iStopLine then return iCursor, false end
-			
-		if 1 == iOffset then 
-			iCursor = thisApp.tFileLines[iStopLine][1]
---			iStopLine = iStopLine - 1
+
+		if 1 == iOffset then
+			iCursor = tLines[iStopLine][1]
 		else
 			iCursor = iCursor - 1
 		end
 
 	elseif wx.WXK_RIGHT == key then
-		
-		if #thisApp.tFileLines[iStopLine][2] == iOffset and #thisApp.tFileLines == iStopLine then return iCursor, false end
-			
-		if #thisApp.tFileLines[iStopLine][2] == iOffset then 
+
+		if #tLines[iStopLine][2] == iOffset and #tLines == iStopLine then return iCursor, false end
+
+		if #tLines[iStopLine][2] == iOffset then
 			iStopLine = iStopLine + 1
-			iCursor = thisApp.tFileLines[iStopLine][1] + 1
+			iCursor   = tLines[iStopLine][1] + 1
 		else
 			iCursor = iCursor + 1
 		end
-		
+
 	elseif wx.WXK_PAGEDOWN == key then
-		
+
 		if ctrl then
 			iStopLine = iStopLine + iPgJump * 2
 		else
 			iStopLine = iStopLine + iPgJump
 		end
-		
-		if #thisApp.tFileLines < iStopLine then iStopLine = #thisApp.tFileLines end
-		
-		iCursor = thisApp.tFileLines[iStopLine][1] + iOffset
+
+		if #tLines < iStopLine then iStopLine = #tLines end
+
+		iCursor = tLines[iStopLine][1] + iOffset
 
 	elseif wx.WXK_PAGEUP == key then
-	
+
 		if ctrl then
 			iStopLine = iStopLine - iPgJump * 2
 		else
 			iStopLine = iStopLine - iPgJump
 		end
-		
+
 		if 1 > iStopLine then iStopLine = 1 end
-		
-		iCursor = thisApp.tFileLines[iStopLine][1] + iOffset
-		
+
+		iCursor = tLines[iStopLine][1] + iOffset
+
 	elseif wx.WXK_HOME == key then
-		
-		if ctrl then 
+
+		if ctrl then
 			iCursor = 1 									-- start of file
-		else 
-			iCursor = thisApp.tFileLines[iStopLine][1] + 1 	-- start of line
+		else
+			iCursor = tLines[iStopLine][1] + 1 				-- start of line
 		end
 
 	elseif wx.WXK_END == key then
-	
-		if ctrl then 
-			iCursor = thisApp.iFileBytes 					-- end of file
-		else 							
-			iCursor = thisApp.tFileLines[iStopLine][1] + #thisApp.tFileLines[iStopLine][2]		-- end of line
+
+		if ctrl then
+			iCursor = m_App.iFileBytes 						-- end of file
+		else
+			iCursor = tLines[iStopLine][1] + #tLines[iStopLine][2]		-- end of line
 		end
-		
+
 	else
-		
-		return iCursor, false
+
+		return iCursor, false								-- key not processed
 	end
-	
+
 	return iCursor, true
 end
 
 -- ----------------------------------------------------------------------------
 -- handles keystrokes
--- currently is driving only the left pane
--- if +/- are pressed then changes the font of the right pane
+--
+local function OnKeyUp(event)
+--	trace.line("OnKeyUp")
+
+	if not event:ShiftDown() and m_Marker.bShiftDown then
+
+		m_Marker.bShiftDown = false
+		m_Marker.iPosStop   = m_Frame.iCursor
+	end
+end
+
+-- ----------------------------------------------------------------------------
+-- handles keystrokes
+-- if +/- are pressed then changes the font
 --
 local function OnKeyDown(event)
 --	trace.line("OnKeyDown")
 
-	if 0 >= thisApp.iFileBytes then return end
-	
+	if 0 >= m_App.iFileBytes then return end
+
 	local iCursor = 0
 	local bValid  = false
-	
-	local key	= event:GetKeyCode()
-		
+
+	local key = event:GetKeyCode()
+
+	-- --------------------------------
 	-- user wants to change active pane
 	--
-	if wx.WXK_TAB == key then 
-		
-		local iSlide = m_MainFrame.iCurrentSlide
+	if wx.WXK_TAB == key then
+
+		local iSlide = m_Frame.iCurrentSlide
 		if 1 == iSlide then iSlide = 2 else iSlide = 1 end
-		
+
 		-- signal slide selection changed
 		--
-		m_MainFrame.iCurrentSlide = iSlide
-		
+		m_Frame.iCurrentSlide = iSlide
+
 		RefreshSlides()
-		Refresh()	
+		Refresh()
 		return
 	end
-	
+
+	-- -----------------------------------
 	-- handle the case of font size change
 	--
-	if _byte("+") == key or _byte("-") == key then 
-	
-		HandleKeybFont(key) 
+	if _byte("+") == key or _byte("-") == key then
+
+		HandleKeybFont(key)
 		return 0, false
 	end
 
+	-- -----------------------------------
 	-- process the key in the correct pane
 	--
-	if 1 == m_MainFrame.iCurrentSlide then
+	if 1 == m_Frame.iCurrentSlide then
 		iCursor, bValid = KeyPressedBytes(event)
 	else
 		iCursor, bValid = KeyPressedText(event)
 	end
-	
+
 	-- key pressed was not recognized
 	--
 	if not bValid then return end
 
 	-- check changed
 	--
-	OnCursorPosChanged(iCursor)
+	OnCursorChanged(iCursor)
 end
 
 -- ----------------------------------------------------------------------------
 -- one time initialization of tick timers and the frame's timer
--- the lower the frame's timer interval the more accurate are the tick timers
+-- the lower the frame's timer interval the more accurate the tick timers are
 --
 local function InstallTimers()
 --	trace.line("InstallTimers")
 
-	if not m_MainFrame.hWindow then return false end
-	if m_MainFrame.hTickTimer then return true end
-	
+	if not m_Frame.hWindow then return false end
+	if m_Frame.hTickTimer then return true end
+
 	if not tTimers.Display:IsEnabled() then
-		
-		local iInterval = thisApp.tConfig.TimeDisplay
+
+		local iInterval = m_App.tConfig.TimeDisplay
 		if 1 >= iInterval then iInterval = 2 end
-		
+
 		tTimers.Display:Setup(iInterval, false)
 	end
-	
+
 	if not tTimers.Garbage:IsEnabled() then
-		
+
 		tTimers.Garbage:Setup(2, true)
 	end
-	
+
 	-- create and start a timer object
 	--
-	m_MainFrame.hTickTimer = wx.wxTimer(m_MainFrame.hWindow, wx.wxID_ANY)
-	m_MainFrame.hTickTimer:Start(500, false)
-	
+	m_Frame.hTickTimer = wx.wxTimer(m_Frame.hWindow, wx.wxID_ANY)
+	m_Frame.hTickTimer:Start(500, false)
+
 	return true
 end
 
@@ -1871,41 +2159,41 @@ end
 --
 local function OnTimer()
 --	trace.line("OnTimer")
-	
+
 	-- this is to cleanup the statusbar message
 	--
 	if tTimers.Display:HasFired() then
-		
+
 		-- cleanup the status bar
 		-- (timer fires once only)
 		--
-		SetStatusText(nil, 2)
-		tTimers.Display:Enable(false)		
+		SetStatusText(nil)
+		tTimers.Display:Enable(false)
 	end
-	
+
 	-- this is to release memory via the GC
 	--
 	if tTimers.Garbage:HasFired() then
-		
+
 		-- perform a cycle of garbage colleting
-		-- (if necessary)
 		--
-		thisApp.GarbageTest()
-		tTimers.Garbage:Reset()		
-	end	
+		m_App.GarbageTest()
+		tTimers.Garbage:Reset()
+	end
 end
 
 -- ----------------------------------------------------------------------------
+-- update internals when the user changes the windows' size
 --
 local function OnSize(event)
 --	trace.line("OnSize")
 
-	if not m_MainFrame.hStatusBar then return end
+	if not m_Frame.hStatusBar then return end
 
 	local size = event:GetSize()
 
-	m_MainFrame.rcClientW = size:GetWidth() -- - 4  -- shall remove something  here
-	m_MainFrame.rcClientH = size:GetHeight() - 80	-- subtract the status bar height
+	m_Frame.rcClientW = size:GetWidth()
+	m_Frame.rcClientH = size:GetHeight() - 80	-- subtract the status bar height
 
 	-- -------------------
 	-- statusbar panes
@@ -1915,17 +2203,15 @@ local function OnSize(event)
 	for i=3, #tStbarWidths do
 		iWidth = iWidth + tStbarWidths[i]
 	end
-	tStbarWidths[2] = m_MainFrame.rcClientW - iWidth
-	
-	m_MainFrame.hStatusBar:SetStatusWidths(tStbarWidths)
-	
+	tStbarWidths[2] = m_Frame.rcClientW - iWidth
+
+	m_Frame.hStatusBar:SetStatusWidths(tStbarWidths)
+
 	-- regenerate the offscreen buffer
 	--
 	RefreshSlides()
 	Refresh()
-	
-	SetStatusText("" .. m_MainFrame.iCursor, 5)
-	SetStatusText("" .. m_MainFrame.iStopLine, 4)
+	SetStatusIndices()
 end
 
 -- ----------------------------------------------------------------------------
@@ -1934,77 +2220,79 @@ end
 local function OnRefreshSettings()
 --	trace.line("OnRefreshSettings")
 
-	if false == thisApp.ReadSetupInf() then
-		SetStatusText("Cannot load settings", 2)
+	if false == m_App.ReadSetupInf() then
+		SetStatusText("Cannot load settings")
 		return
 	end
-	
+
 	if false == SetupDisplay() then
-		SetStatusText("Cannot set fonts", 2)
+		SetStatusText("Cannot set fonts")
 		return
 	end
-	
+
 	-- query a repaint
 	--
 	Refresh()
-	
-	SetStatusText("" .. m_MainFrame.iCursor, 5)
-	SetStatusText("" .. m_MainFrame.iStopLine, 4)
-	
-	SetStatusText("Configuration has been reloaded", 2)
+	SetStatusIndices()
+
+	SetStatusText("Configuration has been reloaded")
 end
 
 -- ----------------------------------------------------------------------------
+-- show/hide the loupe window
 --
 local function OnToggleLoupe()
-		
-	local hLoupe = m_MainFrame.hLoupe
-	
+--	trace.line("OnToggleLoupe")
+
+	local hLoupe = m_Frame.hLoupe
+
 	-- create the loupe window (but don't show yet)
 	--
 	if not hLoupe then
 		-- during creation assign a parent to float over
 		--
-		hLoupe = wxLoupe.Create(m_MainFrame.hWindow, tWindows.Loupe)
-		
-		local font	  = thisApp.tConfig.Loupe
-		local tScheme = m_MainFrame.tColourScheme
-		
-		wxLoupe.SetupColour(tScheme.LoupeBack, tScheme.LoupeFore)
+		hLoupe = wxLoupe.Create(m_App, m_Frame.hWindow, tWindows.Loupe)
+
+		local font	  = m_App.tConfig.Loupe
+		local tScheme = m_Frame.tColourScheme
+
+		wxLoupe.SetupColour(tScheme.LoupeBack, tScheme.LoupeFore, tScheme.LoupeExtra)
 		wxLoupe.SetupFont(font[1], font[2])
-		
-		m_MainFrame.hLoupe = hLoupe
+
+		m_Frame.hLoupe = hLoupe
 	end
-	
+
 	if not wxLoupe.IsVisible() then
-		
+
 		wxLoupe.Display(true)
 		UpdateLoupe()
 	else
-		
+
 		wxLoupe.Display(false)
 	end
 end
 
 -- ----------------------------------------------------------------------------
+-- show/hide the calculatore
 --
 local function OnToggleCalcUnicode()
-		
-	local hCalcUni = m_MainFrame.hCalcUni
-	
+--	trace.line("OnToggleCalcUnicode")
+
+	local hCalcUni = m_Frame.hCalcUni
+
 	-- create the calculator window (but don't show yet)
 	--
 	if not hCalcUni then
-		
+
 		-- during creation assign a parent to float over
 		--
-		hCalcUni = wxCalc.Create(m_MainFrame.hWindow, tWindows.Calc)
-		
-		local tScheme = m_MainFrame.tColourScheme
-		
-		wxCalc.SetupColour(tScheme.DialogsBack, tScheme.DialogsFore)		
-		
-		m_MainFrame.hCalcUni = hCalcUni
+		hCalcUni = wxCalc.Create(m_App, m_Frame.hWindow, tWindows.Calc)
+
+		local tScheme = m_Frame.tColourScheme
+
+		wxCalc.SetupColour(tScheme.DialogsBack, tScheme.DialogsFore, tScheme.DialogsExtra)
+
+		m_Frame.hCalcUni = hCalcUni
 	end
 
 	-- show/hide
@@ -2013,23 +2301,25 @@ local function OnToggleCalcUnicode()
 end
 
 -- ----------------------------------------------------------------------------
+-- show/hide the find text dialog
 --
 local function OnToggleFindText()
-		
-	local hFindText = m_MainFrame.hFindText
-	
+--	trace.line("OnToggleFindText")
+
+	local hFindText = m_Frame.hFindText
+
 	-- create the calculator window (but don't show yet)
 	--
 	if not hFindText then
 		-- during creation assign a parent to float over
 		--
-		hFindText = wxFind.Create(m_MainFrame.hWindow, tWindows.Find)
-		
-		local tScheme = m_MainFrame.tColourScheme
-		
-		wxFind.SetupColour(tScheme.DialogsBack, tScheme.DialogsFore)		
-		
-		m_MainFrame.hFindText = hFindText
+		hFindText = wxFind.Create(m_App, m_Frame.hWindow, tWindows.Find)
+
+		local tScheme = m_Frame.tColourScheme
+
+		wxFind.SetupColour(tScheme.DialogsBack, tScheme.DialogsFore, tScheme.DialogsExtra)
+
+		m_Frame.hFindText = hFindText
 	end
 
 	-- show/hide
@@ -2038,33 +2328,34 @@ local function OnToggleFindText()
 end
 
 -- ----------------------------------------------------------------------------
--- handle the show window event, starts the timer
+-- handle the show window event
+-- grab the event to perform 'run once' operations
 --
 local function OnShow(event)
 --	trace.line("OnShow")
 
-	if not m_MainFrame.hWindow then return end
-	
+	if not m_Frame.hWindow then return end
+
 	if event:GetShow() then
-		
-		m_MainFrame.bVisible = true
+
+		m_Frame.bVisible = true
 		Refresh()
-		
-		if not m_MainFrame.hTickTimer then
-			
+
+		if not m_Frame.hTickTimer then
+
 			-- allocate the tick timers
 			--
 			InstallTimers()
-			
+
 			-- check for automatic open
-			-- (do this here because it must be run once)			
+			-- (do this here because it must be run once)
 			--
 			if 1 == tWindows.Loupe[5] then OnToggleLoupe() end
 			if 1 == tWindows.Calc[5]  then OnToggleCalcUnicode() end
-			if 1 == tWindows.Find[5]  then OnToggleFindText() end			
+			if 1 == tWindows.Find[5]  then OnToggleFindText() end
 		end
 	else
-		m_MainFrame.bVisible = false
+		m_Frame.bVisible = false
 	end
 end
 
@@ -2075,12 +2366,16 @@ local function CreateMainWindow()
 --	trace.line("CreateMainWindow")
 
 	-- unique IDs for the menu
-	--  
+	--
 	local rcMnuReadFile = UniqueID()
-	local rcMnuSaveFile = UniqueID()
+	local rcMnuExport   = UniqueID()
+	local rcMnuOverwrite= UniqueID()
+	local rcMnuOpenNew	= UniqueID()
+	local rcMnuSaveAs	= UniqueID()
 	local rcMnuByBlock  = UniqueID()
 	local rcMnuCheckFmt = UniqueID()
 	local rcMnuEncUTF8  = UniqueID()
+	local rcMnuEnumerate= UniqueID()
 	local rcMnuSettings = UniqueID()
 	local rcMnuLoupe	= UniqueID()
 	local rcMnuCalcUni  = UniqueID()
@@ -2090,27 +2385,31 @@ local function CreateMainWindow()
 	local rcMnuEdCopy	= wx.wxID_COPY
 	local rcMnuEdPaste	= wx.wxID_PASTE
 	local rcMnuEdSelAll	= wx.wxID_SELECTALL
-	
+
 	-- create a window
 	--
-	local ptLeft	= tWindows.Main[1]
+	local ptLeft	= tWindows.Main[1]					-- position/ size
 	local ptTop		= tWindows.Main[2]
 	local siWidth	= tWindows.Main[3]
 	local siHeight	= tWindows.Main[4]
-		
-	local frame = wx.wxFrame(wx.NULL, wx.wxID_ANY, thisApp.sAppName,
-							 wx.wxPoint(ptLeft, ptTop), 
+
+	local frame = wx.wxFrame(wx.NULL, wx.wxID_ANY, m_App.sAppName,
+							 wx.wxPoint(ptLeft, ptTop),
 							 wx.wxSize(siWidth, siHeight),
 							 dwFrameFlags)
 
 	-- create the FILE menu
 	--
 	local mnuFile = wx.wxMenu("", wx.wxMENU_TEAROFF)
-	mnuFile:Append(rcMnuReadFile, "Import File\tCtrl-I", "Read the file in memory")
-	mnuFile:Append(rcMnuSaveFile, "Export File\tCtrl-S", "Save memory to file")
+	mnuFile:Append(rcMnuReadFile, "Import File\tCtrl-I",    "Read the file in memory")
+	mnuFile:Append(rcMnuExport,   "Export File\tCtrl-S",    "Save memory to file set in config")
+	mnuFile:Append(rcMnuOverwrite,"Overwrite File\tCtrl-O", "Save memory to same file as input")
 	mnuFile:AppendSeparator()
-	mnuFile:Append(wx.wxID_EXIT,  "E&xit\tAlt-X",		  "Quit the application")
-	
+	mnuFile:Append(rcMnuOpenNew, "Open File", "Use file open dialog")
+	mnuFile:Append(rcMnuSaveAs,  "Save As",   "Use file save dialog")
+	mnuFile:AppendSeparator()
+	mnuFile:Append(wx.wxID_EXIT,  "E&xit\tAlt-X", "Quit the application")
+
 	-- create the EDIT menu
 	--
 	local mnuEdit = wx.wxMenu("", wx.wxMENU_TEAROFF)
@@ -2118,144 +2417,158 @@ local function CreateMainWindow()
 	mnuEdit:Append(rcMnuEdCopy,	  "&Copy\tCtrl-C",       "Copy selected text to the clipboard")
 	mnuEdit:Append(rcMnuEdPaste,  "&Paste\tCtrl-V",      "Insert clipboard text at cursor")
 	mnuEdit:Append(rcMnuEdSelAll, "Select A&ll\tCtrl-A", "Select all text in the editor")
-	
+
 	-- create the COMMANDS menu
 	--
 	local mnuCmds = wx.wxMenu("", wx.wxMENU_TEAROFF)
-	mnuCmds:Append(rcMnuCheckFmt, "Check Format\tCtrl-U", "Check bytes in current file")
-	mnuCmds:Append(rcMnuEncUTF8,  "Encode UTF_8\tCtrl-E", "Encode memory in UTF_8")
+	mnuCmds:Append(rcMnuCheckFmt, "Check Format\tCtrl-U", 		"Check bytes in current file")
+	mnuCmds:Append(rcMnuEncUTF8,  "Encode UTF_8\tCtrl-E", 		"Encode memory in UTF_8")
+	mnuCmds:Append(rcMnuEnumerate,"Enumerate Codepages\tCtrl-P","Enumerate available codepages in the tracing file")
+
 	mnuCmds:AppendSeparator()
 	mnuCmds:Append(rcMnuByBlock,  "Create Block Samples\tCtrl-B", "Create Unicode samples")
-	
+
 	local mnuView = wx.wxMenu("", wx.wxMENU_TEAROFF)
 	mnuView:AppendCheckItem(rcMnuLoupe,    "Loupe\tCtrl-L",     "Show or hide the magnifier window")
 	mnuView:AppendCheckItem(rcMnuCalcUni,  "Calculator\tCtrl-T","Show or hide the Unicode calculator window")
 	mnuView:AppendCheckItem(rcMnuFindText, "Find Text\tCtrl-F", "Show or hide the find text window")
 	mnuView:AppendSeparator()
 	mnuView:Append(rcMnuSettings, "Refresh Settings\tCtrl-R", "Import settings again and refresh")
-	
+
 	-- sinc check marks with saved configuration
 	--
 	mnuView:Check(rcMnuLoupe,    tWindows.Loupe[5] == 1)
-	mnuView:Check(rcMnuCalcUni,  tWindows.Calc[5] == 1)
-	mnuView:Check(rcMnuFindText, tWindows.Find[5] == 1)
-	
+	mnuView:Check(rcMnuCalcUni,  tWindows.Calc[5]  == 1)
+	mnuView:Check(rcMnuFindText, tWindows.Find[5]  == 1)
+
 	-- create the HELP menu
 	--
-	local mnuHelp = wx.wxMenu("", wx.wxMENU_TEAROFF)  
+	local mnuHelp = wx.wxMenu("", wx.wxMENU_TEAROFF)
 	mnuHelp:Append(wx.wxID_ABOUT, "&About", "Version Information")
 
 	-- create the menu bar and associate sub-menus
 	--
-	local mnuBar
-	mnuBar = wx.wxMenuBar()  
-	mnuBar:Append(mnuFile,	"&File")
-	mnuBar:Append(mnuEdit,	"&Edit")
-	mnuBar:Append(mnuCmds,	"&Commands")
-	mnuBar:Append(mnuView,	"&View")
-	mnuBar:Append(mnuHelp,	"&Help")
+	local mnuBar = wx.wxMenuBar()
+	mnuBar:Append(mnuFile, "&File")
+	mnuBar:Append(mnuEdit, "&Edit")
+	mnuBar:Append(mnuCmds, "&Commands")
+	mnuBar:Append(mnuView, "&View")
+	mnuBar:Append(mnuHelp, "&Help")
 
 	frame:SetMenuBar(mnuBar)
 
 	-- create the bottom status bar
 	--
-	local hStatusBar	
-	hStatusBar = frame:CreateStatusBar(#tStbarWidths, wx.wxST_SIZEGRIP)
-	hStatusBar:SetFont(wx.wxFont(-1 * 12, wx.wxFONTFAMILY_SWISS, wx.wxFONTFLAG_ANTIALIASED, 
+	local hStatusBar = frame:CreateStatusBar(#tStbarWidths, wx.wxST_SIZEGRIP)
+	hStatusBar:SetFont(wx.wxFont(-1 * 12, wx.wxFONTFAMILY_SWISS, wx.wxFONTFLAG_ANTIALIASED,
 								 wx.wxFONTWEIGHT_LIGHT, false, "Lucida Sans Unicode"))
 	hStatusBar:SetStatusWidths(tStbarWidths)
-	
+
 	-- standard event handlers
 	--
-	frame:Connect(wx.wxEVT_SHOW,			OnShow)
-	frame:Connect(wx.wxEVT_PAINT,			OnPaint)
-	frame:Connect(wx.wxEVT_TIMER,			OnTimer)
-	frame:Connect(wx.wxEVT_SIZE,			OnSize)
-	frame:Connect(wx.wxEVT_KEY_DOWN,		OnKeyDown)
-	frame:Connect(wx.wxEVT_LEFT_DOWN,		OnLeftBtnDown)
-	frame:Connect(wx.wxEVT_MOUSEWHEEL,		OnMouseWheel)	
-	frame:Connect(wx.wxEVT_CLOSE_WINDOW,	OnClose)
+	frame:Connect(wx.wxEVT_SHOW,		 OnShow)
+	frame:Connect(wx.wxEVT_PAINT,		 OnPaint)
+	frame:Connect(wx.wxEVT_TIMER,		 OnTimer)
+	frame:Connect(wx.wxEVT_SIZE,		 OnSize)
+	frame:Connect(wx.wxEVT_KEY_UP,		 OnKeyUp)
+	frame:Connect(wx.wxEVT_KEY_DOWN,	 OnKeyDown)
+	frame:Connect(wx.wxEVT_LEFT_DOWN,	 OnLeftBtnDown)
+	frame:Connect(wx.wxEVT_LEFT_UP,		 OnLeftBtnUp)
+	frame:Connect(wx.wxEVT_MOTION,		 OnMouseMove)
+	frame:Connect(wx.wxEVT_MOUSEWHEEL,	 OnMouseWheel)
+	frame:Connect(wx.wxEVT_CLOSE_WINDOW, OnClose)
 
 	-- menu events
 	--
 	frame:Connect(rcMnuReadFile, wx.wxEVT_COMMAND_MENU_SELECTED, OnReadFile)
-	frame:Connect(rcMnuSaveFile, wx.wxEVT_COMMAND_MENU_SELECTED, OnSaveFile)
+	frame:Connect(rcMnuExport,   wx.wxEVT_COMMAND_MENU_SELECTED, OnExportFile)
+	frame:Connect(rcMnuOverwrite,wx.wxEVT_COMMAND_MENU_SELECTED, OnOverwriteFile)
+	frame:Connect(rcMnuOpenNew,  wx.wxEVT_COMMAND_MENU_SELECTED, OnOpenDlgFile)
+	frame:Connect(rcMnuSaveAs,   wx.wxEVT_COMMAND_MENU_SELECTED, OnSaveDlgFile)
+
 	frame:Connect(rcMnuByBlock,  wx.wxEVT_COMMAND_MENU_SELECTED, OnCreateByBlock)
 	frame:Connect(rcMnuCheckFmt, wx.wxEVT_COMMAND_MENU_SELECTED, OnCheckEncoding)
 	frame:Connect(rcMnuEncUTF8,	 wx.wxEVT_COMMAND_MENU_SELECTED, OnEncode_UTF_8)
+	frame:Connect(rcMnuEnumerate,wx.wxEVT_COMMAND_MENU_SELECTED, OnEnumCodepages)
 	frame:Connect(rcMnuSettings, wx.wxEVT_COMMAND_MENU_SELECTED, OnRefreshSettings)
+
 	frame:Connect(rcMnuLoupe,    wx.wxEVT_COMMAND_MENU_SELECTED, OnToggleLoupe)
 	frame:Connect(rcMnuCalcUni,  wx.wxEVT_COMMAND_MENU_SELECTED, OnToggleCalcUnicode)
 	frame:Connect(rcMnuFindText, wx.wxEVT_COMMAND_MENU_SELECTED, OnToggleFindText)
-	
-	frame:Connect(wx.wxID_EXIT,	 wx.wxEVT_COMMAND_MENU_SELECTED, OnClose)
-	frame:Connect(wx.wxID_ABOUT, wx.wxEVT_COMMAND_MENU_SELECTED, OnAbout)
-	
+
 	frame:Connect(rcMnuEdCut,	 wx.wxEVT_COMMAND_MENU_SELECTED, OnEditCut)
 	frame:Connect(rcMnuEdCopy,   wx.wxEVT_COMMAND_MENU_SELECTED, OnEditCopy)
 	frame:Connect(rcMnuEdPaste,  wx.wxEVT_COMMAND_MENU_SELECTED, OnEditPaste)
 	frame:Connect(rcMnuEdSelAll, wx.wxEVT_COMMAND_MENU_SELECTED, OnEditSelectAll)
-	
+
+	frame:Connect(wx.wxID_EXIT,	 wx.wxEVT_COMMAND_MENU_SELECTED, OnClose)
+	frame:Connect(wx.wxID_ABOUT, wx.wxEVT_COMMAND_MENU_SELECTED, OnAbout)
+
 	-- assign an icon
 	--
-	local icon = wx.wxIcon(thisApp.sIconFile, wx.wxBITMAP_TYPE_ICO)
+	local icon = wx.wxIcon(m_App.sIconFile, wx.wxBITMAP_TYPE_ICO)
 	frame:SetIcon(icon)
-		
+
 	-- set up the frame
 	--
-	frame:SetMinSize(wx.wxSize(500, 250))  
+	frame:SetMinSize(wx.wxSize(500, 250))
 	frame:SetStatusBarPane(1)                   -- this is reserved for the menu
-	
+
 	-- this is necessary to avoid flickering
 	-- (comment the line if running with the debugger
 	-- and the Lua's version is below 5.2)
 	--
 	frame:SetBackgroundStyle(wx.wxBG_STYLE_CUSTOM)
-	
+
 	--  store for later
 	--
-	m_MainFrame.hWindow 	= frame	
-	m_MainFrame.hStatusBar	= hStatusBar
-	
+	m_Frame.hWindow		= frame
+	m_Frame.hStatusBar	= hStatusBar
+
 	return frame
 end
 
 -- ----------------------------------------------------------------------------
 -- show the main window and runs the main loop
 --
-local function ShowMainWindow()
+local function ShowMainWindow(inApplication)
 --	trace.line("ShowMainWindow")
-	
-	if m_MainFrame.hWindow then return false end
-	
+
+	-- save the application's reference
+	--
+	m_App = inApplication
+	if not m_App then return false end
+
+	if m_Frame.hWindow then return false end
+
 	-- create a new window
 	--
 	LoadDlgRects()
-	
+
 	if not CreateMainWindow() then return false end
-	
+
 	-- pre-allocate the necessary fonts
 	--
 	if not SetupDisplay() then return false end
-	
+
 	-- display
 	--
-	m_MainFrame.hWindow:Show(true)
+	m_Frame.hWindow:Show(true)
 
 	-- display the release
 	--
-	SetStatusText(thisApp.sAppName .. " [" .. thisApp.sAppVersion .. "]", 1)
-	
+	SetStatusText(m_App.sAppName .. " [" .. m_App.sAppVersion .. "]", 1)
+
 	-- if a file was automatically loaded then display
 	--
-	if 0 < thisApp.iFileBytes then	
-		SetWindowTitle(thisApp.tConfig.InFile)
-		m_MainFrame.iCursor = 1						-- this is a fix
+	if 0 < m_App.iFileBytes then
+		SetWindowTitle(m_App.tConfig.InFile)
+		m_Frame.iCursor = 1						-- fix to call a refresh
 	end
 
 	-- run the main loop
 	--
-	wx.wxGetApp():MainLoop()	
+	wx.wxGetApp():MainLoop()
 end
 
 -- ----------------------------------------------------------------------------
@@ -2273,7 +2586,7 @@ return
 	ShowWindow	 = ShowMainWindow,
 	CloseWindow	 = CloseMainWindow,
 	SetTitle	 = SetWindowTitle,
-	SetCursorPos = OnCursorPosChanged,
+	SetCursorPos = OnCursorChanged,
 	GetCursorPos = OnGetCursorPos,
 }
 
