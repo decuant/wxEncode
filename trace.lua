@@ -4,7 +4,7 @@
 --
 -- ----------------------------------------------------------------------------
 
-local Trace = Trace or {}
+local Trace = {}
 
 local _write	= io.write
 local _flush	= io.flush
@@ -20,9 +20,9 @@ local mTickTimed	= _clock()
 --
 function Trace.msg(inMessage)
 	if not inMessage then return end
-	
+
 	mLineCounter = mLineCounter + 1
-	
+
 	_write(_format("%05d: ", mLineCounter))
 	_write(inMessage)
 end
@@ -31,8 +31,15 @@ end
 --
 function Trace.cat(inMessage)
 	if not inMessage then return end
-	
+
 	_write(inMessage)
+end
+
+-- ----------------------------------------------------------------------------
+--
+function Trace.flushn()
+	_write("\n")
+	_flush()
 end
 
 -- ----------------------------------------------------------------------------
@@ -45,37 +52,37 @@ function Trace.numArray(inTable, inLabel)
 		tStrings[iIndex + 1] = _format("%.04f", number)
 	end
 
-	Trace.line(_concat(tStrings, " ")) 	
+	Trace.line(_concat(tStrings, " "))
 end
 
 -- ----------------------------------------------------------------------------
 --
 function Trace.line(inMessage)
 	if not inMessage then return end
-		
+
 	Trace.msg(inMessage)
 	_write("\n")
-	_flush()	
+	_flush()
 end
 
 -- ----------------------------------------------------------------------------
 --
 function Trace.lnTimeStart(inMessage)
 	if inMessage then Trace.line(inMessage) end
-	
+
 	mTickStart = _clock()
 end
 
 -- ----------------------------------------------------------------------------
 --
 function Trace.lnTimeEnd(inMessage)
-	
+
 	mTickTimed = _clock()
 
 	inMessage = inMessage or "Stopwatch at"
 
 	Trace.line(_format("%s (%.04f s.)", inMessage, (mTickTimed - mTickStart)))
-	
+
 	mTickStart = mTickTimed
 end
 
