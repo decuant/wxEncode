@@ -10,31 +10,52 @@ local palette	= require "wxPalette"	-- common colours definition in wxWidgets
 
 local _floor	= math.floor
 local _format	= string.format
+local _concat	= table.concat
+
+-- ----------------------------------------------------------------------------
+-- reference to the application
+--
+local m_App = nil
 
 -- ----------------------------------------------------------------------------
 -- window's private members
 --
-local m_Frame = 
+local m_Frame =
 {
 	hWindow   = nil,	-- main frame
+	hBackDC   = nil,	-- background device context
 	hMemoryDC = nil,	-- device context for the window
+	bTreat	  = true, 	-- append fix '\n' to character
 	fnDraw    = nil,	-- font big size
 	fnText	  = nil, 	-- font for details
 	sData	  = " ",	-- current character
-	
+	sFontName = "",		-- selected font name
+	iFontSize = -5,		-- selected font size
+
 	rcClientW = 0,
 	rcClientH = 0,
 }
 
 -- ----------------------------------------------------------------------------
+-- font names that do not need treatment
+--
+local m_tTreat =
+{
+	"Unifont",
+	"Gulim",
+	"Batang",
+}
+
+-- ----------------------------------------------------------------------------
 -- preallocated GDI objects
 --
-local penNULL = wx.wxPen(palette.Black, 0, wx.wxTRANSPARENT)
-local brNULL  = wx.wxBrush(palette.White, wx.wxTRANSPARENT)
+local m_penNULL  = wx.wxPen(palette.Black, 0, wx.wxTRANSPARENT)
+local m_brNULL   = wx.wxBrush(palette.White, wx.wxTRANSPARENT)
 
-local penRect = wx.wxPen(palette.Bisque, 2, wx.wxDOT)
-local brBack  = wx.wxBrush(palette.Gray15, wx.wxSOLID)
-local clrFore = palette.White
+local m_penRect  = wx.wxPen(palette.White, 3, wx.wxDOT)
+local m_brBack   = wx.wxBrush(palette.Black, wx.wxSOLID)
+local m_clrFore  = palette.White
+local m_clrExtra = palette.OrangeRed
 
 -- ----------------------------------------------------------------------------
 -- flags in use for the frame
@@ -45,65 +66,90 @@ local dwFrameFlags = bit32.bor(wx.wxFRAME_TOOL_WINDOW, wx.wxCAPTION)
 
 -- ----------------------------------------------------------------------------
 --
-local function DrawChar(inDrawDC) 
+local function DrawChar(inDrawDC)
 --	trace.line("DrawChar")
 
 	if not m_Frame.fnDraw then return end
-	
-	inDrawDC:SetPen(penNULL)
-	inDrawDC:SetBrush(brBack)
-	
-	inDrawDC:DrawRectangle(0, 0, m_Frame.rcClientW, m_Frame.rcClientH)
-
-	-- get the char extent
-	--
-	inDrawDC:SetFont(m_Frame.fnDraw)
 
 	local chCurrent = m_Frame.sData
-	local iSpacerX  = inDrawDC:GetTextExtent(chCurrent)
-	local iSpacerY  = inDrawDC:GetCharHeight()
-	
-	-- align the character to the middle of the client area
+	if 0 == #chCurrent then return end
+
+	inDrawDC:SetFont(m_Frame.fnDraw)
+	inDrawDC:SetTextForeground(m_clrFore)
+
+	local iWidth, iHeight, iExtent, iLeading = inDrawDC:GetTextExtent(chCurrent)
+
+	-- center the character to the middle of the client area width
+	-- and leave some room on the top
 	--
-	local iLeft = _floor((m_Frame.rcClientW - iSpacerX) / 2)
-	local iTop  = _floor((m_Frame.rcClientH - iSpacerY) / 2)
-	
+	local iLeft = _floor((m_Frame.rcClientW - iWidth) / 2)
+	local iTop  = _floor((m_Frame.rcClientH - iHeight) / 4)
+
 	if 0 > iLeft then iLeft = 0 end
 	if 0 > iTop  then iTop  = 0 end
-	
-	-- actual char
+
+	-- with wxWidgets many characters won't display at all
+	-- if the text is not completed with a '\n' or '\r',
+	-- there are exceptions that must be treated
 	--
-	inDrawDC:SetTextForeground(clrFore)
-	inDrawDC:DrawText(chCurrent, iLeft, iTop)
-	
+	if not m_Frame.bTreat then
+		inDrawDC:DrawText(chCurrent, iLeft, iTop)
+	else
+		inDrawDC:DrawText(chCurrent .. "\n", iLeft, iTop)
+	end
+
 	-- draw a thin bounding box for the char
 	--
-	inDrawDC:SetPen(penRect)
-	inDrawDC:SetBrush(brNULL)
-	
-	inDrawDC:DrawRectangle(iLeft, iTop, iSpacerX, iSpacerY)
-	
+	inDrawDC:SetPen(m_penRect)
+	inDrawDC:SetBrush(m_brNULL)
+
+	inDrawDC:DrawRoundedRectangle(iLeft, iTop, iWidth, iHeight, 8)
+
+	if 0 < iLeading then
+		local iOffsetY = iTop + iLeading
+		inDrawDC:DrawLine(iLeft, iOffsetY, iLeft + iWidth, iOffsetY)
+	end
+
+	if 0 < iExtent then
+		local iOffsetY = iTop + iHeight - iExtent
+		inDrawDC:DrawLine(iLeft, iOffsetY, iLeft + iWidth, iOffsetY)
+	end
+
 	-- draw the details
 	--
---	inDrawDC:SetFont(m_Frame.fnText)
---	inDrawDC:SetTextForeground(palette.Bisque)
-	
---	local sToDraw = _format("iLeft = %d  iTop = %d", iLeft, iTop)
---	inDrawDC:DrawText(sToDraw, 5, 5)	
+	local iLength = chCurrent:len()
+	local sHexFmt = "0x%02x"
+	local sText
 
---	local iSum = (iLeft + iSpacerX)
---	local iTot = iLeft * 2 + iSpacerX
---	sToDraw = _format("iSum = %d  iTot = %d", iSum, iTot)
---	inDrawDC:DrawText(sToDraw, 5, 20)
-	
---	sToDraw = _format("Width = %d  Height = %d", m_Frame.rcClientW, m_Frame.rcClientH)
---	inDrawDC:DrawText(sToDraw, 5, 35)
+	if 1 == iLength then
 
+		sText = _format(sHexFmt, chCurrent:byte(i))
+	else
+
+		local tToDraw = { }
+
+		for i=1, iLength do
+			tToDraw[#tToDraw + 1] = _format(sHexFmt, chCurrent:byte(i))
+		end
+
+		sText = _concat(tToDraw, " ")
+	end
+
+	-- switch font and do the draw in the middle
+	--
+	inDrawDC:SetFont(m_Frame.fnText)
+	inDrawDC:SetTextForeground(m_clrExtra)
+
+	local iExtX, iExtY = inDrawDC:GetTextExtent(sText)
+	local iPosX	= iLeft + iWidth / 2 - iExtX / 2		-- center on X
+	local iPosY	= iTop  + iHeight + 25					-- align to top
+
+	inDrawDC:DrawText(sText, iPosX, iPosY)
 end
 
 -- ----------------------------------------------------------------------------
 --
-local function NewMemDC() 
+local function NewMemDC()
 --	trace.line("NewMemDC")
 
 	-- create a bitmap wide as the client area
@@ -112,9 +158,68 @@ local function NewMemDC()
  	local bitmap = wx.wxBitmap(m_Frame.rcClientW, m_Frame.rcClientH)
 	memDC:SelectObject(bitmap)
 
+	-- draw the background
+	--
+	if not m_Frame.hBackDC then return end
+	memDC:Blit(0, 0, m_Frame.rcClientW, m_Frame.rcClientH, m_Frame.hBackDC, 0, 0, wx.wxBLIT_SRCCOPY)
+
+	-- draw the current char
+	--
 	DrawChar(memDC)
 
 	return memDC
+end
+
+-- ----------------------------------------------------------------------------
+--
+local function NewBackground()
+--	trace.line("NewBackground")
+
+	-- create a bitmap wide as the client area
+	--
+	local memDC  = wx.wxMemoryDC()
+ 	local bitmap = wx.wxBitmap(m_Frame.rcClientW, m_Frame.rcClientH)
+	memDC:SelectObject(bitmap)
+
+	-- draw the background
+	--
+	memDC:SetPen(m_penNULL)
+	memDC:SetBrush(m_brBack)
+
+	memDC:DrawRectangle(0, 0, m_Frame.rcClientW, m_Frame.rcClientH)
+
+	-- select font and do the draw in the middle
+	--
+	if m_Frame.fnText then
+
+		memDC:SetFont(m_Frame.fnText)
+		memDC:SetTextForeground(m_clrExtra)
+
+		-- show the current font selected
+		--
+		local iExtX, iExtY = memDC:GetTextExtent(m_Frame.sFontName)
+
+		local iLeft = _floor(m_Frame.rcClientW / 2)
+		local iPosX = iLeft - iExtX / 2						-- center on X
+		local iTopY	= m_Frame.rcClientH - iExtY - 10		-- align to bottom
+
+		memDC:DrawText(m_Frame.sFontName, iPosX, iTopY)
+	end
+
+	return memDC
+end
+
+-- ----------------------------------------------------------------------------
+--
+local function RefreshBackground()
+--	trace.line("RefreshBackground")
+
+	if m_Frame.hBackDC then
+		m_Frame.hBackDC:delete()
+		m_Frame.hBackDC = nil
+	end
+
+	m_Frame.hBackDC = NewBackground()
 end
 
 -- ----------------------------------------------------------------------------
@@ -128,22 +233,32 @@ local function Refresh()
 	end
 
 	m_Frame.hMemoryDC = NewMemDC()
-	
+
 	if m_Frame.hWindow then
-		m_Frame.hWindow:Refresh()   
-	end	
+		m_Frame.hWindow:Refresh()
+	end
+end
+
+-- ----------------------------------------------------------------------------
+-- regenerate the offscreen buffer
+--
+local function RefreshAll()
+--	trace.line("RefreshAll")
+
+	RefreshBackground()
+	Refresh()
 end
 
 -- ----------------------------------------------------------------------------
 -- we just splat the off screen dc over the current dc
 --
-local function OnPaint() 
+local function OnPaint()
 --	trace.line("OnPaint")
-	
+
 	if not m_Frame.hMemoryDC then return end
 
 	local dc = wx.wxPaintDC(m_Frame.hWindow)
-	
+
 	dc:Blit(0, 0, m_Frame.rcClientW, m_Frame.rcClientH, m_Frame.hMemoryDC, 0, 0, wx.wxBLIT_SRCCOPY, true)
 	dc:delete()
 end
@@ -157,10 +272,8 @@ local function OnSize(event)
 
 	m_Frame.rcClientW = size:GetWidth() - 4
 	m_Frame.rcClientH = size:GetHeight() - 36
-	
-	-- regenerate the offscreen buffer
-	--
-	Refresh()
+
+	RefreshAll()
 end
 
 -- ----------------------------------------------------------------------------
@@ -170,19 +283,19 @@ local function OnShow(event)
 --	trace.line("OnShow")
 
 	if not m_Frame.hWindow then return end
-	
-	if event:GetShow() then	Refresh() end	
+
+	if event:GetShow() then	RefreshAll() end
 end
 
 -- ----------------------------------------------------------------------------
 --
 local function IsWindowVisible()
 --	trace.line("IsWindowVisible")
-	
+
 	local wFrame = m_Frame.hWindow
 	if not wFrame then return false end
-	
-	return wFrame:IsShown() 
+
+	return wFrame:IsShown()
 end
 
 -- ----------------------------------------------------------------------------
@@ -191,56 +304,64 @@ end
 local function SetupFont(inFontSize, inFontName)
 --	trace.line("SetupFont")
 
-	-- allocate
+	-- allocate the requested font name with specified font size
 	--
-	local fnDraw = wx.wxFont(-1 * inFontSize, wx.wxFONTFAMILY_SWISS, wx.wxFONTFLAG_ANTIALIASED,
+	local fnDraw = wx.wxFont(-1 * inFontSize, wx.wxFONTFAMILY_DEFAULT, wx.wxFONTFLAG_ANTIALIASED,
 							wx.wxFONTWEIGHT_NORMAL, false, inFontName, wx.wxFONTENCODING_SYSTEM)
-						
-	local fnText = wx.wxFont(-1 * 12.5, wx.wxFONTFAMILY_MODERN, wx.wxFONTFLAG_ANTIALIASED,
+
+	-- this font instead has hardcoded properties
+	--
+	local fnText = wx.wxFont(-1 * 15.5, wx.wxFONTFAMILY_MODERN, wx.wxFONTFLAG_ANTIALIASED,
 							wx.wxFONTWEIGHT_NORMAL, false, "DejaVu Sans Mono")
-	
+
+	-- check if characters must be treated
+	--
+	m_Frame.bTreat = true
+	for _, fontName in ipairs(m_tTreat) do
+		if fontName == inFontName then m_Frame.bTreat = false break end
+	end
+
+	-- store for later
+	--
 	m_Frame.fnDraw = fnDraw
 	m_Frame.fnText = fnText
-	
-	if IsWindowVisible() then Refresh() end
+
+	m_Frame.sFontName = inFontName		-- selected font name
+	m_Frame.iFontSize = inFontSize		-- selected font size
+
+	if IsWindowVisible() then RefreshAll() end
 end
 
 -- ----------------------------------------------------------------------------
 -- set the colour properties
 --
-local function SetupColour(inBack, inFront)
+local function SetupColour(inBack, inFront, inExtra)
 --	trace.line("SetupColour")
 
-	brBack  = wx.wxBrush(inBack, wx.wxSOLID)
-	clrFore = inFront
-	
+	m_brBack   = wx.wxBrush(inBack, wx.wxSOLID)
+	m_clrFore  = inFront
+	m_clrExtra = inExtra
+
+	-- this is the colour used for the bounding rectangle
+	--
 	local colour = wx.wxColour(0xff - inBack:Red(),
 							   0xff - inBack:Green(),
 							   0xff - inBack:Blue())
-	
-	penRect = wx.wxPen(colour, 4, wx.wxDOT)
-	
-	if IsWindowVisible() then Refresh() end
+
+	m_penRect = wx.wxPen(colour, 3, wx.wxDOT)
+
+	if IsWindowVisible() then RefreshAll() end
 end
-	
+
 -- ----------------------------------------------------------------------------
 -- show the window
 --
 local function SetData(inBytes)
 --	trace.line("SetData")
-	
-	inBytes = inBytes or ""
-	
-	if 0 < #inBytes then
-	
-		-- check if character can be printed
-		--
-		if 0x20 > inBytes:byte(1) then inBytes = "�" end
 
-		m_Frame.sData = inBytes
-	end
+	m_Frame.sData = inBytes or ""
 
-	if IsWindowVisible() then Refresh() end	
+	if IsWindowVisible() then Refresh() end
 end
 
 -- ----------------------------------------------------------------------------
@@ -248,10 +369,10 @@ end
 --
 local function DisplayWindow(inShowStatus)
 --	trace.line("DisplayWindow")
-	
+
 	local wFrame = m_Frame.hWindow
 	if not wFrame then return end
-	
+
 	-- display/hide
 	--
 	wFrame:Show(inShowStatus)
@@ -261,7 +382,7 @@ end
 --
 local function OnClose()
 --	trace.line("OnClose")
-	
+
 	local wFrame = m_Frame.hWindow
 	if not wFrame then return end
 
@@ -282,13 +403,11 @@ end
 -- ----------------------------------------------------------------------------
 -- create the main window
 --
-local function CreateWindow(inParent, inConfig)
+local function CreateWindow(inApp, inParent, inConfig)
 --	trace.line("CreateWindow")
 
-	wx.wxBeginBusyCursor()
-
 	inParent = inParent or wx.NULL
-	
+
 	-- create a window
 	--
 	local ptLeft	= inConfig[1]
@@ -297,29 +416,28 @@ local function CreateWindow(inParent, inConfig)
 	local siHeight	= inConfig[4]
 
 	local frame = wx.wxFrame(inParent, wx.wxID_ANY, "Loupe",
-							 wx.wxPoint(ptLeft, ptTop), 
+							 wx.wxPoint(ptLeft, ptTop),
 							 wx.wxSize(siWidth, siHeight),
 							 dwFrameFlags)
-	
+
 	-- standard event handlers
 	--
 	frame:Connect(wx.wxEVT_SHOW,			OnShow)
 	frame:Connect(wx.wxEVT_PAINT,			OnPaint)
 	frame:Connect(wx.wxEVT_SIZE,			OnSize)
 	frame:Connect(wx.wxEVT_CLOSE_WINDOW,	OnClose)
-	
+
 	-- this is necessary to avoid flickering
 	-- (comment the line if running with the debugger
 	-- and the Lua's version is below 5.2)
 	--
 	frame:SetBackgroundStyle(wx.wxBG_STYLE_CUSTOM)
-	
+
 	--  store for later
 	--
-	m_Frame.hWindow = frame	
-	
-	wx.wxEndBusyCursor()
-	
+	m_Frame.hWindow = frame
+	m_App = inApp
+
 	return frame
 end
 
