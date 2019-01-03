@@ -164,6 +164,27 @@ local function str_lkp_utf_8(inCode)
 end
 
 -- ----------------------------------------------------------------------------
+-- return length of UTF_8 character (1 to 4)
+-- on error return 0
+--
+local function str_len_utf_8(inBytes, inStart)
+
+	if 1 > inStart or #inBytes < inStart then return 0 end
+	local chByte = inBytes:byte(inStart, inStart)
+
+	-- quick shot, we know first 0x7f bytes are 1 byte long
+	--
+	if 0x80 > chByte then return 1 end
+
+	-- otherwise we check the lookup table
+	--
+	local utf8Codes = str_lkp_utf_8(chByte)
+	if not utf8Codes then return 1 end
+
+	return (#utf8Codes / 2)
+end
+
+-- ----------------------------------------------------------------------------
 -- check if the byte at inStart is a valid utf_8 code
 -- returns the full utf_8 code or the best available
 -- the second returned value is
@@ -175,9 +196,17 @@ local function str_sub_utf_8(inBytes, inStart)
 	-- check if start of a Unicode point
 	-- get the Unicode row description, if any
 	--
-	local chMark	= inBytes:sub(inStart, inStart)
-	local utf8Codes = str_lkp_utf_8(chMark:byte())
+	local chMark = inBytes:sub(inStart, inStart)
+	local chByte = chMark:byte()
 
+	-- quick shot, we know first 0x7f characters are 1 byte long
+	--
+	if not chByte    then return chMark, -1 end
+	if 0x80 > chByte then return chMark,  1 end
+
+	-- otherwise we check the lookup table
+	--
+	local utf8Codes = str_lkp_utf_8(chByte)
 	if not utf8Codes then return chMark, -1 end
 
 	-- quick shot to return when no check needed
@@ -311,8 +340,9 @@ if not string.trim    then string.trim    = str_trim end
 if not string.endwipe then string.endwipe = str_endwipe end
 if not string.cap1st  then string.cap1st  = str_cap1st end
 if not string.fmtfind then string.fmtfind = str_fmtfind end
-if not string.utf8lup then string.utf8lup = str_lkp_utf_8 end
+if not string.utf8lkp then string.utf8lkp = str_lkp_utf_8 end
 if not string.utf8sub then string.utf8sub = str_sub_utf_8 end
+if not string.utf8len then string.utf8len = str_len_utf_8 end
 if not string.ispunct then string.ispunct = str_ispunct end
 if not string.wordsub then string.wordsub = str_wordsub end
 if not string.fmtkilo then string.fmtkilo = str_fmtkilo end
