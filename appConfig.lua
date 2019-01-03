@@ -15,13 +15,18 @@
 -- ----------------------------------------------------------------------------
 -- list of blocks to output when creating samples
 -- set to false an entry to disable the block
--- note: titles marked with a (*) are a continuation segment
--- and will display data only (no title repetition)
--- look at uniBlocks.lua for the physical division
--- Warning: do not delete rows, disable them instead
+-- Note: titles marked with a (*) are a continuation segment
+-- and will display data only (no title repetition),
+-- look at uniBlocks.lua for the physical division.
+-- Warning: do not delete rows, disable them instead.
 --          ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
--- to retrieve the corresponding document from the Unicode' ftp site
--- then use the Unicode hex value of the first section
+-- Hint: to retrieve the corresponding document from the Unicode' ftp site
+-- then use the Unicode hex value of the first segment (U+....)
+--
+-- Note: this is obviously not a 1:1 mapping of Blocks.txt from the
+-- Unicode's Consortium, as the application details the physical
+-- division of blocks and segments within each block, where a full
+-- segment is 64 characters long (4 rows of 16 characters each).
 --
 local tUnicodeBlocks =
 {
@@ -51,15 +56,15 @@ local tUnicodeBlocks =
 	{true,		"Armenian"},
 	{true,		"Armenian (*)"},
 	{true,		"Armenian (*)"},
-	{true,		"Hebrew"},
+	{true,		"Hebrew"},										-- right to left
 	{true,		"Hebrew (*)"},
-	{true,		"Arabic"},
+	{true,		"Arabic"},										-- right to left
 	{true,		"Arabic (*)"},
-	{true,		"Syriac"},
+	{true,		"Syriac"},										-- right to left
 	{true,		"Syriac (*)"},
-	{true,		"Arabic Supplement"},
-	{true,		"Thaana"},
-	{true,		"NKo"},
+	{true,		"Arabic Supplement"},							-- right to left
+	{true,		"Thaana"},										-- right to left
+	{true,		"NKo"},											-- right to left
 
 	-- e0-ef block (3 bytes)
 	------------------------
@@ -243,15 +248,15 @@ local tUnicodeBlocks =
 	{true,		"Hangul Syllables (*)"},
 	{true,		"Hangul Jamo Extended-B"},
 	{true,		"Hangul Jamo Extended-B (*)"},
-	{false,		"High Surrogates"},							-- not in RFC 3629
-	{false,		"High Private Use Surrogates"},				-- not in RFC 3629
-	{false,		"Low Surrogates"},							-- not in RFC 3629
+	{false,		"High Surrogates"},								-- not in RFC 3629
+	{false,		"High Private Use Surrogates"},					-- not in RFC 3629
+	{false,		"Low Surrogates"},								-- not in RFC 3629
 	{true, 		"Private Use Area"},
 	{true, 		"Private Use Area (*)"},
 	{true,		"CJK Compatibility Ideographs"},
-	{true,		"Alphabetic Presentation Forms"},
-	{true,		"Alphabetic Presentation Forms (*)"},
-	{true,		"Arabic Presentation Forms-A"},
+	{true,		"Alphabetic Presentation Forms"},				-- some right to left
+	{true,		"Alphabetic Presentation Forms (*)"},			-- right to left
+	{true,		"Arabic Presentation Forms-A"},					-- right to left
 	{true,		"Arabic Presentation Forms-A (*)"},
 	{true,		"Variation Selectors"},
 	{true,		"Vertical Forms"},
@@ -259,7 +264,7 @@ local tUnicodeBlocks =
 	{true,		"CJK Compatibility Forms"},
 	{true,		"CJK Compatibility Forms (*)"},
 	{true,		"Small Form Variants"},
-	{true,		"Arabic Presentation Forms-B"},
+	{true,		"Arabic Presentation Forms-B"},					-- right to left	
 	{true,		"Arabic Presentation Forms-B (*)"},
 	{true,		"Halfwidth and Fullwidth Forms"},
 	{true,		"Halfwidth and Fullwidth Forms (*)"},
@@ -303,7 +308,7 @@ local tUnicodeBlocks =
 	{true,		"Linear A"},
 	{false,		"No_Block"},
 	{true,		"Cypriot Syllabary"},
-	{true,		"Imperial Aramaic"},
+	{true,		"Imperial Aramaic"},							-- right to left
 	{true,		"Palmyrene"},
 	{true,		"Nabataean"},
 	{false,		"No_Block"},
@@ -313,21 +318,21 @@ local tUnicodeBlocks =
 	{true,		"Lydian"},
 	{false,		"No_Block"},
 	{true,		"Meroitic Hieroglyphs"},
-	{true,		"Meroitic Cursive"},
+	{true,		"Meroitic Cursive"},							-- right to left
 	{true,		"Meroitic Cursive (*)"},
-	{true,		"Kharoshthi"},
+	{true,		"Kharoshthi"},									-- right to left
 	{true,		"Kharoshthi (*)"},
-	{true,		"Old South Arabian"},
+	{true,		"Old South Arabian"},							-- right to left
 	{true,		"Old North Arabian"},
 	{false,		"No_Block"},
 	{true,		"Manichaean"},
 	{true,		"Avestan"},
-	{true,		"Inscriptional Parthian"},
-	{true,		"Inscriptional Pahlavi"},
+	{true,		"Inscriptional Parthian"},						-- right to left
+	{true,		"Inscriptional Pahlavi"},						-- right to left
 	{true,		"Psalter Pahlavi"},
 	{false,		"No_Block"},
 	{false,		"No_Block (*)"},
-	{true,		"Old Turkic"},
+	{true,		"Old Turkic"},									-- right to left
 	{true,		"Old Turkic (*)"},
 	{false,		"No_Block"},
 	{true,		"Old Hungarian"},
@@ -548,84 +553,107 @@ local tUnicodeBlocks =
 }
 
 -- ----------------------------------------------------------------------------
--- helper: these are some fonts installed on my laptop
--- so if I want to test a new font I just change
--- the index in tSetupInf.ByteFont or tSetupInf.TextFont
--- Note: characters in the 'Private Use Area' really depend on current font
+-- helper: these is a listing of some fonts installed on my laptop
+-- so if I want to test a new font I just change the index in selected entry.
+-- Note: characters in the 'Private Use Area' really depend on current font.
+-- Hint: testing Latin-B, Arrows, Symbols, Shapes will give an idea of correctness.
+-- Note: a star * marks a failure on primary tests.
 --
 local tPreferFont =
 {
-	"Source Code Pro",				--  1 (falls short on Latin B)
-	"Gentium Book Basic",			--  2 (falls long on Latin B)
-	"David Libre",					--  3 (falls long on Latin B)
-	"EmojiOne Color",				--  4 (often prints below baseline)
-	"Microsoft Sans Serif",			--  5 (falls short on Supplemental Arrows)
-	"Lucida Sans Unicode",			--  6 (falls long on Phonetic Extensions)
-	"DejaVu Sans Mono",				--  7 (ok)
-	"Noto Mono",					--  8 (falls short on Latin B)
-	"Trebuchet MS",					--  9 (falls short on Latin B)
-	"Liberation Sans",				-- 10 (ok, fails on Greek Extended)
-	"Courier New",					-- 11 (too bad on Latin B first row)
-	"Frank Ruehl CLM",				-- 12 (often falls short on Latin B)
-	"Alef",							-- 13 (falls really short on Latin B)
-	"Amiri",						-- 14 (odd behaviour, really bad)
-	"Ebrima",						-- 15 (falls a little short on Latin B)
-	"Gadugi",						-- 16 (falls short on Latin B)
-	"MusicM",						-- 17 (really bad)
-	"MS Gothic",					-- 18 (falls very long on Latin B)
-	"Arial Unicode MS",				-- 19 (ok)
-	"Rubik",						-- 20 (falls very short on Latin B)
-	"Segoe UI",						-- 21 (falls short on Arrows)
-	"Tahoma",						-- 22 (ok)
-	"Times New Roman",				-- 23 (ok + has leading space above)
-	"Trebuchet MS",					-- 24 (falls short on Latin B)
-	"Verdana",						-- 25 (falls very long on Latin B)
-	"Unifont",						-- 26 (ok, harsh and techinical)
-	"Batang",						-- 27 (fails on Cyrillic Extended A)
-	"Gulim",						-- 28 (ok)
-	"MingLiU",						-- 29 (many Mathematical Alphanumeric Symbols undefined)
-	"MS Mincho",					-- 30 (falls very long on Latin B)
-	"SimHei",						-- 31 (most of Mathematical Alphanumeric Symbols undefined)
-	"SimSun"						-- 32 (ok)
-
+	"Source Code Pro",				--  1 falls short on Latin B
+	"Gentium Book Basic",			--  2 falls long on Latin B
+	"David Libre",					--  3 falls long on Latin B
+	"EmojiOne Color",				--  4 often prints below baseline
+	"Microsoft Sans Serif",			--  5 falls short on Supplemental Arrows
+	"Lucida Sans Unicode",			--  6 falls long on Phonetic Extensions
+	"DejaVu Sans Mono",				--  7 ok
+	"Noto Mono",					--  8 falls short on Latin B
+	"Trebuchet MS",					--  9 falls short on Latin B
+	"Liberation Sans",				-- 10 ok, fails on Greek Extended + has leading
+	"Courier New",					-- 11 too bad on Latin B first row
+	"Frank Ruehl CLM",				-- 12 nice + leading
+	"Alef",							-- 13 seldom falls really short
+	"Amiri",						-- 14 odd behaviour, really bad
+	"Ebrima",						-- 15 nice, falls really short, slow loupe
+	"Gadugi",						-- 16 falls short on Latin B
+	"MusicM",						-- 17 really bad display
+	"MS Gothic",					-- 18 falls very long on Latin B
+	"Arial Unicode MS",				-- 19 ok
+	"Rubik",						-- 20 fat, *
+	"Segoe UI",						-- 21 falls short on Arrows
+	"Tahoma",						-- 22 ok
+	"Times New Roman",				-- 23 ok + leading
+	"Trebuchet MS",					-- 24 falls short on Latin B
+	"Verdana",						-- 25 falls very long on Latin B
+	"Unifont",						-- 26 harsh + leading + nl
+	"Batang",						-- 27 fails on Cyrillic Extended A + leading + nl
+	"Gulim",						-- 28 ok + leading + nl
+	"MingLiU",						-- 29 many Mathematical Alphanumeric Symbols undefined + leading
+	"MS Mincho",					-- 30 thin, falls very long
+	"SimHei",						-- 31 slow drawing, Greek and Cyrillic wide spacing
+	"SimSun",						-- 32 Greek wide spacing
+	"Caladea",						-- 33 slightly oblique, text's extent really wrong
+	"Calibri",						-- 34 fails on many Arrows
+	"Cambria",						-- 35 ok
+	"Candara",						-- 36 *
+	"Consolas",						-- 37 mono-spaced, *
+	"Constantia",					-- 38 *
+	"Corbel",						-- 39 *, lacks many Arrows
+	"David CLM",					-- 40 *
+	"Datum",						-- 41 *, + leading
+	"Gabriola",						-- 42 really bad, inconsistent
+	"Georgia",						-- 43 often falls short on many characters
+	"Gungsuh",						-- 44 ok but odd behaviour if treated, fat, + leading + nl
+	"Linux Biolinum G",				-- 45 ok, fails on Blocks
+	"MS PMincho",					-- 46 fails short on Latin B
+	"Miriam Mono CLM",				-- 47 narrow Latin 1, mostly mono-spaced
+	"Nachlieli CLM",				-- 48 *
+	"Reem Kufi",					-- 49 *
+	"Rubik",						-- 50 *
+	"Scheherazade",					-- 51 inconsistent
+	"Sitka",						-- 52 fails on Number Forms
+	"Sylfaen",						-- 53 *
+	
 }
 
 -- ----------------------------------------------------------------------------
 -- list of known codepages for the testfiles
 -- (all testfiles provided are Latin I or such ...)
--- Hint: to display properly text with box drawing characters use
--- a mono-spaced font
+-- Hint: to display properly text with box drawing characters use  a mono-spaced font
 --
 local tKnowCPs =
 {
 	{"Windows",	  1252},			-- usually ok (test file 1,2,3,4,6,7,8)
-	{"OEM",		   437},			-- lines and blocks (test file 5, _a, _b)
+	{"OEM",		   437},			-- lines and blocks (test file 5,a,b,c,d)
 	{"ISO",		885901},			-- Euro currency symbol not defined
 }
 
 -- ----------------------------------------------------------------------------
 -- parameters for the application
 -- if modified and the application is running then call refresh settings
--- (it's a wise choice to select the loupe's font name same as per "TextFont")
--- memory garbage collection set to Generational won't release much memory
+--
+-- Hint: it's a wise choice to select the loupe's font name the same as per "TextFont".
+-- Note: memory garbage collection set to Generational won't release much memory.
+-- Note: memory is forced to be fully recollected upon a file read.
 --
 local tSetupInf =
 {
 	-- importing the file
 	--
-	["InFile"]		= "testfiles\\__Test_99.txt",		-- import file name
+	["InFile"]		= "testfiles\\__Test_1.txt",		-- import file name
 	["ReadMode"]	= "r",								-- r/rb
 	["AutoLoad"]	= true,								-- load at startup time
 	["Codepage"]  	= tKnowCPs[1],						-- desired encoding
 
 	-- saving the file
 	--
-	["OutFile"]		= "testfiles\\__Test_yy.txt",		-- output file name
+	["OutFile"]		= "testfiles\\__Test_out.txt",		-- output file name
 	["WriteMode"]	= "w",								-- w/wb/a  with + option
 
 	-- checking validity
 	--
-	["Pedantic"]	= true,								-- trace each line error
+	["Pedantic"]	= false,							-- trace each line error
 	["AutoCheck"]	= false,							-- check validity at load time
 
 	-- samples file creation
@@ -637,9 +665,9 @@ local tSetupInf =
 
 	-- display
 	--
-	["ByteFont"]	= {13.5, tPreferFont[7]},			-- left display (codes)
-	["TextFont"]	= {17.5, tPreferFont[6]},			-- right display (text)
-	["FontStep"]	= 1.5,								-- step for increasing text's font size
+	["ByteFont"]	= {12, tPreferFont[7]},				-- left display (codes)
+	["TextFont"]	= {19, tPreferFont[47]},			-- right display (text)
+	["FontStep"]	= 1,								-- note: wxFont ignores decimals
 	["Columns"]		= 16,								-- format number of columns
 	["Interleave"]	= true,								-- highlight even columns
 	["WheelMult"]	= 10,								-- override o.s. mouse wheel's scroll
@@ -648,18 +676,19 @@ local tSetupInf =
 	["Underline"]	= true,								-- underline bytes below 0x20
 	["ColourCodes"]	= true,								-- highlight Unicode bytes group
 	["TabSize"]		= 4,								-- convert tab to 'n' chars (left pane)
-	["Scheme"]		= "Light",							-- colour scheme - White/Light/Dark/Black
+	["Scheme"]		= "Dark",							-- colour scheme - White/Light/Dark/Black
 
 	-- edit
 	--
-	["CopyOption"]	= "UTF_8",							-- Byte/UTF_8/Word/Line (textual word)
---	["PasteOption"] = "Discard",						-- handling of errors - Discard/Convert/Plain
-	["SelectOption"]= "Free",							-- selection mode - Line/Free
+	["CopyOption"]	= "Select",							-- Byte/UTF_8/Word/Line/Select
+--	["PasteOption"] = "Discard",						-- (ignored) handling of errors - Discard/Convert/Plain
+--	["SelectOption"]= "Free",							-- (ignored) selection mode - Line/Free
 
 	-- magnify
 	--
-	["Loupe"]		= {300, tPreferFont[6]},			-- font for the magnify window
-
+	["Loupe"]		= {200, tPreferFont[47]},			-- font for the magnifying window
+	["UseNames"]	= "Docs\\NamesList.txt",			-- names' file (comment line to disable)
+	
 	-- extra
 	--
 	["TimeDisplay"]	= 10,								-- seconds of message in status bar
