@@ -7,7 +7,7 @@
 -- embedded zeros
 -- ----------------------------------------------------------------------------
 
-package.path = package.path .. ";translate/?.lua;"
+package.path = package.path .. ";transcode/?.lua;"
 
 local trace		= require "trace"		-- shortcut for tracing
 local wxWinMain	= require "wxMain"		-- GUI for the application
@@ -16,6 +16,7 @@ local samples	= require "uniBlocks"	-- create a list of Unicode blocks
 
 local _format	= string.format
 local _strrep	= string.rep
+local _byte		= string.byte
 local _utf8sub	= string.utf8sub		-- extract utf8 bytes (1-4)
 local _wordsub	= string.wordsub		-- extract words
 local _fmtkilo	= string.fmtkilo		-- pretty format byte size
@@ -39,6 +40,12 @@ local function OnLookupInterval(inTable, inByteIndex)
 	local tCurr
 	local iSum
 
+	-- check for the very first row that happens to start with a zero
+	--
+	if (0 == inByteIndex) and (0 < #inTable) then return 1, inTable[1] end
+
+	-- do the scan
+	--
 	while iStart <= iEnd do
 
 		iIndex = _floor(iStart + (iEnd - iStart) / 2)
@@ -46,14 +53,23 @@ local function OnLookupInterval(inTable, inByteIndex)
 		tCurr = inTable[iIndex]
 		iSum  = tCurr[1] + tCurr[2]:len()
 
-		if tCurr[1] <= inByteIndex and inByteIndex < iSum then
-			return iIndex
+		if tCurr[1] < inByteIndex and inByteIndex <= iSum then
+			return iIndex, tCurr
 		end
 
 		if iSum <= inByteIndex then iStart = iIndex + 1 else iEnd = iIndex - 1 end
 	end
 
-	return -1
+	return -1, nil
+end
+
+-- ----------------------------------------------------------------------------
+--
+local function OnFindLine(inAbsOffset)
+
+	if 0 == thisApp.iFileBytes then return -1, nil end
+
+	return OnLookupInterval(thisApp.tFileLines, inAbsOffset)
 end
 
 -- ----------------------------------------------------------------------------
@@ -81,12 +97,12 @@ local function OnFindText(inText, inStartPos, inNoCase)
 
 	-- get the current line from the optional position
 	--
-	local iLineIndex = OnLookupInterval(tLines, inStartPos)	-- get line of text
+	local iLineIndex = OnFindLine(inStartPos)			-- get line of text
 	if 0 > iLineIndex then return -1 end
 
-	inStartPos = inStartPos - tLines[iLineIndex][1]			-- normalize
+	inStartPos = inStartPos - tLines[iLineIndex][1]		-- normalize
 
-	if inNoCase then inText = inText:upper() end			-- check for case
+	if inNoCase then inText = inText:upper() end		-- check for case
 
 	-- the first find might be on the current line
 	--
@@ -131,47 +147,136 @@ local function OnFindText(inText, inStartPos, inNoCase)
 end
 
 -- ----------------------------------------------------------------------------
--- get text from source buffer with the line starting at
--- at inStopStart and the offset at inOffset
--- depending on the configuration will extract
+-- copy text from absolute values
+--
+local function OnCopySelected(inFrom, inTo)
+--	trace.line("OnGetTextAtPos")
+
+	if 0 == thisApp.iFileBytes then return 0, "Nothing in memory" end
+
+	-- correct indices
+	--
+	if inFrom > inTo then
+		inFrom, inTo = inTo, inFrom
+	end
+	
+	if inFrom == inTo then
+		return 0, "Empty selection"
+	end
+
+	if 0 >= inFrom or inTo > thisApp.iFileBytes then
+		return 0, "Invalid indices"
+	end
+
+	local tLines	= thisApp.tFileLines
+	local iStartLn	= OnFindLine(inFrom)
+	local iStopLn	= OnFindLine(inTo)
+	local iStart	= inFrom - tLines[iStartLn][1]
+
+	-- simple case, selection within a single line
+	--
+	if iStartLn == iStopLn then
+
+		local iEnd  = inTo - tLines[iStartLn][1]
+		local sText = tLines[iStartLn][2]:sub(iStart, iEnd)
+
+		return sText:len(), sText
+	end
+
+	-- selected text spans more than 1 line
+	--
+	local tSelected = { }
+
+	-- first piece
+	--
+	tSelected[#tSelected + 1] = tLines[iStartLn][2]:sub(iStart)
+
+	while iStartLn < iStopLn do
+
+		iStartLn = iStartLn + 1
+
+		if iStartLn < iStopLn then
+
+			-- continuation
+			--
+			tSelected[#tSelected + 1] = tLines[iStartLn][2]
+		else
+
+			-- end of selection
+			--
+			local iEnd = inTo - tLines[iStartLn][1]
+
+			tSelected[#tSelected + 1] = tLines[iStartLn][2]:sub(1, iEnd)
+		end
+	end
+
+	-- put all together
+	--
+	local sText = _concat(tSelected)
+
+	return sText:len(), sText
+end
+
+-- ----------------------------------------------------------------------------
+-- get text from source buffer with the line at inLine
+-- start copying from offset to selected option's end
+-- depending on the configuration will extract:
 -- 1 byte
 -- an UTF_8 code made of 1 to 4 bytes
 -- a word starting from punctuation to punctuation
--- a sequence of words stopping at the new line
+-- all the text at inLine
 --
-local function OnGetTextAtPos(inStopStart, inOffset, inOption)
+local function OnGetTextAtPos(inLine, inOffset)
 --	trace.line("OnGetTextAtPos")
 
-	local iLineIndex = OnLookupInterval(thisApp.tFileLines, inStopStart)	-- get line of text
-	if 0 == iLineIndex then return 0, "Nothing in memory" end
+	-- sanity check
+	--
+	if 0 == thisApp.iFileBytes then return 0, "Nothing in memory" end
+	if #thisApp.tFileLines < inLine or 1 > inLine then
+		return 0, "Line index not valid"
+	end
 
-	inOption = inOption or thisApp.tConfig.CopyOption						-- check for option
+	local iOption	= thisApp.tConfig.CopyOption			-- check for option
+	local sTextLine	= thisApp.tFileLines[inLine][2]			-- set current line
 
-	local sSource= thisApp.tFileLines[iLineIndex][2]
+	if "Line" == inOption then return sTextLine:len(), sTextLine end
 
-	if "Line" == inOption then return sSource:len(), sSource end
+	if 0 < inOffset and inOffset < sTextLine:len() then
 
-	local iPosition = inOffset - inStopStart + 1							-- normalize offset
-
-	if 0 < iPosition and iPosition < sSource:len() then
-
-		if "Byte" == inOption then return 1, sSource:sub(iPosition, iPosition) end
+		if "Byte" == inOption then
+			return 1, sTextLine:sub(inOffset, inOffset)
+		end
 
 		if "UTF_8" == inOption then
 
-			local sCopyBuff = _utf8sub(sSource, iPosition)
-
-			return sCopyBuff:len(), sCopyBuff
+			local sUTF8 = _utf8sub(sTextLine, inOffset)
+			return sUTF8:len(), sUTF8
 		end
 
 		-- handle the Word selection
 		--
-		local sCopyBuff = _wordsub(sSource, iPosition)
-		if sCopyBuff then return sCopyBuff:len(), sCopyBuff end
-
+		local sWord = _wordsub(sTextLine, inOffset)
+		if sWord then return sWord:len(), sWord end
 	end
 
-	return 0, "Error !"
+	return 0, "Error performing copy!"
+end
+
+-- ----------------------------------------------------------------------------
+-- get an error from the checked UTF_8 validity test
+-- an error is a table itself:
+-- {line number, offset within the line}
+--
+local function OnGetUTF8Error(inIndex)
+--	trace.line("OnGetUTF8Error")
+
+	inIndex = inIndex or 1
+
+	local tErrors = thisApp.tCheckErrors
+	if #tErrors < inIndex then inIndex = 1 end			-- rotate errors right
+	if 0 >= inIndex then inIndex = #tErrors end			-- rotate errors left
+
+	return inIndex, tErrors[inIndex]
 end
 
 -- ----------------------------------------------------------------------------
@@ -190,6 +295,11 @@ local function OnEnumCodepages()
 end
 
 -- ----------------------------------------------------------------------------
+-- validate the file, loads the errors table (if any)
+-- see the Unicode's recommendation for error handling
+-- that is: a sequence of, say, 4 bytes with an error on the first byte
+-- will produce an error for the first byte only, subsquent bytes might
+-- produce more errors
 --
 local function OnCheckEncoding()
 --	trace.line("OnCheckEncoding")
@@ -197,6 +307,7 @@ local function OnCheckEncoding()
 	trace.lnTimeStart("Testing UTF_8 validity ...")
 
 	local tCounters = {0, 0, 0, 0, 0}		-- UTF1, UTF2, UTF3, UTF4, ERRORS
+	thisApp.tCheckErrors = { }				-- reset errors table
 
 	local iIndex
 	local chCurr
@@ -204,6 +315,7 @@ local function OnCheckEncoding()
 	local iEnd
 	local iRetCode
 	local tLineOut = { }
+	local tErrors  = thisApp.tCheckErrors
 
 	-- format for each line is
 	-- {offset from start of file, line of text}
@@ -215,9 +327,9 @@ local function OnCheckEncoding()
 		-- UTF_8 aware splitting
 		--
 		iIndex	= 1
-		iEnd	= sLine:len()
+		iEnd	= sLine:len() + 1
 
-		while iEnd >= iIndex do
+		while iEnd > iIndex do
 
 			-- get next char, which might span from 1 byte to 4 bytes
 			--
@@ -228,8 +340,12 @@ local function OnCheckEncoding()
 			--
 			if 0 > iRetCode then
 
+				-- add an error to the errors' table
+				--
+				tErrors[#tErrors + 1] = {iCurLine, iIndex}
+
 				if thisApp.tConfig.Pedantic then
-					trace.line(_format("Line [%4d:%2d] -> [%s]", iCurLine, iIndex, chCurr))
+					trace.line(_format("Line [%4d:%2d] -> [0x%02x]", iCurLine, iIndex, _byte(chCurr)))
 				end
 
 				tCounters[5] = tCounters[5] + 1
@@ -262,10 +378,69 @@ local function OnCheckEncoding()
 
 	trace.lnTimeEnd("UTF_8 test end")
 
-	return true, sText
+	return #thisApp.tCheckErrors, sText
 end
 
 -- ----------------------------------------------------------------------------
+--
+local function OnCountSequences(inLineIdx)
+--	trace.line("OnCountSequences")
+	
+	local tCurLine = thisApp.tFileLines[inLineIdx]
+	if not tCurLine then return -1 end
+	
+	local tSequence = { }
+	local tCurrent	= { }
+	local sBuffer   = tCurLine[2]
+	local iLength   = sBuffer:len()
+	local iNumHigh  = 0
+	local iCounter	= 0
+	local chMark    = 0x00
+	local chTest
+	
+	for i=1, iLength do
+		
+		chTest = sBuffer:byte(i)
+		if 0x80 < chTest then
+			iNumHigh = iNumHigh + 1
+			
+			iCounter = iCounter + 1
+			
+			if chTest ~= chMark then		-- add new
+				tCurrent = {chTest, 0}
+				chMark   = chTest
+				iCounter = 1
+				tSequence[#tSequence + 1] = tCurrent
+			end
+			
+			tCurrent[2] = iCounter			-- increment current
+		else
+			
+			chMark  = 0x00					-- restart current
+		end
+	end
+	
+	local tCompact = { }
+	for i, tCurr in ipairs(tSequence) do
+		
+		if 1 < tCurr[2] then
+			tCompact[#tCompact + 1] = tCurr
+		end		
+	end
+	tSequence = tCompact
+	
+	for i, tCurr in ipairs(tSequence) do
+		trace.line(_format(">> [0x%2x]  [%d]", tCurr[1], tCurr[2]))
+	end	
+
+	trace.line(_format("Format Test Line [%d] Length [%d] High [%d]", inLineIdx, iLength, iNumHigh))
+	
+	return iLength, iNumHigh, #tSequence
+end
+
+
+-- ----------------------------------------------------------------------------
+-- read the configuration file written in Lua's syntax
 --
 local function OnReadSetupInf()
 --	trace.line("OnReadSetupInf")
@@ -297,26 +472,32 @@ local function OnLoadFile(inOptFilename)
 
 	-- reset content
 	--
-	thisApp.tFileLines = { }
-	thisApp.iFileBytes = 0
+	thisApp.tFileLines	 = { }
+	thisApp.iFileBytes 	 = 0
+	thisApp.tCheckErrors = { }
 
 	-- refresh setup
 	--
 	if not OnReadSetupInf() then return 0, "Configuration file load failed." end
+
+	-- perform a full garbage collection cycle
+	-- trying to profit of just released memory
+	--
+	collectgarbage("collect")
 
 	-- get names from configuration file
 	--
 	local sSourceFile = thisApp.tConfig.InFile
 	local sOpenMode	  = thisApp.tConfig.ReadMode
 
-	-- override if importing and a different name was provided
+	-- override using last filenames used
 	--
-	if thisApp.sLastOpenFile then sSourceFile = thisApp.sLastOpenFile end
-	if thisApp.sLastSaveFile then sSourceFile = thisApp.sLastSaveFile end
+	if 0 < thisApp.sLastOpenFile:len() then sSourceFile = thisApp.sLastOpenFile end
+--	if 0 < thisApp.sLastSaveFile:len() then sSourceFile = thisApp.sLastSaveFile end
 
 	-- override if a filename was provided
 	--
-	if inOptFilename then sSourceFile = inOptFilename end
+	if inOptFilename and 0 < inOptFilename:len() then sSourceFile = inOptFilename end
 
 	local sText = _format("Loading [%s] (%s)", sSourceFile, sOpenMode)
 	trace.line(sText)
@@ -434,8 +615,13 @@ local function OnSaveFile(inSelector, inOptFilename)
 
 	if 0 == thisApp.iFileBytes then return 0, "Nothing in memory" end
 
-	local sTargetFile = thisApp.sLastSaveFile or thisApp.sLastOpenFile
+	local sTargetFile = nil
 	local sOpenMode   = "w"
+
+	-- override using last filenames used
+	--
+	if 0 < thisApp.sLastOpenFile:len() then sTargetFile = thisApp.sLastOpenFile end
+	if 0 < thisApp.sLastSaveFile:len() then sTargetFile = thisApp.sLastSaveFile end
 
 	inSelector = inSelector or 1
 
@@ -557,9 +743,12 @@ end
 local function SetUpApplication()
 --	trace.line("SetUpApplication")
 
-	trace.line(thisApp.sAppName .. " (Ver. " .. thisApp.sAppVersion .. ")")
+	local sApplication = thisApp.sAppName .. " (Ver. " .. thisApp.sAppVersion .. ")"
+	trace.line(sApplication)
 	trace.line("Released: " .. thisApp.sAppRelDate)
 	trace.line("_VERSION: " .. _VERSION)
+
+	wx.wxGetApp():SetAppName(sApplication)
 
 	-- wxWidgets can be run only with Lua version 5.2
 	--
@@ -611,7 +800,18 @@ local function main(inApplication)
 
 		if thisApp.tConfig.AutoLoad then OnLoadFile() end
 
-		wxWinMain.ShowWindow(thisApp)
+		wx.wxGetApp():SetUseBestVisual(true)
+		wx.wxGetApp():SetExitOnFrameDelete(true)
+
+		local hWindow = wxWinMain.ShowWindow(thisApp)
+		if hWindow then
+
+			wx.wxGetApp():SetTopWindow(hWindow)
+
+			-- run the main loop
+			--
+			wx.wxGetApp():MainLoop()
+		end
 	end
 
 	-- we'll get here only when the main window loop closes
@@ -632,29 +832,33 @@ local tApplication =
 	sChkVer			= "Lua 5.2",			-- Lua's version required
 	sIconFile		= "wxEncode.ico",		-- icon for the application
 	sLogFilename	= "wxEncode.log",		-- logging filename
-	sTranslateApp 	= "translate\\translate.lua",	-- translator
+	sTranslateApp 	= "transcode\\transcode.lua",	-- transcoder
 
 	sConfigIni		= "appConfig.lua",		-- filename for the config
 	tConfig			= { },					-- configuration for the app.
 	iGarbageCount	= 0,					-- last memory check value
 
-	sLastOpenFile	= nil,					-- last input filename used
-	sLastSaveFile	= nil,					-- last output filename used
+	sLastOpenFile	= "",					-- last input filename used
+	sLastSaveFile	= "",					-- last output filename used
 
 	tFileLines		= { },					-- line by line memory file
 	iFileBytes		= 0,					-- sum of all bytes in tFileLines
+	tCheckErrors	= { },					-- table of check UTF_8 errors
 
 	ReadSetupInf	= OnReadSetupInf,		-- read the setupinf.lua file
 	LoadFile		= OnLoadFile,			-- load the file in memory
 	SaveFile		= OnSaveFile,			-- save memory to file
 	CheckEncoding	= OnCheckEncoding,		-- check chars in current file
+	GetUTF8Error	= OnGetUTF8Error,		-- get an error from errors' list
 	EnumCodepages	= OnEnumCodepages,		-- enumerate available codepages
 	Encode_UTF_8	= OnEncode_UTF_8,		-- save the current file UTF_8
 	CreateByBlock	= OnCreateByBlock,		-- crate samples of characters
-	LookupInterval	= OnLookupInterval,		-- test find the row of index
-	GetTextAtPos	= OnGetTextAtPos,		-- get text at pos (see setupinf.lua)
+	FindLine		= OnFindLine,			-- test find the row of index
+	GetTextAtPos	= OnGetTextAtPos,		-- get text at pos (see appConfig.lua)
+	CopySelected	= OnCopySelected,		-- get selected text
 	FindText		= OnFindText,			-- find text within the file
 	GarbageTest		= OnGarbageTest,		-- test memory and call collect
+	CountSequences	= OnCountSequences,		-- test buffer for sequences
 }
 
 -- ----------------------------------------------------------------------------
