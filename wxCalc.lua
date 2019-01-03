@@ -31,17 +31,18 @@ local m_Frame =
 }
 
 -- ----------------------------------------------------------------------------
--- flags in use for the frame - note that lacks the resize border
---
-local dwFrameFlags = bit32.bor(wx.wxFRAME_TOOL_WINDOW, wx.wxCAPTION)
-	  dwFrameFlags = bit32.bor(dwFrameFlags, wx.wxFRAME_FLOAT_ON_PARENT)
-
--- ----------------------------------------------------------------------------
 -- preallocated GDI objects
 --
 local m_clrBack  = palette.Gray15
 local m_clrFore  = palette.Honeydew2
 local m_clrExtra = palette.OrangeRed
+
+-- ----------------------------------------------------------------------------
+-- return the wxWindow handle
+--
+local function GetHandle()
+	return m_Frame.hWindow
+end
 
 -- ----------------------------------------------------------------------------
 -- check the bytes' sequence to be a proper Unicode sequence
@@ -391,6 +392,11 @@ local function CreateWindow(inApp, inParent, inConfig)
 
 	inParent = inParent or wx.NULL
 
+	-- flags in use for the frame - note that lacks the resize border
+	--
+	local dwFrameFlags = bit32.bor(wx.wxFRAME_TOOL_WINDOW, wx.wxCAPTION)
+		  dwFrameFlags = bit32.bor(dwFrameFlags, wx.wxFRAME_FLOAT_ON_PARENT)
+
 	-- create a window
 	--
 	local ptLeft	= inConfig[1]
@@ -466,19 +472,18 @@ local function CreateWindow(inApp, inParent, inConfig)
 							 wx.wxFONTWEIGHT_LIGHT, false, "Lucida Sans Unicode")
 
 	SetupColour(m_clrBack, m_clrFore, m_clrExtra, fnText)
-
-	return frame
 end
 
 -- ----------------------------------------------------------------------------
 --
 return
 {
-	Create	  = CreateWindow,
-	Display	  = DisplayWindow,
-	Close	  = CloseWindow,
-	IsVisible = IsWindowVisible,
-	SetupColour = SetupColour,
+	GetHandle	= GetHandle,
+	Create		= CreateWindow,
+	Display		= DisplayWindow,
+	Close		= CloseWindow,
+	IsVisible	= IsWindowVisible,
+	SetupColour	= SetupColour,
 }
 
 -- ----------------------------------------------------------------------------
