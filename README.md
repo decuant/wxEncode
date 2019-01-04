@@ -1,54 +1,135 @@
-# wxEncode
+# Project Description
 
-using wxLua display both a binary and text views of a file.  
+## 0.0.8 (04-Jan-2019)
 
-the application uses wxLua 2.8.12.3 - Lua 5.2.2
+**wxEncode** is a simple **Lua** application to view a text file with the option 
+of encoding the file from some codepage to UTF8.  
 
-to run the application simply install the wxLua package in your machine, download this application, make the wxLua package visible in the execution environment (PATH in Windows) and run it with this very command: lua wxMain  
+It displays 2 panes:  
+[**Bytes**] which is the bare content of the file formatted Octal/Decimal/Hexadecimal  
+[**Text**]  which is the textual representation, line by line.  
 
-encode an ASCII file to utf_8.  
-create a sample file with some Unicode page blocks.  
-check file's UTF_8 code by blocks of validity [see Unicode RFC 3629](https://tools.ietf.org/html/rfc3629#section-4).  
-copy byte/UTF_8/Word/Line bytes to clipboard.  
-trace most of the operations on a logging file.  
-code is tested to run only on Windows 10, but there shall be no issues on Linux.  
+![wxEncode screenshot](/docs/Screenshot_1.png)
 
-see List of Unicode characters - [Wikipedia](https://en.wikipedia.org/wiki/List_of_Unicode_characters)
+As per the screenshot, the left pane shows coloured bytes for UTF8 characters and 
+highlights the position of the cursor; on the right pane the current line selected 
+and undelined the corresponding cursor position.  
 
-aim of the application originally was to convert an ASCII file containing accented letters to UTF_8 because of the different codepages running on my laptop and the results of the 'dir' command  
+The image shows also 3 more dialogs:  
 
-accented letters belong to this Unicode block: Latin-1 Supplement  
+* **Calc**: calculator from/to UTF8 byte sequence - Unicode (U+) value.  
+* **Find**: find text in the Text pane.  
+* **Loupe**: magnification of the byte (or UTF8 sequence) at the cursor's position.  
 
-there's a main (and only) window with some menu commands.  
-import filename is read from the config file each time the import is launched.  
-bytes display can be selected as oct/dec/hex.  
-can refresh setting by menu command and update the view on the fly.  
-having a wxWidget timer available it will call a cycle of garbage collection when a ticktimer fires.  
-the application can create a number of samples char from the Unicode segmented list, just enable the creation in the setupinf file and run a Create Samples.  
-there's an optional small window to display the current character with a very big size font.  
-there's an optional small window to calculate the UTF_8 bytes sequence from Unicode and vice versa.  
+The application is not an editor, in fact it does operate in a non-destructive way; 
+the user can move the cursor around using the normal keyboard shortcuts that are 
+expected in any editor:  
 
-shortly I will add some screenshots to display what the application capabilities are, but it's such a small step to install it on your machine that I ask you why not donwload it and give it a try?
+* Arrow left/right/up/down.  
+* Page Up/Page Down (+ CTRL for big jumps).  
+* Home/End (+ CTRL for start of file/end of file).  
+* SHIFT + Arrow for selecting text.  
+* CTRL+. / CTRL+, to jump the cursor at next/previous encoding error.  
+* +/- or CTRL + Mouse Wheel to increase/decrese the font for the current pane.  
+* Mouse Wheel to scroll to bottom/to top a number of lines at 1 time.
+* Left Click for selecting the cursor's position, or start/end of seletion.
 
-I worked out this application using ZeroBrane, from within I usually start it, this makes easy for me to leave the setupinf.lua file open on the editor and modify the import name on the fly.  
+**Note** that the cursor movement is bound to UTF8 bytes sequence, so that selecting 
+a byte which is not the start of the sequence will fall automatically to the start.  
 
-Note:
------
+**Note** that scrolling on the right pane has different behaviour than the left pane 
+since in the left pane more lines can fit in 1 single line and this really depends 
+on both the physical file and the choosen number of columns. By default the 
+application is shipped with 16 columns for the left pane, but it can be set to 
+any number depending on the user's preference and monitor's size.
 
-I use a monospaced font for the left pane display and any other font for the right display pane.  
-Fonts may not display characters correctly, but this is a limitation of the font in use itself.  
+## Features
 
-Issues:
--------
+* Check the file for valid UTF8 encoding.  
+* Convert the file from selected codepage to UTF8.  
+* Create a file with Unicode's blocks definition (see next screeshot)  
 
-* cursor's alignement on the text box is currently broken because of the new file read implementation 
-* text's scrollbar does not handle any mouse command.  
-* encoding only works when a file isn't in a standard Unicode format.  
-* the window's client area height is correct only when running from ZeroBrane, if using the lua.exe interpreter than a fix must be applied at OnSize event (actually there is no way to get the statusbar's height)
-  
-file utf8table.lua is still used but deprecated.  
-file utility.lua is no more used and deprecated.  
-file random.lua is not used at all and deprecated.  
+[Unicode RFC 3629](https://tools.ietf.org/html/rfc3629#section-4)
 
---------------------------  
-to easily find help on formatting this very file then [click here](https://help.github.com/articles/basic-writing-and-formatting-syntax/)
+[List of Unicode characters](https://en.wikipedia.org/wiki/List_of_Unicode_characters)
+
+
+![CreateByBlock screenshot](/docs/Screenshot_2.png)
+
+The image depicts a portion of the configuration's file, **appConfig.lua**, where 
+the user can choose which Unicode block to output to file (by default the 
+application will output all blocks excepts segments where Unicode hasn't defined 
+validity {tagged with No_Block} or the 3 Surrogates blocks). The user can disable 
+a block by simply setting the 'true' flag to 'false'.
+
+The application's configuration file, **appConfig.lua**, has many options to tweak 
+the appereance of the 2 panes, which file to import/export and the external 
+Unicode's Names List to use for displaying a description for the current 
+character in the Loupe's dialog.  
+
+One option is to set the fonts to display bytes, text lines, and for the Loupe. 
+The user will usually set a mono-spaced font for the left pane (BYTES). 
+
+This feature, together with the generation of Unicode's blocks, can let the user 
+see which glyphs are implemented by the font selected, and the behaviour of it. 
+
+**Note** that lines of text will be printed using the bi-directional feature of 
+wxWidgets, so that, as an example, Hebrew, Arabic and some old languages will be 
+printed from right to left and that there will be an obvious mis-alignemnt between 
+the Loupe and the current cursor position.  
+
+**Note** the 3 different options to save the current buffer in memory:  
+1. export: will save the file to the filename set in the configuration file;
+2. overwrite: will write the buffer to the same filename as input;
+3. save as: will open a file dialog to manually choose a filename.
+
+## Codepage conversion
+
+At the time of writing this document, the experimental auto-detection of the 
+correct codepage for the input file is not completed, but, anyway, the user 
+can select 1 out of many codepages available (ISO/OEM/WIN). To list the available 
+codepages there's a menu option to output the list to the trace file.  
+
+Set/Change the codepage in the configuration file and then call the transcoder.  
+If testing the actual codepage (when unknown) the cycle of operation would be:  
+1. Import the file with some codepage set  
+2. Test the transcode and terminate if happy with it, or  
+3. Change codepage and refresh settings or re-import the file.  
+
+The sub-folder **transcode** implements the codepage to UTF8 conversion and can 
+be used from the command line in a stand-alone mode or included in another project. 
+
+## wxWidgets and Lua installation
+
+Only the steps for installation on Windows will be listed. although it shall 
+run on Linux and MacOs too.  
+
+1. Download wxWidgets 2.8.12.3 (Unicode) for Lua, **wxLua 5.20**. [wxLua web site](https://wxlua.sourceforge.net/)
+2. Download Lua 5.2.2 [Lua web site](https://www.lua.org/) 
+3. Extract wxLua to a directory of choice (something like. c:\wxLua520).  
+4. Open the Windows' control panel and the Advanced System Settings.  
+5. Open the Environment Variable editor.
+6. Create an entry for the User with the following line: 
+LUA_CPATH=c:\wxLua520\bin\?.dll
+.7 Add c:\wxLua520\bin to the System's PATH variable:
+
+![Windows Environment](/docs/Screenshot_3.png)
+
+The user can then open the Command Prompt, move to the directory where wxEncode 
+has been installed and then run it with the command:  
+
+**lua appMain.lua**
+
+As an alternative, the user can download and install **ZeroBrane Studio**, set 
+the current project directory to the wxEncode folder, select the Lua interpreter 
+version for the project to be 5.2 and simply launch via the 'Run' menu command.  
+
+ZeroBrane can be found at [ZeroBrane web site](https://studio.zerobrane.com/)
+
+## Author
+
+The autor can be reached at decuant@gmail.com
+
+## License
+
+The standard MIT license applies.
