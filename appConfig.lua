@@ -15,11 +15,12 @@
 -- ----------------------------------------------------------------------------
 -- list of blocks to output when creating samples
 -- set to false an entry to disable the block
--- Note: titles marked with a (*) are a continuation segment
--- and will display data only (no title repetition),
--- look at uniBlocks.lua for the physical division.
+--
+-- Note: titles marked with a (*) are a continuation segment and will display
+-- data only (no title repetition), look at uniBlocks.lua for the physical division.
 -- Warning: do not delete rows, disable them instead.
 --          ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
+--
 -- Hint: to retrieve the corresponding document from the Unicode' ftp site
 -- then use the Unicode hex value of the first segment (U+....)
 --
@@ -64,7 +65,7 @@ local tUnicodeBlocks =
 	{true,		"Syriac (*)"},
 	{true,		"Arabic Supplement"},							-- right to left
 	{true,		"Thaana"},										-- right to left
-	{true,		"NKo"},											-- right to left
+	{true,		"N\'Ko"},										-- right to left
 
 	-- e0-ef block (3 bytes)
 	------------------------
@@ -74,7 +75,7 @@ local tUnicodeBlocks =
 	{true,		"Syriac Supplement"},
 	{false,		"No_Block"},
 	{false,		"No_Block (*)"},
-	{true,		"Arabic Extended-A"},
+	{true,		"Arabic Extended-A"},							-- right to left
 	{true,		"Devanagari"},
 	{true,		"Bengali"},
 	{true,		"Gurmukhi"},
@@ -258,13 +259,16 @@ local tUnicodeBlocks =
 	{true,		"Alphabetic Presentation Forms (*)"},			-- right to left
 	{true,		"Arabic Presentation Forms-A"},					-- right to left
 	{true,		"Arabic Presentation Forms-A (*)"},
+	{true,		"Arabic Presentation Forms-A (*)"},
+	{true,		"Non-Characters"},
+	{true,		"Arabic Presentation Forms-A (contd)"},			-- odd but true!
 	{true,		"Variation Selectors"},
 	{true,		"Vertical Forms"},
 	{true,		"Combining Half Marks"},
 	{true,		"CJK Compatibility Forms"},
 	{true,		"CJK Compatibility Forms (*)"},
 	{true,		"Small Form Variants"},
-	{true,		"Arabic Presentation Forms-B"},					-- right to left	
+	{true,		"Arabic Presentation Forms-B"},					-- right to left
 	{true,		"Arabic Presentation Forms-B (*)"},
 	{true,		"Halfwidth and Fullwidth Forms"},
 	{true,		"Halfwidth and Fullwidth Forms (*)"},
@@ -549,15 +553,16 @@ local tUnicodeBlocks =
 	{false,		"Supplementary Private Use Area-A"},
 	{false,		"Supplementary Private Use Area-B"},
 	{false,		"Supplementary Private Use Area-B (*)"},
-	{true,		"Non-characters"},
+	{true,		"Non-Characters"},
 }
 
 -- ----------------------------------------------------------------------------
 -- helper: these is a listing of some fonts installed on my laptop
 -- so if I want to test a new font I just change the index in selected entry.
+--
 -- Note: characters in the 'Private Use Area' really depend on current font.
 -- Hint: testing Latin-B, Arrows, Symbols, Shapes will give an idea of correctness.
--- Note: a star * marks a failure on primary tests.
+--       A star '*' marks a failure on primary tests.
 --
 local tPreferFont =
 {
@@ -614,7 +619,10 @@ local tPreferFont =
 	"Scheherazade",					-- 51 inconsistent
 	"Sitka",						-- 52 fails on Number Forms
 	"Sylfaen",						-- 53 *
-	
+	"Symbola",						-- 54 ok, the best among all
+	"Unifont Upper",				-- 55 ok, harsh after Specials block, + leading
+	"Nilus",						-- 56 ok, the best for Egyptian Hieroglyphs
+
 }
 
 -- ----------------------------------------------------------------------------
@@ -633,15 +641,19 @@ local tKnowCPs =
 -- parameters for the application
 -- if modified and the application is running then call refresh settings
 --
--- Hint: it's a wise choice to select the loupe's font name the same as per "TextFont".
 -- Note: memory garbage collection set to Generational won't release much memory.
--- Note: memory is forced to be fully recollected upon a file read.
+--       Memory is forced to be fully recollected upon a file read.
+-- Hint: it's a wise choice to select the loupe's font name the same as per "TextFont".
+-- Hint: Symbola_Hinted.ttf is the most complete and correct font of all, covers Music
+--       and many obscure blocks. It does lack the external leading hint.
+-- Hint: Unifont Upper though being harsh contains the Sutton SignWriting block.
 --
 local tSetupInf =
 {
 	-- importing the file
 	--
-	["InFile"]		= "testfiles\\__Test_1.txt",		-- import file name
+--	["InFile"]		= "testfiles\\__Test_xx.txt",		-- import file name
+	["InFile"]		= "docs\\Punctuation.txt",		-- import file name
 	["ReadMode"]	= "r",								-- r/rb
 	["AutoLoad"]	= true,								-- load at startup time
 	["Codepage"]  	= tKnowCPs[1],						-- desired encoding
@@ -666,9 +678,9 @@ local tSetupInf =
 	-- display
 	--
 	["ByteFont"]	= {12, tPreferFont[7]},				-- left display (codes)
-	["TextFont"]	= {19, tPreferFont[47]},			-- right display (text)
+	["TextFont"]	= {19, tPreferFont[54]},			-- right display (text)
 	["FontStep"]	= 1,								-- note: wxFont ignores decimals
-	["Columns"]		= 16,								-- format number of columns
+	["Columns"]		= 16,								-- number of columns in left pane
 	["Interleave"]	= true,								-- highlight even columns
 	["WheelMult"]	= 10,								-- override o.s. mouse wheel's scroll
 	["Format"]		= "Hex",							-- Oct/Dec/Hex
@@ -680,15 +692,15 @@ local tSetupInf =
 
 	-- edit
 	--
-	["CopyOption"]	= "Select",							-- Byte/UTF_8/Word/Line/Select
+	["CopyOption"]	= "Word",							-- Byte/UTF_8/Word/Line/Select
 --	["PasteOption"] = "Discard",						-- (ignored) handling of errors - Discard/Convert/Plain
 --	["SelectOption"]= "Free",							-- (ignored) selection mode - Line/Free
 
 	-- magnify
 	--
-	["Loupe"]		= {200, tPreferFont[47]},			-- font for the magnifying window
+	["Loupe"]		= {200, tPreferFont[54]},			-- font for the magnifying window
 	["UseNames"]	= "Docs\\NamesList.txt",			-- names' file (comment line to disable)
-	
+
 	-- extra
 	--
 	["TimeDisplay"]	= 10,								-- seconds of message in status bar
