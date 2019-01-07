@@ -10,7 +10,7 @@ local palette	= require "wxPalette"	-- common colours definition in wxWidgets
 
 local _floor	= math.floor
 local _format	= string.format
-local _utf8lup	= string.utf8lup
+local _utf8lkp	= string.utf8lkp
 local _insert	= table.insert
 
 -- ----------------------------------------------------------------------------
@@ -60,7 +60,7 @@ local function _checkUTF_8(inText)
 
 	-- get the scrutiny row using the first byte
 	--
-	local tUtf8Row = _utf8lup(iByte)
+	local tUtf8Row = _utf8lkp(iByte)
 
 	if not tUtf8Row then return "UTF8 row no found"	end
 
@@ -170,7 +170,11 @@ local function _uni2bytes(inText)
 	--
 	if not iSumUp then return sValue end
 
-	if 0x07d0 > iSumUp then
+	if 0x0080 > iSumUp then
+		
+		sValue = _format("%02x", iSumUp)
+
+	elseif 0x07d0 > iSumUp then
 
 		-- c2-df block (2 bytes)
 		------------------------
@@ -188,6 +192,8 @@ local function _uni2bytes(inText)
 		iByte4 = 0x80	+ (tBytes[4] % 0x10) 		+ 0x10 * (tBytes[3] % 0x04)
 		iByte3 = 0x80	+ _floor(tBytes[3] / 0x04) 	+ 0x04 * (tBytes[2] % 0x10)
 		iByte2 = 0xe0	+ tBytes[1]
+		
+		if 0x00 == tBytes[1] then iByte3 = iByte3 + 1 end		-- correct the start
 
 		sValue = _format("%02x %02x %02x", iByte2, iByte3, iByte4)
 
@@ -222,7 +228,11 @@ local function _bytes2uni(inText)
 	if 4 == #tBytes then
 		iRefUTF8 = ((tBytes[1] - 0xf0) * 0x40000) + ((tBytes[2] - 0x80) * 0x1000) + ((tBytes[3] - 0x80) * 0x40) + (tBytes[4] - 0x80)
 	elseif 3 == #tBytes then
-		iRefUTF8 = ((tBytes[1] - 0xe0) * 0x1000) + ((tBytes[2] - 0x80) * 0x40) + (tBytes[3] - 0x80)
+		if 0xe0 == tBytes[1] then
+			iRefUTF8 = ((tBytes[1] - 0xe0) * 0x1000) + ((tBytes[2] - 0x81) * 0x40) + (tBytes[3] - 0x80)
+		else
+			iRefUTF8 = ((tBytes[1] - 0xe0) * 0x1000) + ((tBytes[2] - 0x80) * 0x40) + (tBytes[3] - 0x80)
+		end
 	elseif 2 == #tBytes then
 		iRefUTF8 = ((tBytes[1] - 0xc0) * 0x40) + (tBytes[2] - 0x80)
 	else
@@ -428,7 +438,7 @@ local function CreateWindow(inApp, inParent, inConfig)
 	--
     local edUnico, edBytes, ckSeqnc, txMsg
 
-    wx.wxStaticText(frame, wx.wxID_ANY, "Unicode Value:  U+",
+    wx.wxStaticText(frame, wx.wxID_ANY, "Unicode Value: U+",
 					wx.wxPoint(10, 40), wx.wxSize(200, 50))
 
     edUnico = wx.wxTextCtrl(frame, wx.wxID_ANY, "",
@@ -468,7 +478,7 @@ local function CreateWindow(inApp, inParent, inConfig)
 
 	-- assign colours and font
 	--
-	local fnText = wx.wxFont(-1 * 17.5, wx.wxFONTFAMILY_SWISS, wx.wxFONTFLAG_ANTIALIASED,
+	local fnText = wx.wxFont(-17, wx.wxFONTFAMILY_SWISS, wx.wxFONTFLAG_ANTIALIASED,
 							 wx.wxFONTWEIGHT_LIGHT, false, "Lucida Sans Unicode")
 
 	SetupColour(m_clrBack, m_clrFore, m_clrExtra, fnText)
