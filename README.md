@@ -2,7 +2,7 @@
 
 ## 0.0.8 (04-Jan-2019)
 
-**wxEncode** is a simple **Lua** application to view a text file with the option 
+**wxEncode** is a short **Lua** application to view a text file with the option 
 of encoding the file from some codepage to UTF8.  
 
 It displays 2 panes:  
@@ -33,6 +33,7 @@ expected in any editor:
 * +/- or CTRL + Mouse Wheel to increase/decrese the font for the current pane.  
 * Mouse Wheel to scroll to bottom/to top a number of lines at 1 time.
 * Left Click for selecting the cursor's position, or start/end of seletion.
+* TAB to cycle the active pane
 
 **Note** that the cursor movement is bound to UTF8 bytes sequence, so that selecting 
 a byte which is not the start of the sequence will fall automatically to the start.  
@@ -92,6 +93,7 @@ codepages there's a menu option to output the list to the trace file.
 
 Set/Change the codepage in the configuration file and then call the transcoder.  
 If testing the actual codepage (when unknown) the cycle of operation would be:  
+
 1. Import the file with some codepage set  
 2. Test the transcode and terminate if happy with it, or  
 3. Change codepage and refresh settings or re-import the file.  
@@ -99,19 +101,34 @@ If testing the actual codepage (when unknown) the cycle of operation would be:
 The sub-folder **transcode** implements the codepage to UTF8 conversion and can 
 be used from the command line in a stand-alone mode or included in another project. 
 
+## Auxiliary punctuation folder
+
+In the project's sub-folder **punctuation** there's a driver for extracting the 
+code-points that are marked as punctuation in the Unicode's NameList.txt file. 
+An auxiliary function translates the UTF8 codes to Lua' syntax and the result 
+(very long) string can be embedded in a project or loaded dynamically with the 
+'dofile' statement. An example of operation is in the 'test.lua' file.  
+An example of usage is in **extrastr.lua** file, where both the methods are shown.  
+Running the driver will produce 2 files: 
+
+1. docs\Punctuation.txt (see screenshot below)
+2. punctuation\unipunct.lua
+
+![Punctuation screenshot](/docs/Screenshot_4.png)
+
 ## wxWidgets and Lua installation
 
 Only the steps for installation on Windows will be listed. although it shall 
 run on Linux and MacOs too.  
 
-1. Download wxWidgets 2.8.12.3 (Unicode) for Lua, **wxLua 5.20**. [wxLua web site](https://wxlua.sourceforge.net/)
+1. Download wxWidgets 2.8.12.3 (Windows Unicode) for Lua, **wxLua 5.20**. [wxLua web site](https://wxlua.sourceforge.net/)
 2. Download Lua 5.2.2 [Lua web site](https://www.lua.org/) 
 3. Extract wxLua to a directory of choice (something like. c:\wxLua520).  
 4. Open the Windows' control panel and the Advanced System Settings.  
-5. Open the Environment Variable editor.
+5. Open the Environment Variables editor.
 6. Create an entry for the User with the following line: 
-LUA_CPATH=c:\wxLua520\bin\?.dll
-.7 Add c:\wxLua520\bin to the System's PATH variable:
+	LUA_CPATH=c:\wxLua520\bin\?.dll 
+7. Add c:\wxLua520\bin to the System's PATH variable:
 
 ![Windows Environment](/docs/Screenshot_3.png)
 
@@ -122,9 +139,24 @@ has been installed and then run it with the command:
 
 As an alternative, the user can download and install **ZeroBrane Studio**, set 
 the current project directory to the wxEncode folder, select the Lua interpreter 
-version for the project to be 5.2 and simply launch via the 'Run' menu command.  
+version for the project to be 5.2 and simply launch via the 'Run' menu command. 
+Before launch right click on **appMain.lua** that can be found on the project's 
+file list and select "Set As Start File".  
 
-ZeroBrane can be found at [ZeroBrane web site](https://studio.zerobrane.com/)
+ZeroBrane can be found at [ZeroBrane web site](https://studio.zerobrane.com/)  
+
+##Issues
+
+1. Running the application from the Command Prompt and running the application from 
+ZeroBrane will display a noticeable difference, in fact from ZeroBrane the application 
+looks a lot nicer.
+
+2. Drawing is not that fast.
+
+##Updates
+
+The list of modificationcs is here:  
+[List of changes](Changes.md)
 
 ## Author
 
