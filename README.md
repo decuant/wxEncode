@@ -145,7 +145,7 @@ file list and select "Set As Start File".
 
 ZeroBrane can be found at [ZeroBrane web site](https://studio.zerobrane.com/)  
 
-##Issues
+## Issues
 
 1. Running the application from the Command Prompt and running the application from 
 ZeroBrane will display a noticeable difference, in fact from ZeroBrane the application 
@@ -153,7 +153,7 @@ looks a lot nicer.
 
 2. Drawing is not that fast.
 
-##Updates
+## Updates
 
 The list of modificationcs is here:  
 [List of changes](Changes.md)
