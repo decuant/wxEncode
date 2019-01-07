@@ -89,7 +89,7 @@ local function _text2uni(inText)
 
 	local tBytes	= { }			-- split values
 	local iRefUTF8	= -1
-	
+
 	for i=1, inText:len() do
 		tBytes[i] = inText:byte(i)
 	end
@@ -99,7 +99,11 @@ local function _text2uni(inText)
 	if 4 == #tBytes then
 		iRefUTF8 = ((tBytes[1] - 0xf0) * 0x40000) + ((tBytes[2] - 0x80) * 0x1000) + ((tBytes[3] - 0x80) * 0x40) + (tBytes[4] - 0x80)
 	elseif 3 == #tBytes then
-		iRefUTF8 = ((tBytes[1] - 0xe0) * 0x1000) + ((tBytes[2] - 0x80) * 0x40) + (tBytes[3] - 0x80)
+		if 0xe0 == tBytes[1] then
+			iRefUTF8 = ((tBytes[1] - 0xe0) * 0x1000) + ((tBytes[2] - 0x81) * 0x40) + (tBytes[3] - 0x80)
+		else
+			iRefUTF8 = ((tBytes[1] - 0xe0) * 0x1000) + ((tBytes[2] - 0x80) * 0x40) + (tBytes[3] - 0x80)
+		end
 	else -- if 2 == #tBytes then
 		iRefUTF8 = ((tBytes[1] - 0xc0) * 0x40) + (tBytes[2] - 0x80)
 	end
@@ -160,7 +164,7 @@ local function DrawChar(inDrawDC)
 		local iOffsetY = iTop + iHeight - iExtent
 		inDrawDC:DrawLine(iLeft, iOffsetY, iLeft + iWidth, iOffsetY)
 	end
-	
+
 	-- switch font
 	--
 	inDrawDC:SetFont(m_Frame.fnText)
@@ -193,25 +197,25 @@ local function DrawChar(inDrawDC)
 	local iPosY	= iTop  + iHeight + 25					-- align to bounding box bottom
 
 	inDrawDC:DrawText(sText, iPosX, iPosY)
-	
+
 	-- corresponding Unicode value (16 bits)
 	--
 	sText = m_Frame.sUnicode
 	iExtX = inDrawDC:GetTextExtent(sText)
 	iPosX = iLeft + iWidth / 2 - iExtX / 2
 	iPosY = iPosY + iExtY
-	
-	inDrawDC:DrawText(sText, iPosX, iPosY)	
-	
+
+	inDrawDC:DrawText(sText, iPosX, iPosY)
+
 	-- if got a Unicode's description then write it
 	-- (break at 'WITH' word to span on 2 lines, note
 	-- that Unicode's descriptions are uppercase)
 	--
 	if 0 < m_Frame.sDescription:len() then
-		
+
 		local sLine1, sLine2
 		local iStart, iEnd = m_Frame.sDescription:find("WITH")
-		
+
 		if iStart then
 			sLine1 = m_Frame.sDescription:sub(1, iStart - 1)
 			sLine2 = m_Frame.sDescription:sub(iEnd + 1)
@@ -219,20 +223,20 @@ local function DrawChar(inDrawDC)
 			sLine1 = m_Frame.sDescription
 			sLine2 = ""
 		end
-		
+
 		if 0 < sLine1:len() then
 			iExtX = inDrawDC:GetTextExtent(sLine1)
 			iPosX = iLeft + iWidth / 2 - iExtX / 2
 			iPosY = iPosY + iExtY
-			
+
 			inDrawDC:DrawText(sLine1, iPosX, iPosY)
 		end
-		
+
 		if 0 < sLine2:len() then
 			iExtX = inDrawDC:GetTextExtent(sLine2)
 			iPosX = iLeft + iWidth / 2 - iExtX / 2
 			iPosY = iPosY + iExtY
-			
+
 			inDrawDC:DrawText(sLine2, iPosX, iPosY)
 		end
 	end
@@ -484,24 +488,24 @@ end
 -- check for a description in the name's file
 --
 local function GetDescription(inUnicode)
-	
+
 	-- sanity check
 	--
 	if 0 > inUnicode then return "" end
 	if not m_tNames.fhNames then return "" end
-	
+
 	-- get the seek position
 	--
 	local iSeekPos	= SeekPosLookup(inUnicode)
 	local sText		= ""
-	
+
 	if -1 < iSeekPos then
-		
+
 		m_tNames.fhNames:seek("set", iSeekPos)		-- seek pos
 		sText = m_tNames.fhNames:read("*l")			-- read line
 		sText = sText:sub(sText:find("\t") + 1)		-- extract description
 	end
-	
+
 	return sText
 end
 
@@ -516,15 +520,15 @@ local function SetData(inBytes)
 		m_Frame.sData = inBytes or ""
 		m_Frame.sUnicode 	 = ""
 		m_Frame.sDescription = ""
-		
+
 		if 0 < m_Frame.sData:len() then
-			
+
 			local iUnicode = _text2uni(inBytes)
-			
+
 			m_Frame.sUnicode	 = _format("U+%04X", iUnicode)
 			m_Frame.sDescription = GetDescription(iUnicode)
 		end
-		
+
 		Refresh()
 	end
 end
@@ -542,13 +546,13 @@ local function SetNamesFile(inFilename)
 	m_tNames.sNamesFile	= inFilename
 	m_tNames.fhNames	= nil			-- reset
 	m_tNames.tFileCache = { }
-	
+
 	-- sanity check
 	--
 	if not inFilename then return end
 	local fhSrc = io.open(inFilename, "r")
 	if not fhSrc then return end
-	
+
 	-- read all lines (with newline)
 	--
 	local tLines = { }
@@ -556,24 +560,24 @@ local function SetNamesFile(inFilename)
 	local iSeek  = 0
 	local iStart, iEnd
 	local iUnicode
-	
+
 	wx.wxBeginBusyCursor()
-	
+
 	local sLine = fhSrc:read("*L")			-- note that we must read all the line
 
 	while sLine do
-		
+
 		iStart = _find(sLine, "\t")
-		
+
 		if iStart and 1 < iStart then
-			
+
 			iUnicode = tonumber(sLine:sub(1, iStart - 1), 16)
 			if iUnicode then
-				
+
 				tCurr[1] = iUnicode					-- Unicode value
 				tCurr[2] = iSeek					-- seek position
 				tLines[#tLines + 1] = tCurr			-- add row to lookup
-				
+
 				tCurr = {0, 0}						-- make new row
 			end
 		end
