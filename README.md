@@ -105,7 +105,7 @@ be used from the command line in a stand-alone mode or included in another proje
 
 In the project's sub-folder **punctuation** there's a driver for extracting the 
 code-points that are marked as punctuation in the Unicode's NameList.txt file. 
-An auxiliary function translates the UTF8 codes to Lua' syntax and the result 
+An auxiliary function translates the UTF8 codes to Lua' syntax and the resulting 
 (very long) string can be embedded in a project or loaded dynamically with the 
 'dofile' statement. An example of operation is in the 'test.lua' file.  
 An example of usage is in **extrastr.lua** file, where both the methods are shown.  
