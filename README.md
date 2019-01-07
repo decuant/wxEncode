@@ -121,7 +121,7 @@ Running the driver will produce 2 files:
 Only the steps for installation on Windows will be listed. although it shall 
 run on Linux and MacOs too.  
 
-1. Download wxWidgets 2.8.12.3 (Windows Unicode) for Lua, **wxLua 5.20**. [wxLua web site](https://wxlua.sourceforge.net/)
+1. Download wxWidgets 2.8.12.3 (Windows Unicode) for Lua, **wxLua 5.20**. [wxLua web site](https://sourceforge.net/projects/wxlua/files/wxlua/2.8.12.3)
 2. Download Lua 5.2.2 [Lua web site](https://www.lua.org/) 
 3. Extract wxLua to a directory of choice (something like. c:\wxLua520).  
 4. Open the Windows' control panel and the Advanced System Settings.  
