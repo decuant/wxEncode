@@ -13,4 +13,6 @@
 8. extrastr.lua  - added str_ispunct_u and Unicode's punctuation list
 9. unipunct.lua  - added to the project
 10. docs/punctuations.txt   - added to the project's documentation
+11. extrastr.lua - added iterator to extract UTF_8 characters from a line of text 
+
 
