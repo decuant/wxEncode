@@ -44,6 +44,7 @@ on both the physical file and the choosen number of columns. By default the
 application is shipped with 16 columns for the left pane, but it can be set to 
 any number depending on the user's preference and monitor's size.
 
+
 ## Features
 
 * Check the file for valid UTF8 encoding.  
@@ -84,6 +85,7 @@ the Loupe and the current cursor position.
 2. overwrite: will write the buffer to the same filename as input;
 3. save as: will open a file dialog to manually choose a filename.
 
+
 ## Codepage conversion
 
 At the time of writing this document, the experimental auto-detection of the 
@@ -101,6 +103,7 @@ If testing the actual codepage (when unknown) the cycle of operation would be:
 The sub-folder **transcode** implements the codepage to UTF8 conversion and can 
 be used from the command line in a stand-alone mode or included in another project. 
 
+
 ## Auxiliary punctuation folder
 
 In the project's sub-folder **punctuation** there's a driver for extracting the 
@@ -115,6 +118,26 @@ Running the driver will produce 2 files:
 2. punctuation\unipunct.lua
 
 ![Punctuation screenshot](/docs/Screenshot_4.png)
+
+
+## Lua Functions in extrastr.lua
+
+Note that an UTF8's character length spans from 1 to 4 bytes:
+
+1. str_lkp_utf_8			test UTF8 sequence against ABNF from RFC 3629
+2. str_len_utf_8			get the length of a single UTF8 character
+3. str_sub_utf_8			extract a UTF8 character from a buffer
+4. str_iter_utf_8_char		iterator for extracting UTF8 chars from buffer
+5. str_ispunct_u			test if a given UTF8 character is punctuation
+
+All these functions will get installed in the string's library and thus can be accessed via 
+calls like:  
+
+string.str_sub_utf_8(inBytes, inStart)    or  
+inBytes:str_sub_utf_8(inStart)  
+
+See the bottom of **extrastr.lua** for the aliases ussed when these functions are installed.  
+
 
 ## wxWidgets and Lua installation
 
@@ -145,6 +168,7 @@ file list and select "Set As Start File".
 
 ZeroBrane can be found at [ZeroBrane web site](https://studio.zerobrane.com/)  
 
+
 ## Issues
 
 1. Running the application from the Command Prompt and running the application from 
@@ -153,14 +177,17 @@ looks a lot nicer.
 
 2. Drawing is not that fast.
 
+
 ## Updates
 
 The list of modificationcs is here:  
 [List of changes](Changes.md)
 
+
 ## Author
 
 The autor can be reached at decuant@gmail.com
+
 
 ## License
 
