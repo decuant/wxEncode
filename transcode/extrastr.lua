@@ -167,7 +167,7 @@ end
 -- return length of UTF_8 character (1 to 4)
 -- on error return 0
 --
-local function str_len_utf8(inBytes, inStart)
+local function str_len_utf_8(inBytes, inStart)
 
 	if 1 > inStart or #inBytes < inStart then return 0 end
 	local chByte = inBytes:byte(inStart, inStart)
@@ -249,6 +249,33 @@ local function str_sub_utf_8(inBytes, inStart)
 	return inBytes:sub(inStart, inStart + iChkLen), (iChkLen + 1)
 end
 
+-- ----------------------------------------------------------------------------
+-- iterator for UTF_8 characters in a line of text
+--
+local function str_iter_utf_8_char(inText)
+	
+	local iCurr	 = 1
+	local bError = false
+	
+	return function ()
+		
+		local sUtf8, iULen = inText:utf8sub(iCurr)
+		
+		-- adjust the current position
+		--
+		if - 1 == iULen then 
+			iCurr  = iCurr + 1
+			bError = true
+		else 
+			iCurr  = iCurr + iULen
+			bError = false
+		end
+		
+		if -1 == iULen and 0 == sUtf8:len() then sUtf8 = nil end
+			
+		return sUtf8, bError		
+	end
+end
 
 -- ----------------------------------------------------------------------------
 -- Unicode's punctuation characters
@@ -549,13 +576,15 @@ if not string.trim     then string.trim    = str_trim		end
 if not string.endwipe  then string.endwipe = str_endwipe	end
 if not string.cap1st   then string.cap1st  = str_cap1st		end
 if not string.fmtfind  then string.fmtfind = str_fmtfind	end
-if not string.utf8lkp  then string.utf8lkp = str_lkp_utf_8	end
-if not string.utf8sub  then string.utf8sub = str_sub_utf_8	end
-if not string.utf8len  then string.utf8len = str_len_utf8	end
-if not string.a_punct  then string.a_punct = str_ispunct_a	end
-if not string.u_punct  then string.u_punct = str_ispunct_u	end
 if not string.wordsub  then string.wordsub = str_wordsub	end
 if not string.fmtkilo  then string.fmtkilo = str_fmtkilo	end
+if not string.a_punct  then string.a_punct = str_ispunct_a	end
+
+if not string.utf8lkp  then string.utf8lkp = str_lkp_utf_8	end
+if not string.utf8sub  then string.utf8sub = str_sub_utf_8	end
+if not string.utf8len  then string.utf8len = str_len_utf_8	end
+if not string.u_punct  then string.u_punct = str_ispunct_u	end
+if not string.i_Uchar  then string.i_Uchar = str_iter_utf_8_char end
 
 -- ----------------------------------------------------------------------------
 -- ----------------------------------------------------------------------------
