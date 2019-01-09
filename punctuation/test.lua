@@ -21,42 +21,25 @@ local function ExtractPunctuation(inFilename)
 	local fhSrc = io.open(inFilename, "r")
 	if not fhSrc then return -1 end
 	
-	local sUtf8
-	local iCurr
-	local iULen
-	local iLength
 	local tOutput = { }
 	local sLine   = fhSrc:read("*l")
 	
 	while sLine do
-
-		iCurr = 1
-		iLength = sLine:len() + 1
 		
-		if 1 < iLength then
+		trace.line(sLine)
 		
-			trace.line(sLine)
-			while iCurr < iLength do
-				
-				sUtf8, iULen = sLine:utf8sub(iCurr)	
-				if 0 > iULen then
+		for sUtf8, bError in sLine:i_Uchar() do
+			
+			if bError then 
+				trace.line(_format("Invalid UTF8 char: [0x%02x]", sUtf8:byte(1, 1)))
+			else
+				-- valid character
+				--
+				if sUtf8:u_punct() then 
 					
-					trace.line("Not a valid UTF8 character")
-					
-					iCurr = iCurr + 1
-				else
-					if sUtf8:u_punct() then
-						
-						-- avoid printing spaces, it's only a test ...
-						--
---						if " " ~= sUtf8 then tOutput[#tOutput + 1] = sUtf8 end
-						tOutput[#tOutput + 1] = sUtf8
-					end
-
-					iCurr = iCurr + iULen
+					tOutput[#tOutput + 1] = sUtf8
 				end
-				
-			end
+			end				
 		end
 		
 		-- flush result
@@ -109,58 +92,41 @@ local function OccurrenceOf(inFilename, inDictFile)
 	-- ----------------------------
 	-- scan the file
 	--
-	local sUtf8
-	local iCurr
-	local iULen
-	local iLength
 	local tWord = { }				-- current word
 	local sLine = fhSrc:read("*l")
 	
 	while sLine do
-
-		iCurr = 1
-		iLength = sLine:len() + 1
-		
-		if 1 < iLength then
-
-			while iCurr < iLength do
-				
-				sUtf8, iULen = sLine:utf8sub(iCurr)	
-				if 0 > iULen then
-					
-					trace.line("Not a valid UTF8 character")
-					
-					iCurr = iCurr + 1
-				else
-					-- valid character
-					--
-					if sUtf8:u_punct() then 
-						
-						if 0 < #tWord then						
-							
-							AddToDictionary(_concat(tWord))							
-							tWord = { }
-						end
-					else
-						
-						-- add character to word
-						--
-						tWord[#tWord + 1] = sUtf8
-					end
-
-					iCurr = iCurr + iULen
-				end
-				
-			end
 			
-			-- reached the end of line
-			--
-			if 0 < #tWord then						
-				
-				AddToDictionary(_concat(tWord))							
-				tWord = { }
-			end						
+		for sUtf8, bError in sLine:i_Uchar() do
+			
+			if bError then 
+				trace.line(_format("Invalid UTF8 char: [0x%02x]", sUtf8:byte(1, 1)))
+			else
+				-- valid character
+				--
+				if sUtf8:u_punct() then 
+					
+					if 0 < #tWord then						
+						
+						AddToDictionary(_concat(tWord))							
+						tWord = { }
+					end
+				else
+					
+					-- add character to word
+					--
+					tWord[#tWord + 1] = sUtf8
+				end
+			end				
 		end
+
+		-- reached the end of line
+		--
+		if 0 < #tWord then						
+			
+			AddToDictionary(_concat(tWord))							
+			tWord = { }
+		end						
 
 		sLine = fhSrc:read("*l")
 	end
