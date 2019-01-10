@@ -124,19 +124,32 @@ Running the driver will produce 2 files:
 
 Note that an UTF8's character length spans from 1 to 4 bytes:
 
-1. str_lkp_utf_8			test UTF8 sequence against ABNF from RFC 3629
-2. str_len_utf_8			get the length of a single UTF8 character
-3. str_sub_utf_8			extract a UTF8 character from a buffer
-4. str_iter_utf_8_char		iterator for extracting UTF8 chars from buffer
-5. str_ispunct_u			test if a given UTF8 character is punctuation
+1. str_lkp_utf_8		test UTF8 sequence against ABNF from RFC 3629
+2. str_len_utf_8		get the length of a single UTF8 character
+3. str_sub_utf_8		extract a UTF8 character from a buffer
+4. str_iter_utf_8_char	iterator for extracting UTF8 chars from buffer
+5. str_ispunct_u		test if a given UTF8 character is punctuation
 
-All these functions will get installed in the string's library and thus can be accessed via 
-calls like:  
+All these functions will get installed in the string's library:
 
-string.str_sub_utf_8(inBytes, inStart)    or  
-inBytes:str_sub_utf_8(inStart)  
+1. str_sub_utf_8        becomes  string.utf8sub
+2. str_iter_utf_8_char  becomes  string.i_Uchar  
 
-See the bottom of **extrastr.lua** for the aliases ussed when these functions are installed.  
+These then can be used as per the Lua' syntax, thus used as:
+
+```
+
+local myString  = <some utf8 encoded text>  
+local myUtf8Char  
+   
+myUtf8Char = myString:utf8sub()  
+if myUtf8Char:u_punct() then  
+    print("punctuation find")    
+end
+
+```
+
+**Note**: the punctuation code-points defined by Unicode are more than 700.  
 
 
 ## wxWidgets and Lua installation
