@@ -58,6 +58,67 @@ local function ExtractPunctuation(inFilename)
 end
 
 -- ----------------------------------------------------------------------------
+-- iterator for UTF_8 words in a line of text
+--
+local function i_Uword(inText)
+	
+	local tWord  	= { }				-- current word
+	local tWordLst  = { }				-- current list
+	local sText  	= inText
+	local iRetIndex = 0
+	
+	return function ()
+		
+		if 0 == iRetIndex then
+			for sUtf8, bError in inText:i_Uchar() do
+				
+				if bError then
+					
+					-- save good
+					--
+					if 0 < #tWord then
+						tWordLst[#tWordLst + 1] = {_concat(tWord), false}
+					end
+					
+					-- save bad
+					--
+					tWordLst[#tWordLst + 1] = {sUtf8, true}
+					
+					tWord = { }
+				else
+					
+					-- valid character
+					--
+					if sUtf8:u_punct() then 
+						
+						if 0 < #tWord then						
+							
+							tWordLst[#tWordLst + 1] = {_concat(tWord), false}
+							tWord = { }
+						end
+						
+					else
+						
+						-- add character to word
+						--
+						tWord[#tWord + 1] = sUtf8
+					end
+				end				
+			end
+		end
+	
+		iRetIndex = iRetIndex + 1
+		if iRetIndex <= #tWordLst then
+			return tWordLst[iRetIndex][1], tWordLst[iRetIndex][2]
+		end
+		
+		return nil, true
+	end
+end
+
+if not string.i_Uword  then string.i_Uword = i_Uword end
+
+-- ----------------------------------------------------------------------------
 -- from a Smalltalk/V examples
 --
 local function OccurrenceOf(inFilename, inDictFile)
@@ -92,41 +153,20 @@ local function OccurrenceOf(inFilename, inDictFile)
 	-- ----------------------------
 	-- scan the file
 	--
-	local tWord = { }				-- current word
 	local sLine = fhSrc:read("*l")
 	
 	while sLine do
 			
-		for sUtf8, bError in sLine:i_Uchar() do
+		for sWord, bError in sLine:i_Uword() do
 			
 			if bError then 
-				trace.line(_format("Invalid UTF8 char: [0x%02x]", sUtf8:byte(1, 1)))
+				trace.line(_format("Invalid UTF8 char: [0x%02x]", sWord:byte(1, 1)))
 			else
-				-- valid character
+				-- valid word
 				--
-				if sUtf8:u_punct() then 
-					
-					if 0 < #tWord then						
-						
-						AddToDictionary(_concat(tWord))							
-						tWord = { }
-					end
-				else
-					
-					-- add character to word
-					--
-					tWord[#tWord + 1] = sUtf8
-				end
+				AddToDictionary(sWord)
 			end				
 		end
-
-		-- reached the end of line
-		--
-		if 0 < #tWord then						
-			
-			AddToDictionary(_concat(tWord))							
-			tWord = { }
-		end						
 
 		sLine = fhSrc:read("*l")
 	end
@@ -163,7 +203,7 @@ local function TestPunctuation(inFilename, inDictionary)
 	
 	trace.lnTimeStart(_format("\n\nTesting File [%s]\n\n", inFilename))
 	
-	ExtractPunctuation(inFilename)
+--	ExtractPunctuation(inFilename)
 	OccurrenceOf(inFilename, inDictionary)
 	
 	trace.lnTimeEnd("**** TEST END *****")
@@ -175,7 +215,7 @@ end
 	--
 io.output(".\\Testing.log")
 	
-TestPunctuation("test\\ASCII.txt",   "test\\Dict_ASCII.txt")
+-- TestPunctuation("test\\ASCII.txt",   "test\\Dict_ASCII.txt")
 TestPunctuation("test\\Unicode.txt", "test\\Dict_Unicode.txt")
 
 io.output():close()
