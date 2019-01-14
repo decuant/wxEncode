@@ -70,6 +70,7 @@ local function i_Uword(inText)
 	return function ()
 		
 		if 0 == iRetIndex then
+
 			for sUtf8, bError in inText:i_Uchar() do
 				
 				if bError then
@@ -105,6 +106,13 @@ local function i_Uword(inText)
 					end
 				end				
 			end
+
+			-- end of buffer
+			--
+			if 0 < #tWord then
+				tWordLst[#tWordLst + 1] = {_concat(tWord), false}
+			end
+
 		end
 	
 		iRetIndex = iRetIndex + 1
