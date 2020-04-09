@@ -163,7 +163,7 @@ run on Linux and MacOs too.
 4. Open the Windows' control panel and the Advanced System Settings.  
 5. Open the Environment Variables editor.
 6. Create an entry for the User with the following line: 
-	LUA_CPATH=c:\wxLua520\bin\?.dll 
+	```LUA_CPATH=c:\wxLua520\bin\?.dll ```
 7. Add c:\wxLua520\bin to the System's PATH variable:
 
 ![Windows Environment](/docs/Screenshot_3.png)
